@@ -594,34 +594,40 @@ document.getElementById('ftabs').addEventListener('click',e=>{
   tab.classList.add('on');curFilter=tab.dataset.f;renderSidebar();
 });
 
-// ── INIT ──────────────────────────────────────
-setSS('busy','Loading...');
-renderAll(); // render immediately so calendar shows
-startCountdown();
-loadFromBin().then(()=>{startPolling();setSS('ok');}).catch(()=>{setSS('err');});
-
 // ── COUNTDOWN ─────────────────────────────────
-(function(){
-  const target = new Date('2026-07-22T00:00:00-05:00'); // CDT
+function startCountdown(){
+  const target = new Date('2026-07-22T06:00:00-05:00');
   function tick(){
     const now = new Date();
     const diff = target - now;
+    const units = document.getElementById('cdUnits');
+    if(!units) return;
     if(diff <= 0){
-      document.getElementById('cdUnits').innerHTML = '<span class="cd-done">🌊 WE'RE HERE!! 🐚</span>';
+      units.innerHTML = "<span class=\"cd-done\">🌊 WE\'RE HERE!! 🐚</span>";
       return;
     }
-    const d = Math.floor(diff/864e5);
-    const h = Math.floor((diff%864e5)/36e5);
-    const m = Math.floor((diff%36e5)/6e4);
-    const s = Math.floor((diff%6e4)/1e3);
-    document.getElementById('cdDays').textContent = String(d).padStart(2,'0');
-    document.getElementById('cdHrs').textContent  = String(h).padStart(2,'0');
-    document.getElementById('cdMins').textContent = String(m).padStart(2,'0');
-    document.getElementById('cdSecs').textContent = String(s).padStart(2,'0');
+    const dd = Math.floor(diff/864e5);
+    const hh = Math.floor((diff%864e5)/36e5);
+    const mm = Math.floor((diff%36e5)/6e4);
+    const ss = Math.floor((diff%6e4)/1e3);
+    const dEl=document.getElementById('cdDays');
+    const hEl=document.getElementById('cdHrs');
+    const mEl=document.getElementById('cdMins');
+    const sEl=document.getElementById('cdSecs');
+    if(dEl) dEl.textContent=String(dd).padStart(2,'0');
+    if(hEl) hEl.textContent=String(hh).padStart(2,'0');
+    if(mEl) mEl.textContent=String(mm).padStart(2,'0');
+    if(sEl) sEl.textContent=String(ss).padStart(2,'0');
   }
   tick();
-  setInterval(tick, 1000);
-})();
+  setInterval(tick,1000);
+}
+
+// ── INIT ──────────────────────────────────────
+setSS('busy','Loading...');
+renderAll();
+startCountdown();
+loadFromBin().then(()=>{startPolling();setSS('ok');}).catch(()=>{setSS('err');});
 
 </script>
 </body>
