@@ -45,7 +45,7 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
 .day-tab.on .dt-name{color:var(--ocean-d)}
 
 /* ── CALENDAR ── */
-.cal-view{flex:1;overflow-y:auto;padding:0}
+.cal-view{height:calc(100vh - 230px);overflow-y:auto;padding:0}
 .time-grid{display:grid;grid-template-columns:48px 1fr}
 .tlabel{font-size:9px;font-weight:700;color:var(--muted);text-align:right;padding-right:6px;height:52px;display:flex;align-items:flex-start;padding-top:4px;border-right:1px solid var(--border);background:var(--white)}
 .tslot{height:52px;border-bottom:1px solid var(--border);background:var(--sky-l);position:relative;cursor:pointer;transition:background .1s;-webkit-user-select:none;user-select:none}
@@ -596,7 +596,9 @@ document.getElementById('ftabs').addEventListener('click',e=>{
 
 // ── INIT ──────────────────────────────────────
 setSS('busy','Loading...');
-loadFromBin().then(()=>{renderAll();startPolling();setSS('ok');});
+renderAll(); // render immediately so calendar shows
+startCountdown();
+loadFromBin().then(()=>{startPolling();setSS('ok');}).catch(()=>{setSS('err');});
 
 // ── COUNTDOWN ─────────────────────────────────
 (function(){
