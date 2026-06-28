@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Port A Trip Lists 🌊</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --ocean:#1B7A8A; --teal:#4ABFB0; --mint:#D4F5EA; --coral:#E8816A;
+  --sand:#FAF3E0; --tan:#E8D5B0; --tan-d:#C4A882; --sky:#E0F4FA;
+  --text:#2C4A52; --muted:#6B9099; --border:#C5DDE3; --white:#fff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--sand);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+}
+
+/* HEADER */
+.page-header {
+  border-top: 5px solid var(--ocean);
+  padding-top: 16px;
+  margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  color: var(--ocean);
+  line-height: 1.1;
+}
+
+.page-header h1 span {
+  display: block;
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 4px;
+}
+
+.page-header .trip-info {
+  text-align: right;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.page-header .trip-info strong {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--ocean);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/* CONDO CALLOUT */
+.condo-card {
+  background: var(--ocean);
+  color: white;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.condo-card .icon { font-size: 26px; flex-shrink: 0; }
+.condo-card h3 { font-size: 12.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 3px; }
+.condo-card p { font-size: 11px; opacity: .9; line-height: 1.6; }
+.condo-card .warn { background: rgba(255,255,255,.18); border-radius: 6px; padding: 4px 10px; display: inline-block; font-size: 10.5px; font-weight: 700; margin-top: 5px; }
+
+/* GRID */
+.lists-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.lists-grid.wide {
+  grid-template-columns: 1fr;
+}
+
+/* LIST CARD */
+.list-card {
+  background: var(--white);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  break-inside: avoid;
+}
+
+.list-card-header {
+  padding: 10px 14px 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-card-header h2 {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.list-card-header .icon { font-size: 18px; }
+
+/* Header accent colors */
+.hc-ocean { background: var(--ocean); color: white; }
+.hc-teal { background: var(--teal); color: white; }
+.hc-coral { background: var(--coral); color: white; }
+.hc-turtle { background: #2D8A55; color: white; }
+.hc-sky { background: var(--sky); color: var(--ocean); border-bottom: 1.5px solid var(--border); }
+.hc-tan { background: var(--tan); color: var(--text); border-bottom: 1.5px solid var(--border); }
+
+/* SECTIONS within a card */
+.list-section {
+  padding: 8px 14px 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.list-section:last-child { border-bottom: none; padding-bottom: 10px; }
+
+.list-section h3 {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+  margin-top: 2px;
+}
+
+/* CHECKLIST ITEMS */
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 3px 0;
+  line-height: 1.4;
+}
+
+.check-item input[type="checkbox"] {
+  margin-top: 1px;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  accent-color: var(--teal);
+  cursor: pointer;
+}
+
+.check-item label {
+  font-size: 11.5px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.check-item label .note {
+  font-size: 10px;
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.check-item label strong { font-weight: 800; }
+.tip { font-size: 10px; color: var(--coral); font-weight: 700; margin: 3px 0 5px 20px; }
+
+/* BEACH FOOTER */
+.footer-bar {
+  margin-top: 28px;
+  position: relative;
+  height: 56px;
+  overflow: hidden;
+}
+
+.footer-bar .sand { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--sand) 0%, var(--tan) 60%, var(--tan-d) 100%); }
+.footer-bar svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 56px; }
+
+.print-note {
+  text-align: center;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 10px;
+  font-style: italic;
+}
+
+
+.top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.btn-clear{padding:7px 14px;border-radius:8px;border:1.5px solid var(--coral);background:white;color:var(--coral);font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .14s}
+.btn-clear:hover{background:var(--coral);color:white}
+.btn-back{padding:7px 14px;border-radius:8px;border:1.5px solid var(--teal);background:white;color:var(--teal);font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;text-decoration:none;transition:all .14s}
+.btn-back:hover{background:var(--teal);color:white}
+
+/* PRINT */
+@media print {
+  body { background: white; font-size: 11px; }
+  .page { padding: 12px 16px; }
+  .page-header h1 { font-size: 22px; }
+  .lists-grid { gap: 12px; }
+  .no-print { display: none; }
+  .list-card { break-inside: avoid; border: 1px solid #ccc; }
+  a { text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- TOP ACTIONS -->
+  <div class="top-actions">
+    <a class="btn-back" href="/">← Back to Planner</a>
+    <button class="btn-clear" onclick="clearAll()">↺ Clear all checks</button>
+    <span style="font-size:10px;color:var(--muted);font-style:italic">Checks save automatically to your device 🐚</span>
+  </div>
+  <!-- HEADER -->
+  <div class="page-header">
+    <h1>
+      <span>Port Aransas, Texas</span>
+      Trip Lists 🌊
+    </h1>
+    <div class="trip-info">
+      <strong>The Crew</strong>
+      Nicole · RJ · Tyler · Gracie · Lacey<br>
+      July 22–26, 2026 · 4 nights<br>
+      Unit 212, Executive Keys Condos
+    </div>
+  </div>
+
+  <!-- CONDO CALLOUT -->
+  <div class="condo-card">
+    <div class="icon">🏠</div>
+    <div>
+      <h3>Unit 212 — Executive Keys Condos, Port Aransas</h3>
+      <p>3rd floor · 1,100 sq ft · King bed + Double bed + Twin bunk w/ trundle · 2 private baths · Private balcony (Gulf + courtyard views) · Pool on property · Beach 5 min walk · Full kitchen · 4.83 ⭐</p>
+      <div class="warn">⚠ No elevator in Building 2 — pack smart for that 3rd floor haul!</div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="lists-grid">
+
+    <!-- 🛒 GROCERY LIST -->
+    <div class="list-card">
+      <div class="list-card-header hc-ocean">
+        <span class="icon">🛒</span>
+        <h2>Grocery List</h2>
+      </div>
+
+      <div class="list-section">
+        <h3>Breakfast (5 people × 4 mornings)</h3>
+        <div class="check-item"><input type="checkbox" id="g1"><label for="g1">Eggs <span class="note">(2 dozen)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g2"><label for="g2">Bacon or turkey sausage</label></div>
+        <div class="check-item"><input type="checkbox" id="g3"><label for="g3">Bread / English muffins</label></div>
+        <div class="check-item"><input type="checkbox" id="g4"><label for="g4">Butter</label></div>
+        <div class="check-item"><input type="checkbox" id="g5"><label for="g5">Coffee + creamer</label></div>
+        <div class="check-item"><input type="checkbox" id="g6"><label for="g6">OJ / drinks</label></div>
+        <div class="check-item"><input type="checkbox" id="g7"><label for="g7">Yogurt cups <span class="note">(easy grab)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g8"><label for="g8">Bananas, grapes, easy fruit</label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>Condo Dinners (burgers, tacos, protein bowls)</h3>
+        <div class="check-item"><input type="checkbox" id="g9"><label for="g9">Ground beef or burger patties <span class="note">(5–6)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g10"><label for="g10">Chicken thighs or shrimp <span class="note">(2 lbs)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g11"><label for="g11">Flour tortillas <span class="note">(taco size)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g12"><label for="g12">Shredded cheese, sour cream, salsa, guac</label></div>
+        <div class="check-item"><input type="checkbox" id="g13"><label for="g13">Instant rice or rice bag</label></div>
+        <div class="check-item"><input type="checkbox" id="g14"><label for="g14">Canned black beans</label></div>
+        <div class="check-item"><input type="checkbox" id="g15"><label for="g15">Burger buns + ketchup/mustard/mayo</label></div>
+        <div class="check-item"><input type="checkbox" id="g16"><label for="g16">Romaine / mixed greens</label></div>
+        <div class="check-item"><input type="checkbox" id="g17"><label for="g17">Tomatoes, red onion, jalapeño</label></div>
+        <div class="check-item"><input type="checkbox" id="g18"><label for="g18">Olive oil, salt, pepper, taco seasoning</label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>Lunches / Easy Meals</h3>
+        <div class="check-item"><input type="checkbox" id="g19"><label for="g19">Deli meat + sliced cheese</label></div>
+        <div class="check-item"><input type="checkbox" id="g20"><label for="g20">Good bread or wraps</label></div>
+        <div class="check-item"><input type="checkbox" id="g21"><label for="g21">Mayo, mustard, hot sauce</label></div>
+        <div class="check-item"><input type="checkbox" id="g22"><label for="g22">Chips + queso / salsa</label></div>
+        <div class="check-item"><input type="checkbox" id="g23"><label for="g23">Hummus + veggies / pita</label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>Snacks + Pool Supplies</h3>
+        <div class="check-item"><input type="checkbox" id="g24"><label for="g24">Protein bars</label></div>
+        <div class="check-item"><input type="checkbox" id="g25"><label for="g25">Popcorn + trail mix / nuts</label></div>
+        <div class="check-item"><input type="checkbox" id="g26"><label for="g26">Goldfish / crackers</label></div>
+        <div class="check-item"><input type="checkbox" id="g27"><label for="g27">Grapes, watermelon <span class="note">(pre-cut if possible)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g28"><label for="g28">Popsicles / ice cream bars 🍦</label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>Drinks</h3>
+        <div class="check-item"><input type="checkbox" id="g29"><label for="g29">LaCroix / sparkling water <span class="note">(bulk)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g30"><label for="g30">Gatorade / electrolyte packets</label></div>
+        <div class="check-item"><input type="checkbox" id="g31"><label for="g31">Beer / seltzers / wine</label></div>
+        <div class="check-item"><input type="checkbox" id="g32"><label for="g32">Water bottles for beach</label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>Misc / Condo Supplies</h3>
+        <div class="check-item"><input type="checkbox" id="g33"><label for="g33">Ziplock bags <span class="note">(multiple sizes)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g34"><label for="g34">Paper towels + trash bags</label></div>
+        <div class="check-item"><input type="checkbox" id="g35"><label for="g35">Dish soap + sponge</label></div>
+        <div class="check-item"><input type="checkbox" id="g36"><label for="g36">Aluminum foil + plastic wrap</label></div>
+        <div class="check-item"><input type="checkbox" id="g37"><label for="g37">Plastic cups + plates <span class="note">(if condo is sparse)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g38"><label for="g38">Coffee filters</label></div>
+      </div>
+    </div>
+
+    <!-- 🧴 PERSONAL PACKING -->
+    <div class="list-card">
+      <div class="list-card-header hc-teal">
+        <span class="icon">🧴</span>
+        <h2>Personal Packing</h2>
+      </div>
+
+      <div class="list-section">
+        <h3>Clothes <span style="font-size:9px;font-weight:600;color:var(--muted)">(4 nights — pack light, 3rd floor no elevator!)</span></h3>
+        <div class="check-item"><input type="checkbox" id="p1"><label for="p1">Swimsuits <span class="note">(2–3 — they don't dry fast in humidity)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p2"><label for="p2">Cover-ups <span class="note">(2)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p3"><label for="p3">Casual shorts + tops <span class="note">(3–4 outfits)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p4"><label for="p4">One nicer outfit <span class="note">(for Moby Dick's / dinner out)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p5"><label for="p5">Pajamas</label></div>
+        <div class="check-item"><input type="checkbox" id="p6"><label for="p6">Underwear <span class="note">(×6)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p7"><label for="p7">Sandals / flip flops</label></div>
+        <div class="check-item"><input type="checkbox" id="p8"><label for="p8">One pair sneakers / walking shoes</label></div>
+        <div class="check-item"><input type="checkbox" id="p9"><label for="p9"><strong>Water shoes</strong> <span class="note">(jetty rocks — non-negotiable!)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p10"><label for="p10">Light cardigan / hoodie <span class="note">(restaurant AC is arctic)</span></label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>Toiletries</h3>
+        <div class="check-item"><input type="checkbox" id="p11"><label for="p11"><strong>Reef-safe sunscreen</strong> <span class="note">(bring a lot — reapply every 90 min!)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p12"><label for="p12">After-sun aloe gel 🌿</label></div>
+        <div class="check-item"><input type="checkbox" id="p13"><label for="p13"><strong>Bug spray</strong> <span class="note">(DEET — near marshes it's real)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p14"><label for="p14">Shampoo / conditioner / body wash</label></div>
+        <div class="check-item"><input type="checkbox" id="p15"><label for="p15">Dry shampoo <span class="note">(humidity = hair enemy)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p16"><label for="p16">Face wash + skincare</label></div>
+        <div class="check-item"><input type="checkbox" id="p17"><label for="p17">Deodorant, razor, feminine products</label></div>
+        <div class="check-item"><input type="checkbox" id="p18"><label for="p18">Hair ties, clips</label></div>
+        <div class="check-item"><input type="checkbox" id="p19"><label for="p19">Nail stuff <span class="note">(beach mani touch-up 💅)</span></label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>Tech</h3>
+        <div class="check-item"><input type="checkbox" id="p20"><label for="p20">Phone charger + backup battery pack</label></div>
+        <div class="check-item"><input type="checkbox" id="p21"><label for="p21"><strong>Waterproof phone pouch / dry bag</strong></label></div>
+        <div class="check-item"><input type="checkbox" id="p22"><label for="p22">Earbuds</label></div>
+        <div class="check-item"><input type="checkbox" id="p23"><label for="p23">Camera / GoPro</label></div>
+        <div class="check-item"><input type="checkbox" id="p24"><label for="p24">Portable speaker</label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>Misc Personal</h3>
+        <div class="check-item"><input type="checkbox" id="p25"><label for="p25">Sunglasses + backup pair</label></div>
+        <div class="check-item"><input type="checkbox" id="p26"><label for="p26">Sun hat</label></div>
+        <div class="check-item"><input type="checkbox" id="p27"><label for="p27">Small crossbody bag for going out</label></div>
+        <div class="check-item"><input type="checkbox" id="p28"><label for="p28"><strong>Cash</strong> <span class="note">(Beer Hut is cash only!)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p29"><label for="p29">ID + cards in waterproof case</label></div>
+        <div class="check-item"><input type="checkbox" id="p30"><label for="p30">Any personal prescriptions</label></div>
+      </div>
+    </div>
+
+    <!-- 🏖️ BEACH GEAR -->
+    <div class="list-card">
+      <div class="list-card-header hc-sky">
+        <span class="icon">🏖️</span>
+        <h2>Beach &amp; Activity Gear</h2>
+      </div>
+
+      <div class="list-section">
+        <h3>Beach Essentials</h3>
+        <div class="check-item"><input type="checkbox" id="b1"><label for="b1">Beach towels <span class="note">(1–2 per person — condo may not have enough)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="b2"><label for="b2">Big beach tote bag</label></div>
+        <div class="check-item"><input type="checkbox" id="b3"><label for="b3"><strong>Cooler</strong> <span class="note">(hard or soft — you'll use it every single day)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="b4"><label for="b4">Ice packs or plan to buy ice</label></div>
+        <div class="check-item"><input type="checkbox" id="b5"><label for="b5">Reusable water bottles</label></div>
+        <div class="check-item"><input type="checkbox" id="b6"><label for="b6"><strong>Umbrella or pop-up shade tent</strong> <span class="note">(July Gulf sun = brutal)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="b7"><label for="b7">Beach chairs <span class="note">(check if condo has them first)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="b8"><label for="b8">Bluetooth speaker <span class="note">(waterproof ideally)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="b9"><label for="b9">Frisbee / paddleball / cards</label></div>
+        <div class="check-item"><input type="checkbox" id="b10"><label for="b10">Mesh bag for wet gear / shells 🐚</label></div>
+        <div class="check-item"><input type="checkbox" id="b11"><label for="b11"><strong>Red flashlight</strong> <span class="note">(night turtle watching — no white light near nests!)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="b12"><label for="b12"><strong>Baby powder</strong> <span class="note">(sand hack — dust on skin, sand falls right off!)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="b13"><label for="b13">Microfiber towels <span class="note">(shed sand way better than regular towels)</span></label></div>
+      </div>
+    </div>
+
+    <!-- 💊 FIRST AID + BEACH SURVIVAL -->
+    <div class="list-card">
+      <div class="list-card-header hc-coral">
+        <span class="icon">💊</span>
+        <h2>First Aid + Beach Survival</h2>
+      </div>
+
+      <div class="list-section">
+        <h3>Medicine Cabinet</h3>
+        <div class="check-item"><input type="checkbox" id="m1"><label for="m1">Ibuprofen + Tylenol</label></div>
+        <div class="check-item"><input type="checkbox" id="m2"><label for="m2">Benadryl <span class="note">(bug bites + just in case)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m3"><label for="m3">Pepto / Gas-X <span class="note">(5 people + seafood = be prepared lol)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m4"><label for="m4">Hydrocortisone cream <span class="note">(bug bites, rashes, stings)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m5"><label for="m5">Bandaids + blister pads</label></div>
+        <div class="check-item"><input type="checkbox" id="m6"><label for="m6">Neosporin</label></div>
+        <div class="check-item"><input type="checkbox" id="m7"><label for="m7">Sunburn spray / aloe</label></div>
+        <div class="check-item"><input type="checkbox" id="m8"><label for="m8">Antacids</label></div>
+        <div class="check-item"><input type="checkbox" id="m9"><label for="m9">Motion sickness tabs <span class="note">(ferry / boat tours)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m10"><label for="m10">Eye drops <span class="note">(salt water + sun = dry eyes)</span></label></div>
+      </div>
+
+      <div class="list-section">
+        <h3>🪼 Jellyfish Sting Kit</h3>
+        <div class="check-item"><input type="checkbox" id="m11"><label for="m11"><strong>Lidocaine spray</strong> <span class="note">(Solarcaine — best for immediate sting pain)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m12"><label for="m12"><strong>Meat tenderizer</strong> <span class="note">(yes really — enzymes break down venom, mix with water)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m13"><label for="m13">Tweezers <span class="note">(for tentacles + jetty rock splinters)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m14"><label for="m14">Benadryl cream <span class="note">(itch + swelling)</span></label></div>
+        <div class="tip">⚡ Sting protocol: rinse with SEAWATER (not fresh!) → remove tentacles with card/tweezers → lidocaine spray → hydrocortisone</div>
+        <div class="tip">🚫 Do NOT pee on it. Do NOT rinse with fresh water. Do NOT rub.</div>
+      </div>
+
+      <div class="list-section">
+        <h3>🌊 Gulf Hazard Reminders</h3>
+        <div class="check-item"><input type="checkbox" id="m15"><label for="m15">Do the <strong>stingray shuffle</strong> entering the water <span class="note">(drag feet — they move out of the way)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m16"><label for="m16">Watch for <strong>Portuguese Man o' War</strong> <span class="note">(blue/purple balloon — if on beach, skip the water that day)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="m17"><label for="m17">Reapply sunscreen every <strong>90 min</strong> + after swimming</label></div>
+        <div class="check-item"><input type="checkbox" id="m18"><label for="m18">Hydrate constantly — heat exhaustion sneaks up fast at 95°F+</label></div>
+        <div class="check-item"><input type="checkbox" id="m19"><label for="m19">Turtle sighting on beach? Call <strong>1-866-887-8535</strong> 🐢</label></div>
+      </div>
+    </div>
+
+  </div><!-- end grid -->
+
+  <!-- KITCHEN SUPPLIES — FULL WIDTH -->
+  <div style="margin-top:18px">
+    <div class="list-card">
+      <div class="list-card-header hc-tan">
+        <span class="icon">🍳</span>
+        <h2>Condo Kitchen Supplies to Bring</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:8px 14px 12px;gap:0">
+        <div class="list-section" style="border-bottom:none;border-right:1px solid var(--border)">
+          <h3>Cooking</h3>
+          <div class="check-item"><input type="checkbox" id="k1"><label for="k1"><strong>Your own good knife</strong> <span class="note">(condo knives are always terrible 😂)</span></label></div>
+          <div class="check-item"><input type="checkbox" id="k2"><label for="k2">Cutting board</label></div>
+          <div class="check-item"><input type="checkbox" id="k3"><label for="k3">Can opener</label></div>
+          <div class="check-item"><input type="checkbox" id="k4"><label for="k4">Good spatula <span class="note">(for grilling)</span></label></div>
+          <div class="check-item"><input type="checkbox" id="k5"><label for="k5">Tongs</label></div>
+        </div>
+        <div class="list-section" style="border-bottom:none;border-right:1px solid var(--border);padding-left:18px">
+          <h3>Storage + Cleanup</h3>
+          <div class="check-item"><input type="checkbox" id="k6"><label for="k6">Extra dish soap + sponge</label></div>
+          <div class="check-item"><input type="checkbox" id="k7"><label for="k7">Foil + plastic wrap</label></div>
+          <div class="check-item"><input type="checkbox" id="k8"><label for="k8">Ziplock bags (all sizes)</label></div>
+          <div class="check-item"><input type="checkbox" id="k9"><label for="k9">Reusable grocery bags</label></div>
+          <div class="check-item"><input type="checkbox" id="k10"><label for="k10">Coffee filters <span class="note">(if picky about coffee)</span></label></div>
+        </div>
+        <div class="list-section" style="border-bottom:none;padding-left:18px">
+          <h3>Extras</h3>
+          <div class="check-item"><input type="checkbox" id="k11"><label for="k11">Bottle opener / wine key</label></div>
+          <div class="check-item"><input type="checkbox" id="k12"><label for="k12">Small broom / brush <span class="note">(sand at the door)</span></label></div>
+          <div class="check-item"><input type="checkbox" id="k13"><label for="k13">Paper towel roll extra</label></div>
+          <div class="check-item"><input type="checkbox" id="k14"><label for="k14">Trash bags</label></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEACH FOOTER -->
+  <div class="footer-bar">
+    <div class="sand"></div>
+    <svg viewBox="0 0 900 56" preserveAspectRatio="none">
+      <ellipse cx="60" cy="48" rx="42" ry="7" fill="rgba(196,168,130,.4)"/>
+      <ellipse cx="200" cy="50" rx="30" ry="5" fill="rgba(196,168,130,.3)"/>
+      <ellipse cx="400" cy="49" rx="36" ry="6" fill="rgba(196,168,130,.35)"/>
+      <ellipse cx="600" cy="50" rx="28" ry="5" fill="rgba(196,168,130,.3)"/>
+      <ellipse cx="800" cy="48" rx="38" ry="6" fill="rgba(196,168,130,.38)"/>
+      <g transform="translate(48,38)"><ellipse cx="0" cy="0" rx="10" ry="6" fill="#E8C99A" stroke="#D4A877" stroke-width=".7"/><path d="M-10,0 Q0,-4 10,0" stroke="#C49A6C" stroke-width=".5" fill="none"/><path d="M-8,2 Q0,-2 8,2" stroke="#C49A6C" stroke-width=".4" fill="none"/><line x1="-2" y1="-6" x2="-3" y2="-10" stroke="#D4A877" stroke-width=".6"/></g>
+      <g transform="translate(130,46)"><ellipse cx="0" cy="0" rx="6" ry="6" fill="#F0D9B5" stroke="#D4B896" stroke-width=".6"/><ellipse cx="0" cy="0" rx="4" ry="4" fill="none" stroke="#C4A070" stroke-width=".4"/><ellipse cx="0" cy="0" rx="2" ry="2" fill="#C4A070"/></g>
+      <g transform="translate(250,40)"><path d="M0,-8 Q8,0 2,8 Q0,9 -2,8 Q-8,0 0,-8Z" fill="#E8C99A" stroke="#C4A070" stroke-width=".6"/><path d="M0,-8 Q3,-1 2,5" stroke="#C4A070" stroke-width=".4" fill="none"/><path d="M0,-8 Q-3,-1 -2,5" stroke="#C4A070" stroke-width=".4" fill="none"/></g>
+      <g transform="translate(360,42)"><ellipse cx="0" cy="0" rx="11" ry="7" fill="#FADADD" stroke="#E4A0A8" stroke-width=".7"/><path d="M-11,0 Q0,-5 11,0" stroke="#C48090" stroke-width=".5" fill="none"/><path d="M-9,2 Q0,-3 9,2" stroke="#C48090" stroke-width=".4" fill="none"/><line x1="-2" y1="-7" x2="-3" y2="-11" stroke="#D4909A" stroke-width=".6"/></g>
+      <g transform="translate(480,46)"><ellipse cx="0" cy="0" rx="6" ry="6" fill="#C5E8F0" stroke="#88C8D8" stroke-width=".6"/><ellipse cx="0" cy="0" rx="4" ry="4" fill="none" stroke="#68A8B8" stroke-width=".4"/><ellipse cx="0" cy="0" rx="1.5" ry="1.5" fill="#88C8D8"/></g>
+      <g transform="translate(600,40)"><ellipse cx="0" cy="0" rx="10" ry="6" fill="#FFE0B2" stroke="#E4A060" stroke-width=".7"/><path d="M-10,0 Q0,-4 10,0" stroke="#D49050" stroke-width=".5" fill="none"/><line x1="1" y1="-6" x2="2" y2="-10" stroke="#D4A060" stroke-width=".5"/></g>
+      <g transform="translate(720,43)"><path d="M0,-9 Q9,1 2,9 Q0,10 -2,9 Q-9,1 0,-9Z" fill="#C8E8C0" stroke="#88C880" stroke-width=".6"/><line x1="0" y1="-9" x2="0" y2="9" stroke="#78B870" stroke-width=".4"/></g>
+      <g transform="translate(820,46)"><ellipse cx="0" cy="0" rx="7" ry="4" fill="#E0D0F0" stroke="#B090D0" stroke-width=".5"/><ellipse cx="0" cy="0" rx="4.5" ry="2.5" fill="none" stroke="#9070B0" stroke-width=".4"/><ellipse cx="0" cy="0" rx="2" ry="1.2" fill="#B090D0"/></g>
+      <path d="M10,53 Q50,51 90,53 Q130,51 170,53" stroke="rgba(196,168,130,.5)" stroke-width=".7" fill="none"/>
+      <path d="M300,53 Q350,51 400,53 Q450,51 500,53" stroke="rgba(196,168,130,.4)" stroke-width=".6" fill="none"/>
+      <path d="M650,53 Q700,51 750,53" stroke="rgba(196,168,130,.45)" stroke-width=".6" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="print-note no-print">
+    👆 Click any checkbox to check it off · <strong>Ctrl/Cmd + P</strong> to print
+  </div>
+
+</div>
+
+<script>
+// ── PERSISTENT CHECKBOXES ──────────────────────
+const STORAGE_KEY = 'porta-lists-v1';
+
+function saveChecks() {
+  const state = {};
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    state[cb.id] = cb.checked;
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadChecks() {
+  try {
+    const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      if (state[cb.id]) {
+        cb.checked = true;
+        cb.closest('.check-item').style.opacity = '0.45';
+        cb.closest('.check-item').querySelector('label').style.textDecoration = 'line-through';
+      }
+    });
+  } catch(e) {}
+}
+
+function clearAll() {
+  if (!confirm('Clear all checkboxes?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.checked = false;
+    cb.closest('.check-item').style.opacity = '1';
+    cb.closest('.check-item').querySelector('label').style.textDecoration = 'none';
+  });
+}
+
+// Wire up all checkboxes
+document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const item = cb.closest('.check-item');
+    if (cb.checked) {
+      item.style.opacity = '0.45';
+      item.querySelector('label').style.textDecoration = 'line-through';
+    } else {
+      item.style.opacity = '1';
+      item.querySelector('label').style.textDecoration = 'none';
+    }
+    saveChecks();
+  });
+});
+
+// Load saved state on open
+loadChecks();
+</script>
+
+</body>
+</html>
