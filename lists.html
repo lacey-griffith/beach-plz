@@ -24,20 +24,20 @@ body {
 .page {
   max-width: 900px;
   margin: 0 auto;
-  padding: 28px 24px 40px;
+  padding: 16px 14px 40px;
 }
+@media(min-width:480px){.page{padding:28px 24px 40px;}}
 
 /* HEADER */
 .page-header {
   border-top: 5px solid var(--ocean);
-  padding-top: 16px;
-  margin-bottom: 28px;
+  padding-top: 14px;
+  margin-bottom: 18px;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
 }
+@media(min-width:560px){.page-header{flex-direction:row;align-items:flex-end;margin-bottom:28px;}}
 
 .page-header h1 {
   font-family: 'Playfair Display', serif;
@@ -58,11 +58,12 @@ body {
 }
 
 .page-header .trip-info {
-  text-align: right;
+  text-align: left;
   font-size: 11px;
   line-height: 1.8;
   color: var(--muted);
 }
+@media(min-width:560px){.page-header .trip-info{text-align:right;}}
 
 .page-header .trip-info strong {
   display: block;
@@ -78,10 +79,10 @@ body {
   background: var(--ocean);
   color: white;
   border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 24px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
   display: flex;
-  gap: 14px;
+  gap: 10px;
   align-items: flex-start;
   flex-wrap: wrap;
 }
@@ -94,12 +95,15 @@ body {
 /* GRID */
 .lists-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  grid-template-columns: 1fr;
+  gap: 14px;
 }
 
-.lists-grid.wide {
-  grid-template-columns: 1fr;
+@media (min-width: 640px) {
+  .lists-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
 }
 
 /* LIST CARD */
@@ -157,22 +161,22 @@ body {
 .check-item {
   display: flex;
   align-items: flex-start;
-  gap: 7px;
-  padding: 3px 0;
+  gap: 8px;
+  padding: 5px 0;
   line-height: 1.4;
 }
 
 .check-item input[type="checkbox"] {
-  margin-top: 1px;
-  width: 13px;
-  height: 13px;
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
   accent-color: var(--teal);
   cursor: pointer;
 }
 
 .check-item label {
-  font-size: 11.5px;
+  font-size: 13px;
   cursor: pointer;
   flex: 1;
 }
@@ -212,6 +216,12 @@ body {
 .btn-clear:hover{background:var(--coral);color:white}
 .btn-back{padding:7px 14px;border-radius:8px;border:1.5px solid var(--teal);background:white;color:var(--teal);font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;text-decoration:none;transition:all .14s}
 .btn-back:hover{background:var(--teal);color:white}
+@media (min-width:560px){
+  .kitchen-grid{grid-template-columns:1fr 1fr 1fr !important}
+  .kitchen-sec{border-bottom:none !important;border-right:1px solid var(--border);padding-left:14px}
+  .kitchen-sec:last-child{border-right:none}
+}
+.kitchen-sec{border-right:none !important;padding-left:14px}
 
 /* PRINT */
 @media print {
@@ -460,8 +470,8 @@ body {
         <span class="icon">🍳</span>
         <h2>Condo Kitchen Supplies to Bring</h2>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:8px 14px 12px;gap:0">
-        <div class="list-section" style="border-bottom:none;border-right:1px solid var(--border)">
+      <div style="display:grid;grid-template-columns:1fr;padding:8px 14px 12px;gap:0" class="kitchen-grid">
+        <div class="list-section kitchen-sec">
           <h3>Cooking</h3>
           <div class="check-item"><input type="checkbox" id="k1"><label for="k1"><strong>Your own good knife</strong> <span class="note">(condo knives are always terrible 😂)</span></label></div>
           <div class="check-item"><input type="checkbox" id="k2"><label for="k2">Cutting board</label></div>
@@ -469,7 +479,7 @@ body {
           <div class="check-item"><input type="checkbox" id="k4"><label for="k4">Good spatula <span class="note">(for grilling)</span></label></div>
           <div class="check-item"><input type="checkbox" id="k5"><label for="k5">Tongs</label></div>
         </div>
-        <div class="list-section" style="border-bottom:none;border-right:1px solid var(--border);padding-left:18px">
+        <div class="list-section kitchen-sec">
           <h3>Storage + Cleanup</h3>
           <div class="check-item"><input type="checkbox" id="k6"><label for="k6">Extra dish soap + sponge</label></div>
           <div class="check-item"><input type="checkbox" id="k7"><label for="k7">Foil + plastic wrap</label></div>
@@ -477,7 +487,7 @@ body {
           <div class="check-item"><input type="checkbox" id="k9"><label for="k9">Reusable grocery bags</label></div>
           <div class="check-item"><input type="checkbox" id="k10"><label for="k10">Coffee filters <span class="note">(if picky about coffee)</span></label></div>
         </div>
-        <div class="list-section" style="border-bottom:none;padding-left:18px">
+        <div class="list-section kitchen-sec">
           <h3>Extras</h3>
           <div class="check-item"><input type="checkbox" id="k11"><label for="k11">Bottle opener / wine key</label></div>
           <div class="check-item"><input type="checkbox" id="k12"><label for="k12">Small broom / brush <span class="note">(sand at the door)</span></label></div>
