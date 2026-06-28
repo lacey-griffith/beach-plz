@@ -140,6 +140,16 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
 
 /* ── BEACH FOOTER ── */
 .beach-footer{height:52px;position:relative;overflow:hidden;background:var(--tan);flex-shrink:0}
+
+.countdown-bar{background:linear-gradient(135deg,var(--ocean-d),var(--teal));color:#fff;text-align:center;padding:7px 14px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.cd-label{font-size:10px;opacity:.8;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+.cd-units{display:flex;gap:8px;align-items:center}
+.cd-unit{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.15);border-radius:8px;padding:4px 8px;min-width:44px}
+.cd-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1;color:#A8FFE8}
+.cd-sub{font-size:8px;opacity:.75;text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+.cd-sep{font-size:16px;opacity:.5;font-weight:700;padding-bottom:8px}
+.cd-done{font-family:'Playfair Display',serif;font-size:16px;color:#A8FFE8;font-style:italic}
+
 .beach-footer .sbg{position:absolute;inset:0;background:linear-gradient(to bottom,var(--sand-d),var(--tan),var(--tan-d))}
 .beach-footer svg{position:absolute;bottom:0;left:0;width:100%;height:52px}
 </style>
@@ -163,6 +173,21 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
   <span class="who-lbl">I am:</span>
   <button class="who-btn lacey on" id="btnL" onclick="setWho('lacey')">Lacey 💜</button>
   <button class="who-btn nicole" id="btnN" onclick="setWho('nicole')">Nicole 🧡</button>
+</div>
+
+
+<!-- COUNTDOWN -->
+<div class="countdown-bar" id="countdownBar">
+  <span class="cd-label">⏳ Port A in</span>
+  <div class="cd-units" id="cdUnits">
+    <div class="cd-unit"><span class="cd-num" id="cdDays">--</span><span class="cd-sub">days</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cdHrs">--</span><span class="cd-sub">hrs</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cdMins">--</span><span class="cd-sub">min</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cdSecs">--</span><span class="cd-sub">sec</span></div>
+  </div>
 </div>
 
 <!-- DAY TABS -->
@@ -572,6 +597,30 @@ document.getElementById('ftabs').addEventListener('click',e=>{
 // ── INIT ──────────────────────────────────────
 setSS('busy','Loading...');
 loadFromBin().then(()=>{renderAll();startPolling();setSS('ok');});
+
+// ── COUNTDOWN ─────────────────────────────────
+(function(){
+  const target = new Date('2026-07-22T00:00:00-05:00'); // CDT
+  function tick(){
+    const now = new Date();
+    const diff = target - now;
+    if(diff <= 0){
+      document.getElementById('cdUnits').innerHTML = '<span class="cd-done">🌊 WE'RE HERE!! 🐚</span>';
+      return;
+    }
+    const d = Math.floor(diff/864e5);
+    const h = Math.floor((diff%864e5)/36e5);
+    const m = Math.floor((diff%36e5)/6e4);
+    const s = Math.floor((diff%6e4)/1e3);
+    document.getElementById('cdDays').textContent = String(d).padStart(2,'0');
+    document.getElementById('cdHrs').textContent  = String(h).padStart(2,'0');
+    document.getElementById('cdMins').textContent = String(m).padStart(2,'0');
+    document.getElementById('cdSecs').textContent = String(s).padStart(2,'0');
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+
 </script>
 </body>
 </html>
