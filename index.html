@@ -105,6 +105,33 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
 .fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--teal);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(27,122,138,.35);z-index:50;display:flex;align-items:center;justify-content:center;transition:all .14s}
 .fab:active{background:var(--ocean);transform:scale(.94)}
 
+/* ── DESKTOP LAYOUT (768px+) ── */
+@media(min-width:768px){
+  /* Show sidebar, hide FAB and bottom sheet trigger */
+  .fab{display:none}
+  .sheet-overlay,.sheet{display:none !important}
+
+  /* Main layout: sidebar + calendar side by side */
+  .app-body{display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 180px)}
+
+  /* Sidebar visible inline */
+  .desktop-sidebar{display:flex;flex-direction:column;background:var(--white);border-right:1.5px solid var(--border);overflow-y:auto;height:100%}
+
+  /* Calendar: full 5-col grid */
+  .cal-view{height:100%;overflow-y:auto}
+  .time-grid{display:grid;grid-template-columns:52px repeat(5,1fr)}
+
+  /* Day tabs hidden on desktop — headers are in the grid */
+  .day-tabs{display:none}
+}
+
+@media(max-width:767px){
+  .desktop-sidebar{display:none}
+  .app-body{display:block}
+  .time-grid{display:grid;grid-template-columns:48px 1fr}
+}
+
+
 /* ── TIME PICKER MODAL ── */
 .tpicker{position:fixed;inset:0;background:rgba(27,60,70,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center}
 .tpicker-card{background:var(--white);border-radius:18px 18px 0 0;width:100%;max-width:480px;padding:20px 20px 32px}
@@ -193,8 +220,35 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
 <!-- DAY TABS -->
 <div class="day-tabs" id="dayTabs"></div>
 
-<!-- CALENDAR VIEW -->
-<div class="cal-view" id="calView"></div>
+<!-- APP BODY: sidebar (desktop) + calendar -->
+<div class="app-body">
+  <!-- DESKTOP SIDEBAR -->
+  <div class="desktop-sidebar" id="desktopSidebar">
+    <div style="padding:10px">
+      <div class="who-row" style="margin-bottom:7px">
+        <span class="who-lbl">I am:</span>
+        <button class="who-btn lacey on" id="btnL2" onclick="setWho('lacey')">Lacey 💜</button>
+        <button class="who-btn nicole" id="btnN2" onclick="setWho('nicole')">Nicole 🧡</button>
+      </div>
+      <button class="add-btn" onclick="openModal()" style="margin-bottom:8px">✦ Add custom activity</button>
+      <div style="font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ocean);margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid var(--mint)">Activities</div>
+      <div class="ftabs" id="ftabs2">
+        <div class="ftab on" data-f2="all">All</div>
+        <div class="ftab" data-f2="custom">✦</div>
+        <div class="ftab" data-f2="travel">🚙</div>
+        <div class="ftab" data-f2="pool">🏊</div>
+        <div class="ftab" data-f2="turtle">🐢</div>
+        <div class="ftab" data-f2="bar">🍺</div>
+        <div class="ftab" data-f2="food">🍕</div>
+        <div class="ftab" data-f2="nature">🌿</div>
+      </div>
+      <div id="acList2"></div>
+    </div>
+  </div>
+
+  <!-- CALENDAR VIEW -->
+  <div class="cal-view" id="calView"></div>
+</div>
 
 <!-- BEACH FOOTER -->
 <div class="beach-footer">
@@ -375,8 +429,8 @@ function startPolling(){if(pollTimer) clearInterval(pollTimer);pollTimer=setInte
 // ── WHO ───────────────────────────────────────
 function setWho(w){
   currentWho=w;
-  document.getElementById('btnL').className='who-btn lacey'+(w==='lacey'?' on':'');
-  document.getElementById('btnN').className='who-btn nicole'+(w==='nicole'?' on':'');
+  ['btnL','btnL2'].forEach(id=>{const el=document.getElementById(id);if(el) el.className='who-btn lacey'+(w==='lacey'?' on':'');});
+  ['btnN','btnN2'].forEach(id=>{const el=document.getElementById(id);if(el) el.className='who-btn nicole'+(w==='nicole'?' on':'');});
 }
 
 // ── TOAST ─────────────────────────────────────
@@ -401,11 +455,32 @@ function renderDayTabs(){
 }
 
 // ── CALENDAR ──────────────────────────────────
+function isDesktop(){ return window.innerWidth >= 768; }
+
 function renderCalendar(){
   const view=document.getElementById('calView');
   view.innerHTML='';
   const grid=document.createElement('div');
-  grid.className='time-grid';
+  const desktop=isDesktop();
+  const activeDays = desktop ? DAYS : [DAYS.find(d=>d.id===curDay)];
+
+  // Desktop: col headers
+  if(desktop){
+    const corner=document.createElement('div');
+    corner.className='tlabel';corner.style.borderBottom='2.5px solid var(--teal)';corner.style.background='var(--sky-l)';
+    grid.appendChild(corner);
+    activeDays.forEach(day=>{
+      const h=document.createElement('div');
+      h.style.cssText='text-align:center;padding:7px 3px;font-size:11px;font-weight:800;color:var(--ocean-d);background:var(--sky-l);border:1px solid var(--border);border-bottom:2.5px solid var(--teal);position:sticky;top:0;z-index:10';
+      const dc=dayCost(day.id);
+      h.innerHTML=`<div style="font-size:12px;font-weight:800">${day.name}</div><div style="font-size:9px;color:var(--muted)">${day.date} · ${day.label}</div>${dc>0?`<div style="font-size:9px;font-weight:800;color:var(--coral)">$${dc}/p</div>`:''}`;
+      grid.appendChild(h);
+    });
+    grid.style.display='grid';
+    grid.style.gridTemplateColumns=`52px repeat(${activeDays.length},1fr)`;
+  } else {
+    grid.className='time-grid';
+  }
 
   for(let s=0;s<TOTAL;s++){
     const lbl=document.createElement('div');
@@ -413,39 +488,47 @@ function renderCalendar(){
     if(s%2===0) lbl.textContent=t2s(s);
     grid.appendChild(lbl);
 
-    const cell=document.createElement('div');
-    cell.className='tslot';
-    cell.dataset.s=s;
+    activeDays.forEach(day=>{
+      const cell=document.createElement('div');
+      cell.className='tslot';
+      cell.dataset.s=s;
+      cell.dataset.did=day.id;
 
-    const entry=placed[curDay][s];
-    if(entry?.isStart){
-      const a=getA(entry.actId);
-      if(a){
-        const pa=document.createElement('div');
-        pa.className=`pa ct-${a.isCustom?'custom':a.type} who-ring-${entry.who||'lacey'}`;
-        pa.style.height=`${entry.span*52-4}px`;
-        pa.innerHTML=`<div class="pa-name">${a.e} ${a.name}</div><div class="pa-meta">${t2s(s)} · ${a.cost===0?'Free':'$'+a.cost+'/p'} · ~${a.dur*30}min</div><div class="pa-rm">✕</div><div class="who-badge">${entry.who==='nicole'?'N':'L'}</div>`;
-        pa.querySelector('.pa-rm').addEventListener('click',e=>{
-          e.stopPropagation();
-          removeAct(curDay,s,entry.actId,entry.span);
-        });
-        cell.appendChild(pa);
+      const entry=placed[day.id][s];
+      if(entry?.isStart){
+        const a=getA(entry.actId);
+        if(a){
+          const slotH=desktop?44:52;
+          const pa=document.createElement('div');
+          pa.className=`pa ct-${a.isCustom?'custom':a.type} who-ring-${entry.who||'lacey'}`;
+          pa.style.height=`${entry.span*slotH-4}px`;
+          pa.innerHTML=`<div class="pa-name">${a.e} ${a.name}</div><div class="pa-meta">${t2s(s)} · ${a.cost===0?'Free':'$'+a.cost+'/p'}</div><div class="pa-rm">✕</div><div class="who-badge">${entry.who==='nicole'?'N':'L'}</div>`;
+          pa.querySelector('.pa-rm').addEventListener('click',e=>{
+            e.stopPropagation();
+            removeAct(day.id,s,entry.actId,entry.span);
+          });
+          cell.appendChild(pa);
+        }
+      } else if(entry&&!entry.isStart){
+        cell.classList.add('occ');
       }
-    } else if(entry&&!entry.isStart){
-      cell.classList.add('occ');
-    } else {
-      // Empty slot — tap to place if we have a pending activity
-      cell.addEventListener('click',()=>{
-        if(pendingAct) placeAct(curDay,s,pendingAct);
-      });
-    }
 
-    grid.appendChild(cell);
+      if(!entry||!entry.isStart){
+        cell.addEventListener('click',()=>{
+          if(pendingAct){ placeAct(day.id,s,pendingAct); return; }
+          if(desktop){ curDay=day.id; openSheet(); }
+        });
+      }
+      grid.appendChild(cell);
+    });
   }
 
   view.appendChild(grid);
   document.getElementById('totalCost').textContent='$'+totalCost();
 }
+
+// Re-render on resize
+window.addEventListener('resize',()=>renderAll());
 
 function renderAll(){renderDayTabs();renderCalendar();renderSidebar();}
 
@@ -467,7 +550,12 @@ function closeSheet(){
 function renderSidebar(){
   const list=document.getElementById('acList');list.innerHTML='';
   const acts=curFilter==='all'?allActs():curFilter==='custom'?customActs:allActs().filter(a=>a.type===curFilter);
-  if(!acts.length){list.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">No activities here</div>';return;}
+  const list2=document.getElementById('acList2');
+  if(!acts.length){
+    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">No activities here</div>';
+    if(list2) list2.innerHTML=list.innerHTML;
+    return;
+  }
   acts.forEach(a=>{
     const used=isUsed(a.id);
     const closed=isClosed(a.id,curDay);
@@ -590,9 +678,19 @@ function deleteCustom(id){
 // ── FILTER TABS ───────────────────────────────
 document.getElementById('ftabs').addEventListener('click',e=>{
   const tab=e.target.closest('.ftab');if(!tab)return;
-  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('#ftabs .ftab').forEach(t=>t.classList.remove('on'));
   tab.classList.add('on');curFilter=tab.dataset.f;renderSidebar();
 });
+
+// Desktop sidebar filter tabs
+const ftabs2=document.getElementById('ftabs2');
+if(ftabs2){
+  ftabs2.addEventListener('click',e=>{
+    const tab=e.target.closest('.ftab');if(!tab)return;
+    document.querySelectorAll('#ftabs2 .ftab').forEach(t=>t.classList.remove('on'));
+    tab.classList.add('on');curFilter=tab.dataset.f2;renderSidebar();
+  });
+}
 
 // ── COUNTDOWN ─────────────────────────────────
 function startCountdown(){
