@@ -1057,9 +1057,9 @@ function startCountdown(){
 
 // ── INIT ──────────────────────────────────────
 setSS('busy','Loading...');
-renderAll();
-startCountdown();
-loadFromBin().then(()=>{startPolling();setSS('ok');}).catch(()=>{setSS('err');});
+try{ renderAll(); }catch(e){ console.error('renderAll failed:', e); }
+try{ startCountdown(); }catch(e){ console.error('countdown failed:', e); }
+loadFromBin().then(()=>{startPolling();setSS('ok');}).catch(e=>{console.error('loadFromBin failed:',e);setSS('err');renderAll();});
 
 // ── TURTLE ANIMATION ──────────────────────────────────────────────
 let turtleRunning = false;
@@ -1291,13 +1291,6 @@ function toggleChat(){
     document.addEventListener('touchend', onUp);
   },{passive:true});
 })();
-
-// Hook chat loading into polling
-const _origLoad = loadFromBin;
-loadFromBin = async function(){
-  await _origLoad();
-  await loadChat();
-};
 
 </script>
 
