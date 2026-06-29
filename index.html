@@ -53,7 +53,9 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
 .tslot.tap-hint{background:var(--mint-l)}
 
 /* ── PLACED ACTIVITY ── */
-.pa{position:absolute;left:3px;right:3px;top:2px;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;color:#fff;overflow:hidden;z-index:5;display:flex;flex-direction:column;gap:1px;cursor:pointer}
+.pa{position:absolute;left:3px;right:3px;top:2px;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;color:#fff;overflow:hidden;z-index:5;display:flex;flex-direction:column;gap:1px;cursor:grab;user-select:none}
+.pa:active{cursor:grabbing}
+.pa-dur{font-size:9px;font-weight:600;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pa-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pa-meta{font-size:9px;font-weight:600;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
@@ -524,7 +526,10 @@ function renderCalendar(){
           const pa=document.createElement('div');
           pa.className=`pa ct-${a.isCustom?'custom':a.type} who-ring-${entry.who||'lacey'}`;
           pa.style.height=`${entry.span*slotH-4}px`;
-          pa.innerHTML=`<div class="pa-name">${a.e} ${a.name}</div><div class="pa-meta">${t2s(s)} · ${a.cost===0?'Free':'$'+a.cost+'/p'}</div><div class="pa-rm">✕</div><div class="who-badge">${entry.who==='nicole'?'N':'L'}</div><div class="pa-resize" title="Drag to resize"></div>`;
+          const durMins = entry.span * 30;
+          const durLabel = durMins < 60 ? `${durMins}min` : durMins % 60 === 0 ? `${durMins/60}hr` : `${Math.floor(durMins/60)}hr ${durMins%60}min`;
+          pa.draggable = true;
+          pa.innerHTML=`<div class="pa-name">${a.e} ${a.name}</div><div class="pa-dur">⏱ ${durLabel}</div><div class="pa-meta">${t2s(s)} · ${a.cost===0?'Free':'$'+a.cost+'/p'}</div><div class="pa-rm">✕</div><div class="who-badge">${entry.who==='nicole'?'N':'L'}</div><div class="pa-resize" title="Drag bottom edge to resize"></div>`;
           pa.querySelector('.pa-rm').addEventListener('click',e=>{
             e.stopPropagation();
             removeAct(day.id,s,entry.actId,entry.span);
@@ -605,18 +610,62 @@ function renderCalendar(){
             document.addEventListener('touchend', onUp);
           },{passive:true});
 
+          // ── DRAG TO MOVE ──
+          let dragMoveData = null;
+          let dragOffsetSlot = 0;
+
+          pa.addEventListener('dragstart', e => {
+            if(e.target.classList.contains('pa-resize') || e.target.classList.contains('pa-rm')) {
+              e.preventDefault(); return;
+            }
+            const rect = pa.getBoundingClientRect();
+            const slotH = isDesktop() ? 44 : 52;
+            dragOffsetSlot = Math.max(0, Math.floor((e.clientY - rect.top) / slotH));
+            dragMoveData = { fromDay: day.id, fromSlot: s, actId: entry.actId, span: entry.span, who: entry.who };
+            pa.style.opacity = '.3';
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', JSON.stringify({...dragMoveData, offsetSlot: dragOffsetSlot}));
+          });
+
+          pa.addEventListener('dragend', () => {
+            pa.style.opacity = '1';
+            dragMoveData = null;
+            document.querySelectorAll('.slot-drag-over').forEach(el => el.classList.remove('slot-drag-over'));
+          });
+
           cell.appendChild(pa);
         }
       } else if(entry&&!entry.isStart){
         cell.classList.add('occ');
       }
 
+      // Click to place pending activity
       if(!entry||!entry.isStart){
         cell.addEventListener('click',()=>{
           if(pendingAct){ placeAct(day.id,s,pendingAct); return; }
           if(desktop){ curDay=day.id; openSheet(); }
         });
       }
+
+      // Drag-over highlight
+      cell.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        cell.classList.add('slot-drag-over');
+      });
+      cell.addEventListener('dragleave', () => cell.classList.remove('slot-drag-over'));
+
+      // Drop: move placed activity to new slot/day
+      cell.addEventListener('drop', e => {
+        e.preventDefault();
+        cell.classList.remove('slot-drag-over');
+        let data;
+        try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch(err){ return; }
+        if(!data || !data.actId) return;
+        const targetSlot = Math.max(0, s - (data.offsetSlot || 0));
+        moveActivity(data.fromDay, data.fromSlot, day.id, targetSlot, data.actId, data.span, data.who);
+      });
+
       grid.appendChild(cell);
     });
   }
@@ -627,6 +676,51 @@ function renderCalendar(){
 
 // Re-render on resize
 window.addEventListener('resize',()=>renderAll());
+
+
+// ── MOVE ACTIVITY ─────────────────────────────
+function moveActivity(fromDid, fromSlot, toDid, toSlot, actId, span, who){
+  const a = getA(actId);
+  if(!a) return;
+
+  toSlot = Math.max(0, Math.min(toSlot, TOTAL - span));
+
+  if(isClosed(actId, toDid)){
+    toast(`⚠ ${a.name} is CLOSED on ${DAYS.find(d=>d.id===toDid)?.name}!`, 'te', 3500);
+    return;
+  }
+
+  // Temporarily clear source slots
+  const bak = {};
+  for(let i = fromSlot; i < fromSlot + span; i++){
+    bak[i] = placed[fromDid][i];
+    delete placed[fromDid][i];
+  }
+
+  // Check conflict at destination (ignore same-day same-slots)
+  let conflict = false;
+  for(let i = toSlot; i < toSlot + span; i++){
+    if(placed[toDid][i] && placed[toDid][i].actId !== actId){ conflict = true; break; }
+  }
+
+  if(conflict){
+    // Restore
+    for(let i = fromSlot; i < fromSlot + span; i++) placed[fromDid][i] = bak[i];
+    toast(`⚠ Conflict at ${t2s(toSlot)} — move something first.`, 'tw');
+    return;
+  }
+
+  // Place at new location
+  for(let i = toSlot; i < toSlot + span; i++){
+    placed[toDid][i] = { actId, isStart: i === toSlot, span, who: who || currentWho };
+  }
+
+  if(fromDid !== toDid || fromSlot !== toSlot){
+    toast(`↕ Moved to ${DAYS.find(d=>d.id===toDid)?.name} at ${t2s(toSlot)}`, 'ts', 1800);
+  }
+  renderAll();
+  saveToBin();
+}
 
 function renderAll(){renderDayTabs();renderCalendar();renderSidebar();}
 
