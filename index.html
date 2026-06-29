@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Port A Trip Planner 🌊</title>
 <style>
@@ -786,6 +789,45 @@ function renderSidebar(){
     }
     list.appendChild(div);
   });
+
+  // Mirror to desktop sidebar with proper desktop click handlers
+  const list2 = document.getElementById('acList2');
+  if(list2){
+    list2.innerHTML = '';
+    acts.forEach(a => {
+      const used = isUsed(a.id);
+      const closed = isClosed(a.id, curDay);
+      const div2 = document.createElement('div');
+      div2.className = `ac${a.isCustom?' custom-card':''}${used?' used':''}`;
+      const cp = a.cost===0 ? `<span class="pill pf">Free</span>` : `<span class="pill pc">~$${a.cost}/p</span>`;
+      const cl = closed
+        ? `<div class="ac-closed">⚠ Closed on selected day</div>`
+        : (a.cl&&a.cl.length ? `<div class="ac-closed">⚠ Closed: ${a.cl.map(d=>DAYS.find(x=>x.id===d)?.name||d).join(', ')}</div>` : '');
+      const badge = a.isCustom ? `<span class="pill" style="background:var(--mint-l);color:var(--ocean-d)">✦${a.createdBy==='nicole'?'Nicole':'Lacey'}</span>` : '';
+      const delBtn = a.isCustom ? `<button class="ac-del" data-del="${a.id}">✕</button>` : '';
+      div2.innerHTML = `
+        <div class="ac-left">
+          <div class="ac-name">${a.e} ${a.name}</div>
+          <div class="ac-meta">${cp}<span class="pill pt">~${a.dur*30}min</span>${badge}</div>
+          ${cl}
+        </div>
+        ${!used&&!closed ? `<button class="ac-add" data-aid="${a.id}" style="background:var(--teal)">＋</button>` : ''}
+        ${delBtn}
+      `;
+      // Desktop: clicking + opens time picker (works for both mobile and desktop)
+      if(!used && !closed){
+        div2.querySelector('.ac-add').addEventListener('click', e => {
+          e.stopPropagation();
+          selectActivityToPlace(a.id);
+        });
+      }
+      if(a.isCustom){
+        const de = div2.querySelector('[data-del]');
+        if(de) de.addEventListener('click', e => { e.stopPropagation(); deleteCustom(a.id); });
+      }
+      list2.appendChild(div2);
+    });
+  }
 }
 
 // ── SELECT ACTIVITY → SHOW TIME PICKER ────────
