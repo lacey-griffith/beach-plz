@@ -753,10 +753,10 @@ function closeSheet(){
 function renderSidebar(){
   const list=document.getElementById('acList');list.innerHTML='';
   const acts=curFilter==='all'?allActs():curFilter==='custom'?customActs:allActs().filter(a=>a.type===curFilter);
-  const list2=document.getElementById('acList2');
   if(!acts.length){
     list.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">No activities here</div>';
-    if(list2) list2.innerHTML=list.innerHTML;
+    const l2=document.getElementById('acList2');
+    if(l2) l2.innerHTML=list.innerHTML;
     return;
   }
   acts.forEach(a=>{
