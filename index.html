@@ -492,7 +492,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--
 </div>
 
 <!-- CHAT FAB -->
-<button class="chat-fab" id="chatFab" title="Notes with Nicole 🐚">🐚</button>
+<button class="chat-fab" id="chatFab" title="🏈 NFL Chat">🐚</button>
 
 <!-- CHAT PANEL -->
 <div class="chat-panel" id="chatPanel">
@@ -502,7 +502,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row">
-    <input class="chat-input" id="chatInput" placeholder="Leave a note..." maxlength="280"
+    <input class="chat-input" id="chatInput" placeholder="Message Nicole..." maxlength="280"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();Chat.send();}"/>
     <button class="chat-send" onclick="Chat.send()">➤</button>
   </div>
@@ -1115,7 +1115,7 @@ const Chat = {
     const el = document.getElementById('chatMessages');
     if (!el) return;
     if (!state.chat.length) {
-      el.innerHTML = '<div class="chat-empty">No notes yet — say hi! 🐚</div>';
+      el.innerHTML = '<div class="chat-empty">No messages yet — say hi! 🏈</div>';
       return;
     }
     el.innerHTML = '';
