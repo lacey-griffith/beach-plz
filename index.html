@@ -80,11 +80,19 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
 .who-ring-lacey{box-shadow:0 0 0 2.5px #7B68EE}
 .who-ring-nicole{box-shadow:0 0 0 2.5px var(--coral)}
 .who-badge{position:absolute;bottom:3px;right:6px;font-size:8px;opacity:.85;font-weight:800}
-.ct-travel{background:linear-gradient(135deg,#D84315,#E64A19)}.ct-pool{background:linear-gradient(135deg,#00838F,#006064)}
-.ct-turtle{background:linear-gradient(135deg,#2E7D32,#1B5E20)}.ct-bar{background:linear-gradient(135deg,#BF360C,#D84315)}
-.ct-food{background:linear-gradient(135deg,#AD1457,#880E4F)}.ct-nature{background:linear-gradient(135deg,#2E7D32,#388E3C)}
-.ct-beach{background:linear-gradient(135deg,#1565C0,#0D47A1)}.ct-drive{background:linear-gradient(135deg,#4527A0,#311B92)}
-.ct-other{background:linear-gradient(135deg,#37474F,#263238)}.ct-custom{background:linear-gradient(135deg,#00838F,#0097A7)}
+/* Sea glass palette — soft, translucent, coastal */
+.ct-travel{background:rgba(180,120,80,.72);backdrop-filter:blur(2px);color:#fff}
+.ct-pool{background:rgba(64,186,186,.68);backdrop-filter:blur(2px);color:#fff}
+.ct-turtle{background:rgba(80,168,110,.70);backdrop-filter:blur(2px);color:#fff}
+.ct-bar{background:rgba(210,140,100,.70);backdrop-filter:blur(2px);color:#fff}
+.ct-food{background:rgba(190,110,130,.70);backdrop-filter:blur(2px);color:#fff}
+.ct-nature{background:rgba(100,175,140,.70);backdrop-filter:blur(2px);color:#fff}
+.ct-beach{background:rgba(80,148,200,.70);backdrop-filter:blur(2px);color:#fff}
+.ct-drive{background:rgba(140,110,185,.70);backdrop-filter:blur(2px);color:#fff}
+.ct-other{background:rgba(120,155,165,.70);backdrop-filter:blur(2px);color:#fff}
+.ct-custom{background:rgba(80,195,185,.70);backdrop-filter:blur(2px);color:#fff}
+/* Sea glass shimmer edge */
+.pa::before{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:rgba(255,255,255,.18);border-radius:8px 8px 0 0;pointer-events:none}
 .occ{background:rgba(74,191,176,.12)}
 
 /* ── BOTTOM SHEET ── */
@@ -919,6 +927,171 @@ renderAll();
 startCountdown();
 loadFromBin().then(()=>{startPolling();setSS('ok');}).catch(()=>{setSS('err');});
 
+// ── TURTLE ANIMATION ──────────────────────────────────────────────
+let turtleRunning = false;
+
+function swimTurtle(){
+  if(turtleRunning) return;
+  turtleRunning = true;
+
+  const stage = document.getElementById('turtle-stage');
+  const wrap = document.getElementById('turtle-wrap');
+  const overlay = document.getElementById('turtleOverlay');
+  const svg = document.getElementById('turtle-svg');
+  const W = window.innerWidth;
+  const midY = window.innerHeight * 0.42;
+
+  stage.classList.add('active');
+  wrap.style.transition = 'none';
+  wrap.style.position = 'absolute';
+  wrap.style.left = (W + 160) + 'px';
+  wrap.style.top = midY + 'px';
+  svg.style.transform = 'scaleX(-1)';
+
+  function spawnBubble(){
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const sz = 4 + Math.random() * 9;
+    b.style.cssText = `width:${sz}px;height:${sz}px;position:absolute;animation-duration:${1.2+Math.random()}s;`;
+    const rect = wrap.getBoundingClientRect();
+    b.style.left = (rect.left + 30 + Math.random()*80)+'px';
+    b.style.top = (rect.top + 10 + Math.random()*50)+'px';
+    stage.appendChild(b);
+    setTimeout(()=>b.remove(), 2200);
+  }
+
+  function spawnRipple(x, y){
+    const r = document.createElement('div');
+    r.className = 'water-ripple';
+    const sz = 28;
+    r.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;left:${x-sz/2}px;top:${y-sz/2}px;`;
+    stage.appendChild(r);
+    setTimeout(()=>r.remove(), 1400);
+  }
+
+  setTimeout(()=>{
+    overlay.classList.add('tinted');
+    wrap.style.transition = 'left 2.2s cubic-bezier(.4,0,.2,1), top 2.2s ease';
+    wrap.style.left = (W/2 - 70)+'px';
+
+    const bubbleIn = setInterval(spawnBubble, 280);
+
+    setTimeout(()=>{
+      clearInterval(bubbleIn);
+      svg.style.transition = 'transform .5s ease';
+      svg.style.transform = 'scaleX(1)';
+
+      setTimeout(()=>{
+        const rect = wrap.getBoundingClientRect();
+        for(let i=0;i<3;i++) setTimeout(()=>{
+          spawnRipple(rect.left+70, rect.top+50);
+          spawnBubble(); spawnBubble();
+        }, i*320);
+
+        // tap wiggle
+        const tapX = parseFloat(wrap.style.left)||W/2-70;
+        let tc=0;
+        const tapInt=setInterval(()=>{
+          wrap.style.transition='left .07s ease';
+          wrap.style.left=(tapX+(tc%2===0?-9:9))+'px';
+          tc++;
+          if(tc>=6){clearInterval(tapInt);wrap.style.left=tapX+'px';}
+        },80);
+
+        setTimeout(()=>{
+          const exitBubbles = setInterval(spawnBubble, 200);
+          wrap.style.transition='left 2s cubic-bezier(.6,0,.8,0), top 2s ease';
+          wrap.style.left=(-200)+'px';
+          setTimeout(()=>{
+            clearInterval(exitBubbles);
+            overlay.classList.remove('tinted');
+            setTimeout(()=>{
+              stage.classList.remove('active');
+              stage.querySelectorAll('.bubble,.water-ripple').forEach(el=>el.remove());
+              turtleRunning=false;
+            },800);
+          },2100);
+        },2200);
+      },600);
+    },2400);
+  },60);
+}
+
+// Hook turtle into placeAct
+const _origPlaceAct = placeAct;
+placeAct = function(did,s,aid){
+  _origPlaceAct(did,s,aid);
+  const a=getA(aid);
+  if(a&&['turtle','beach','nature','pool'].includes(a.type)) setTimeout(swimTurtle,700);
+};
+
+// Extend polling to include chat
+const _origLoad = loadFromBin;
+loadFromBin = async function(){
+  await _origLoad();
+  await loadChat();
+};
+
 </script>
+
+<!-- CHAT FAB -->
+<button class="chat-fab" id="chatFab" title="Notes with Nicole 🐚">🐚</button>
+
+<!-- CHAT PANEL -->
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-hdr">
+    <h4>🐚 Notes with Nicole</h4>
+    <button class="ch-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Leave a note..." maxlength="280"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"/>
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- TURTLE STAGE -->
+<div id="turtle-stage">
+  <div class="turtle-overlay" id="turtleOverlay"></div>
+  <div id="turtle-wrap">
+    <svg id="turtle-svg" viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg">
+      <!-- Kemp's Ridley sea turtle — olive/gray-green -->
+      <!-- Body -->
+      <ellipse cx="70" cy="52" rx="32" ry="22" fill="#7B9E6B" stroke="#5A7A4A" stroke-width="1.5"/>
+      <!-- Shell -->
+      <ellipse cx="70" cy="50" rx="26" ry="18" fill="#8BAF7A" stroke="#5A7A4A" stroke-width="1.2"/>
+      <!-- Shell scutes pattern -->
+      <ellipse cx="70" cy="50" rx="16" ry="11" fill="#9DC08B" stroke="#6A8A5A" stroke-width="1"/>
+      <line x1="70" y1="33" x2="70" y2="67" stroke="#6A8A5A" stroke-width=".8"/>
+      <line x1="52" y1="44" x2="88" y2="44" stroke="#6A8A5A" stroke-width=".8"/>
+      <line x1="52" y1="56" x2="88" y2="56" stroke="#6A8A5A" stroke-width=".8"/>
+      <line x1="56" y1="38" x2="62" y2="62" stroke="#6A8A5A" stroke-width=".6"/>
+      <line x1="78" y1="38" x2="84" y2="62" stroke="#6A8A5A" stroke-width=".6"/>
+      <!-- Head -->
+      <ellipse cx="70" cy="32" rx="11" ry="9" fill="#7B9E6B" stroke="#5A7A4A" stroke-width="1.2"/>
+      <ellipse cx="70" cy="29" rx="9" ry="7" fill="#8BAF7A"/>
+      <!-- Eyes -->
+      <circle cx="65" cy="28" r="2.5" fill="#2C3E20"/>
+      <circle cx="75" cy="28" r="2.5" fill="#2C3E20"/>
+      <circle cx="65.8" cy="27.3" r=".9" fill="white"/>
+      <circle cx="75.8" cy="27.3" r=".9" fill="white"/>
+      <!-- Nostrils -->
+      <ellipse cx="67.5" cy="31.5" rx=".8" ry=".5" fill="#4A6A3A"/>
+      <ellipse cx="72.5" cy="31.5" rx=".8" ry=".5" fill="#4A6A3A"/>
+      <!-- Mouth (slight smile) -->
+      <path d="M65,34 Q70,36.5 75,34" stroke="#4A6A3A" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <!-- Front flippers -->
+      <ellipse cx="42" cy="48" rx="14" ry="5" fill="#7B9E6B" stroke="#5A7A4A" stroke-width="1" transform="rotate(-20,42,48)"/>
+      <ellipse cx="98" cy="48" rx="14" ry="5" fill="#7B9E6B" stroke="#5A7A4A" stroke-width="1" transform="rotate(20,98,48)"/>
+      <!-- Back flippers -->
+      <ellipse cx="50" cy="68" rx="10" ry="4" fill="#7B9E6B" stroke="#5A7A4A" stroke-width="1" transform="rotate(30,50,68)"/>
+      <ellipse cx="90" cy="68" rx="10" ry="4" fill="#7B9E6B" stroke="#5A7A4A" stroke-width="1" transform="rotate(-30,90,68)"/>
+      <!-- Tail -->
+      <ellipse cx="70" cy="73" rx="4" ry="6" fill="#7B9E6B" stroke="#5A7A4A" stroke-width="1"/>
+    </svg>
+  </div>
+</div>
+
 </body>
 </html>
