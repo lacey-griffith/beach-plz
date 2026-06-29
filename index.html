@@ -56,6 +56,24 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
 .pa{position:absolute;left:3px;right:3px;top:2px;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;color:#fff;overflow:hidden;z-index:5;display:flex;flex-direction:column;gap:1px;cursor:pointer}
 .pa-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pa-meta{font-size:9px;font-weight:600;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.pa-resize{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:10px;
+  cursor:ns-resize;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;
+  transition:opacity .15s;
+}
+.pa:hover .pa-resize{opacity:1}
+.pa-resize::after{
+  content:'';
+  width:28px;height:3px;
+  background:rgba(255,255,255,.6);
+  border-radius:2px;
+}
+
 .pa-rm{position:absolute;top:4px;right:6px;width:18px;height:18px;background:rgba(0,0,0,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px}
 .who-ring-lacey{box-shadow:0 0 0 2.5px #7B68EE}
 .who-ring-nicole{box-shadow:0 0 0 2.5px var(--coral)}
@@ -106,29 +124,33 @@ body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--text);fo
 .fab:active{background:var(--ocean);transform:scale(.94)}
 
 /* ── DESKTOP LAYOUT (768px+) ── */
+.desktop-sidebar{display:none}
+.app-body{display:block}
+
 @media(min-width:768px){
-  /* Show sidebar, hide FAB and bottom sheet trigger */
-  .fab{display:none}
+  .fab{display:none !important}
   .sheet-overlay,.sheet{display:none !important}
+  .day-tabs{display:none !important}
+  .who-bar{display:none !important}
 
-  /* Main layout: sidebar + calendar side by side */
-  .app-body{display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 180px)}
-
-  /* Sidebar visible inline */
-  .desktop-sidebar{display:flex;flex-direction:column;background:var(--white);border-right:1.5px solid var(--border);overflow-y:auto;height:100%}
-
-  /* Calendar: full 5-col grid */
-  .cal-view{height:100%;overflow-y:auto}
-  .time-grid{display:grid;grid-template-columns:52px repeat(5,1fr)}
-
-  /* Day tabs hidden on desktop — headers are in the grid */
-  .day-tabs{display:none}
-}
-
-@media(max-width:767px){
-  .desktop-sidebar{display:none}
-  .app-body{display:block}
-  .time-grid{display:grid;grid-template-columns:48px 1fr}
+  .app-body{
+    display:grid;
+    grid-template-columns:268px 1fr;
+    height:calc(100vh - 148px);
+    overflow:hidden;
+  }
+  .desktop-sidebar{
+    display:flex !important;
+    flex-direction:column;
+    background:var(--white);
+    border-right:2px solid var(--border);
+    overflow-y:auto;
+    height:100%;
+  }
+  .cal-view{
+    height:100%;
+    overflow-y:auto;
+  }
 }
 
 
@@ -502,11 +524,87 @@ function renderCalendar(){
           const pa=document.createElement('div');
           pa.className=`pa ct-${a.isCustom?'custom':a.type} who-ring-${entry.who||'lacey'}`;
           pa.style.height=`${entry.span*slotH-4}px`;
-          pa.innerHTML=`<div class="pa-name">${a.e} ${a.name}</div><div class="pa-meta">${t2s(s)} · ${a.cost===0?'Free':'$'+a.cost+'/p'}</div><div class="pa-rm">✕</div><div class="who-badge">${entry.who==='nicole'?'N':'L'}</div>`;
+          pa.innerHTML=`<div class="pa-name">${a.e} ${a.name}</div><div class="pa-meta">${t2s(s)} · ${a.cost===0?'Free':'$'+a.cost+'/p'}</div><div class="pa-rm">✕</div><div class="who-badge">${entry.who==='nicole'?'N':'L'}</div><div class="pa-resize" title="Drag to resize"></div>`;
           pa.querySelector('.pa-rm').addEventListener('click',e=>{
             e.stopPropagation();
             removeAct(day.id,s,entry.actId,entry.span);
           });
+
+          // ── RESIZE HANDLE ──
+          const resizeHandle = pa.querySelector('.pa-resize');
+          resizeHandle.addEventListener('mousedown', e=>{
+            e.stopPropagation();
+            e.preventDefault();
+            const startY = e.clientY;
+            const startSpan = entry.span;
+            const slotH = isDesktop() ? 44 : 52;
+
+            function onMove(ev){
+              const dy = ev.clientY - startY;
+              const deltaSlots = Math.round(dy / slotH);
+              const newSpan = Math.max(1, Math.min(startSpan + deltaSlots, TOTAL - s));
+              // Check no conflict in new slots
+              let ok = true;
+              for(let i = s + startSpan; i < s + newSpan; i++){
+                if(placed[day.id][i] && placed[day.id][i].actId !== entry.actId){ ok=false; break; }
+              }
+              if(ok){
+                // Clear old slots
+                for(let i = s; i < s + startSpan; i++) delete placed[day.id][i];
+                // Set new slots
+                for(let i = s; i < s + newSpan; i++){
+                  placed[day.id][i] = {actId:entry.actId, isStart:i===s, span:newSpan, who:entry.who||currentWho};
+                }
+                renderCalendar();
+              }
+            }
+
+            function onUp(){
+              document.removeEventListener('mousemove', onMove);
+              document.removeEventListener('mouseup', onUp);
+              saveToBin();
+            }
+
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+          });
+
+          // Touch resize
+          resizeHandle.addEventListener('touchstart', e=>{
+            e.stopPropagation();
+            const touch = e.touches[0];
+            const startY = touch.clientY;
+            const startSpan = entry.span;
+            const slotH = isDesktop() ? 44 : 52;
+
+            function onMove(ev){
+              const t = ev.touches[0];
+              const dy = t.clientY - startY;
+              const deltaSlots = Math.round(dy / slotH);
+              const newSpan = Math.max(1, Math.min(startSpan + deltaSlots, TOTAL - s));
+              let ok = true;
+              for(let i = s + startSpan; i < s + newSpan; i++){
+                if(placed[day.id][i] && placed[day.id][i].actId !== entry.actId){ ok=false; break; }
+              }
+              if(ok){
+                for(let i = s; i < s + startSpan; i++) delete placed[day.id][i];
+                for(let i = s; i < s + newSpan; i++){
+                  placed[day.id][i] = {actId:entry.actId, isStart:i===s, span:newSpan, who:entry.who||currentWho};
+                }
+                renderCalendar();
+              }
+            }
+
+            function onUp(){
+              document.removeEventListener('touchmove', onMove);
+              document.removeEventListener('touchend', onUp);
+              saveToBin();
+            }
+
+            document.addEventListener('touchmove', onMove, {passive:true});
+            document.addEventListener('touchend', onUp);
+          },{passive:true});
+
           cell.appendChild(pa);
         }
       } else if(entry&&!entry.isStart){
