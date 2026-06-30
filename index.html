@@ -728,89 +728,102 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 <div id="turtle-stage">
   <div class="t-overlay" id="tOverlay"></div>
   <div id="t-wrap">
-    <svg id="t-svg" viewBox="0 0 220 160" width="220" height="160" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 6px 18px rgba(0,80,60,.5))">
-  <!-- Cartoon sea turtle v2 — bold flat-vector style, ref-inspired -->
-  <!-- Palette: olive-green shell plates, cream-yellow head/flippers, near-black bold outline -->
+    <svg id="t-svg" viewBox="0 0 240 170" width="240" height="170" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 6px 18px rgba(0,80,60,.5))">
+  <!-- Sea turtle v3 — side-swimming, Olive Ridley proportions, bold ref-style outlines -->
+  <!-- Shell is wide+flat (2:1 ratio), head is prominent, flippers sweep dramatically -->
 
   <!-- TAIL -->
-  <path d="M166,90 Q184,82 194,74 Q190,69 181,76 Q179,68 173,80Z"
-        fill="#8FA23E" stroke="#1F2B0E" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M186,84 Q206,74 215,65 Q210,60 200,68 Q197,59 190,72Z"
+        fill="#527A28" stroke="#1B2608" stroke-width="2.6" stroke-linejoin="round"/>
 
-  <!-- BACK FLIPPERS (drawn first, sit behind shell edge) -->
-  <path d="M146,104 Q160,116 168,130 Q162,134 156,128 Q151,134 147,124 Q140,126 142,114Z"
-        fill="#E8D89A" stroke="#1F2B0E" stroke-width="2.6" stroke-linejoin="round"/>
-  <path d="M150,84 Q168,76 180,68 Q184,73 176,79 Q183,84 172,89 Q175,98 163,93Z"
-        fill="#D8C888" stroke="#1F2B0E" stroke-width="2.6" stroke-linejoin="round"/>
+  <!-- FAR BACK FLIPPER -->
+  <path d="M164,92 Q176,112 180,130 Q173,134 168,124 Q162,130 161,118 Q153,122 157,106Z"
+        fill="#CCBA78" stroke="#1B2608" stroke-width="2.5" stroke-linejoin="round"/>
 
-  <!-- FRONT RIGHT FLIPPER (far, raised) -->
-  <path d="M74,70 Q60,48 54,34 Q61,29 67,40 Q73,31 76,46 Q85,37 82,56Z"
-        fill="#D8C888" stroke="#1F2B0E" stroke-width="2.8" stroke-linejoin="round"/>
-  <path d="M64,42 Q70,50 75,58" stroke="#1F2B0E" stroke-width="1.6" fill="none" opacity=".55" stroke-linecap="round"/>
-  <path d="M58,40 Q64,49 70,57" stroke="#1F2B0E" stroke-width="1.6" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- FAR FRONT FLIPPER (angled up and back, smaller perspective) -->
+  <path d="M84,66 Q72,42 66,26 Q74,20 80,33 Q87,22 88,40 Q98,28 94,50Z"
+        fill="#CCBA78" stroke="#1B2608" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M74,36 Q80,46 86,56" stroke="#1B2608" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
+  <path d="M68,33 Q74,43 80,53" stroke="#1B2608" stroke-width="1.4" fill="none" opacity=".38" stroke-linecap="round"/>
 
-  <!-- UNDERBELLY -->
-  <ellipse cx="110" cy="94" rx="60" ry="32" fill="#F2E6B8" stroke="#1F2B0E" stroke-width="2.8"/>
-  <path d="M66,98 Q110,112 154,98" stroke="#D8C888" stroke-width="1.6" fill="none" opacity=".7"/>
-  <path d="M70,108 Q110,118 150,108" stroke="#D8C888" stroke-width="1.4" fill="none" opacity=".6"/>
+  <!-- PLASTRON (belly) — wide flat band under shell -->
+  <ellipse cx="122" cy="110" rx="65" ry="17" fill="#F6EECC" stroke="#1B2608" stroke-width="2.6"/>
+  <path d="M68,110 Q122,124 178,110" stroke="#D4C484" stroke-width="1.4" fill="none" opacity=".7"/>
 
-  <!-- SHELL — bold carapace silhouette -->
-  <path d="M52,80 Q56,42 110,38 Q166,42 168,80 Q166,112 110,118 Q56,112 52,80Z"
-        fill="#8FA23E" stroke="#1F2B0E" stroke-width="3.2" stroke-linejoin="round"/>
+  <!-- SHELL — elongated, wide lens shape (ratio ~1.8:1) -->
+  <path d="M72,58 Q80,30 122,24 Q164,28 178,58 Q188,80 180,108 Q168,126 122,128 Q76,126 64,108 Q58,80 72,58Z"
+        fill="#638E30" stroke="#1B2608" stroke-width="3.4" stroke-linejoin="round"/>
 
-  <!-- Shell scute plates — bold segment lines (vertebral row) -->
-  <path d="M86,42 L84,114" stroke="#1F2B0E" stroke-width="2.2" fill="none" opacity=".85"/>
-  <path d="M110,39 L110,118" stroke="#1F2B0E" stroke-width="2.2" fill="none" opacity=".85"/>
-  <path d="M134,42 L136,114" stroke="#1F2B0E" stroke-width="2.2" fill="none" opacity=".85"/>
-  <path d="M58,62 Q110,52 162,62" stroke="#1F2B0E" stroke-width="2" fill="none" opacity=".75"/>
-  <path d="M54,90 Q110,102 166,90" stroke="#1F2B0E" stroke-width="2" fill="none" opacity=".75"/>
+  <!-- Shell scute vertical dividers -->
+  <line x1="97" y1="26" x2="92" y2="126" stroke="#1B2608" stroke-width="2.2" opacity=".82"/>
+  <line x1="122" y1="24" x2="122" y2="128" stroke="#1B2608" stroke-width="2.2" opacity=".82"/>
+  <line x1="147" y1="26" x2="152" y2="126" stroke="#1B2608" stroke-width="2.2" opacity=".82"/>
+  <!-- Shell scute horizontal rows -->
+  <path d="M76,58 Q122,48 174,58" stroke="#1B2608" stroke-width="2" fill="none" opacity=".78"/>
+  <path d="M68,90 Q122,104 178,90" stroke="#1B2608" stroke-width="2" fill="none" opacity=".78"/>
 
-  <!-- Plate shading — alternating tone blocks for a faceted look -->
-  <path d="M86,42 Q110,39 110,39 L110,62 Q98,58 84,62Z" fill="#A2B656" opacity=".9"/>
-  <path d="M110,39 Q134,42 134,42 L136,62 Q122,58 110,62Z" fill="#7E9036" opacity=".9"/>
-  <path d="M84,62 Q98,58 110,62 L110,90 Q96,86 82,90Z" fill="#9CB04F" opacity=".9"/>
-  <path d="M110,62 Q122,58 136,62 L138,90 Q124,86 110,90Z" fill="#86992E" opacity=".9"/>
-  <path d="M82,90 Q96,86 110,90 L110,112 Q96,108 80,112Z" fill="#93A645" opacity=".9"/>
-  <path d="M110,90 Q124,86 138,90 L140,112 Q124,108 110,112Z" fill="#7A8C30" opacity=".9"/>
+  <!-- Plate colour variation — alternating lighter/darker panels -->
+  <path d="M97,26 Q122,24 122,24 L122,58 Q110,53 95,58Z" fill="#76A43A" opacity=".92"/>
+  <path d="M122,24 Q147,26 147,26 L152,58 Q136,53 122,58Z" fill="#547822" opacity=".92"/>
+  <path d="M95,58 Q110,53 122,58 L122,90 Q108,86 93,90Z" fill="#6E9C34" opacity=".92"/>
+  <path d="M122,58 Q136,53 152,58 L154,90 Q138,86 122,90Z" fill="#4E7018" opacity=".92"/>
+  <path d="M93,90 Q108,86 122,90 L122,124 Q106,120 88,122Z" fill="#67983A" opacity=".88"/>
+  <path d="M122,90 Q138,86 154,90 L158,122 Q140,120 122,124Z" fill="#4C6C1A" opacity=".88"/>
 
-  <!-- Marginal scalloped edge -->
-  <path d="M52,80 Q56,42 110,38 Q166,42 168,80 Q166,112 110,118 Q56,112 52,80Z"
-        fill="none" stroke="#1F2B0E" stroke-width="3.2" stroke-linejoin="round"/>
-  <g fill="none" stroke="#1F2B0E" stroke-width="1.6" opacity=".5">
-    <path d="M60,56 q4,4 0,8"/><path d="M68,46 q4,4 0,8"/><path d="M80,40 q4,3 1,7"/>
-    <path d="M140,40 q-4,3 -1,7"/><path d="M153,46 q-4,4 0,8"/><path d="M161,56 q-4,4 0,8"/>
-    <path d="M163,98 q-4,4 0,7"/><path d="M153,108 q-3,4 1,7"/><path d="M68,108 q3,4 -1,7"/><path d="M58,98 q4,4 0,7"/>
+  <!-- Shell final bold outline on top -->
+  <path d="M72,58 Q80,30 122,24 Q164,28 178,58 Q188,80 180,108 Q168,126 122,128 Q76,126 64,108 Q58,80 72,58Z"
+        fill="none" stroke="#1B2608" stroke-width="3.4" stroke-linejoin="round"/>
+
+  <!-- Marginal scallop hints -->
+  <g fill="none" stroke="#1B2608" stroke-width="1.6" opacity=".45">
+    <path d="M78,48 q3,5 -1,8"/><path d="M86,34 q4,4 0,8"/>
+    <path d="M158,34 q-4,4 0,8"/><path d="M166,48 q-3,5 1,8"/>
+    <path d="M170,102 q-3,5 1,7"/><path d="M160,116 q-3,4 1,7"/>
+    <path d="M82,116 q3,4 -1,7"/><path d="M70,102 q3,5 -1,7"/>
   </g>
 
   <!-- Shell sheen -->
-  <ellipse cx="92" cy="58" rx="20" ry="11" fill="rgba(255,255,255,.18)" stroke="none"/>
+  <ellipse cx="100" cy="54" rx="24" ry="13" fill="rgba(255,255,255,.20)" stroke="none"/>
 
-  <!-- NECK -->
-  <path d="M58,82 Q46,76 38,72 Q36,80 44,86 Q37,89 42,96 Q50,93 60,93Z"
-        fill="#E8D89A" stroke="#1F2B0E" stroke-width="2.6" stroke-linejoin="round"/>
+  <!-- NECK — visible, bridges head to shell -->
+  <path d="M68,98 Q54,90 44,84 Q42,94 50,101 Q42,104 47,113 Q56,108 70,108Z"
+        fill="#EAE09E" stroke="#1B2608" stroke-width="2.8" stroke-linejoin="round"/>
 
-  <!-- HEAD -->
-  <ellipse cx="32" cy="80" rx="20" ry="17" fill="#E8D89A" stroke="#1F2B0E" stroke-width="3"/>
-  <path d="M32,64 Q44,66 48,76 Q50,82 44,84 Q40,72 32,70Z" fill="#C8B868" stroke="#1F2B0E" stroke-width="2"/>
-  <!-- snout -->
-  <path d="M14,78 Q9,80 11,85 Q16,88 22,83Z" fill="#E8D89A" stroke="#1F2B0E" stroke-width="2.4" stroke-linejoin="round"/>
-  <path d="M12,83 Q20,89 30,85" stroke="#1F2B0E" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-  <ellipse cx="15" cy="78" rx="1.6" ry="1.1" fill="#1F2B0E"/>
+  <!-- HEAD — big, round, expressive; takes up left third of canvas -->
+  <ellipse cx="28" cy="96" rx="26" ry="24" fill="#EAE09E" stroke="#1B2608" stroke-width="3.4"/>
+  <!-- Top-of-head darker banding -->
+  <path d="M12,78 Q28,72 44,78 Q48,88 42,92 Q32,80 14,82Z" fill="#CABC72" stroke="none"/>
+  <!-- Snout -->
+  <path d="M6,93 Q1,96 3,103 Q9,107 17,100Z" fill="#EAE09E" stroke="#1B2608" stroke-width="2.8" stroke-linejoin="round"/>
+  <!-- Mouth smile -->
+  <path d="M4,101 Q14,108 26,103" stroke="#1B2608" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- Nostril -->
+  <ellipse cx="8" cy="91" rx="2.4" ry="1.6" fill="#1B2608"/>
 
-  <!-- EYE — big, round, expressive -->
-  <circle cx="27" cy="74" r="8" fill="#1F2B0E"/>
-  <circle cx="27" cy="74" r="6.2" fill="#2E4014"/>
-  <circle cx="27" cy="74" r="3.6" fill="#0E1606"/>
-  <circle cx="29.5" cy="71.5" r="2.1" fill="white"/>
-  <circle cx="24.5" cy="76.5" r="1" fill="rgba(255,255,255,.55)"/>
-  <circle cx="27" cy="74" r="8" fill="none" stroke="#1F2B0E" stroke-width="1.8"/>
-  <path d="M19,65 Q27,61 35,65" stroke="#1F2B0E" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
+  <!-- EYE — large, round, bold; the money shot -->
+  <circle cx="20" cy="84" r="10" fill="#1B2608"/>
+  <circle cx="20" cy="84" r="7.8" fill="#243010"/>
+  <circle cx="20" cy="84" r="4.5" fill="#0E1606"/>
+  <!-- Main shine spot -->
+  <circle cx="23.5" cy="80.5" r="3.2" fill="white"/>
+  <!-- Secondary glint -->
+  <circle cx="16" cy="87.5" r="1.5" fill="rgba(255,255,255,.55)"/>
+  <!-- Outline ring -->
+  <circle cx="20" cy="84" r="10" fill="none" stroke="#1B2608" stroke-width="2.2"/>
+  <!-- Brow ridge — gives character -->
+  <path d="M10,72 Q20,67 30,71" stroke="#1B2608" stroke-width="2.6" fill="none" stroke-linecap="round"/>
 
-  <!-- FRONT LEFT FLIPPER (near, sweeping back) -->
-  <path d="M66,92 Q40,114 24,124 Q17,117 26,110 Q19,104 30,100 Q23,92 36,93 Q41,82 58,86Z"
-        fill="#E8D89A" stroke="#1F2B0E" stroke-width="2.8" stroke-linejoin="round"/>
-  <path d="M52,92 Q38,104 26,114" stroke="#1F2B0E" stroke-width="1.7" fill="none" opacity=".5" stroke-linecap="round"/>
-  <path d="M46,97 Q34,107 23,116" stroke="#1F2B0E" stroke-width="1.7" fill="none" opacity=".4" stroke-linecap="round"/>
-  <path d="M40,101 Q29,110 20,118" stroke="#1F2B0E" stroke-width="1.5" fill="none" opacity=".3" stroke-linecap="round"/>
+  <!-- NEAR FRONT FLIPPER — long, dramatic sweep downward -->
+  <path d="M74,108 Q46,132 26,144 Q18,136 29,128 Q20,121 32,118 Q24,108 38,109 Q44,97 66,102Z"
+        fill="#EAE09E" stroke="#1B2608" stroke-width="3.2" stroke-linejoin="round"/>
+  <!-- Flipper cross-band lines -->
+  <path d="M60,107 Q44,120 30,133" stroke="#1B2608" stroke-width="1.9" fill="none" opacity=".5" stroke-linecap="round"/>
+  <path d="M52,114 Q38,125 26,137" stroke="#1B2608" stroke-width="1.7" fill="none" opacity=".38" stroke-linecap="round"/>
+  <path d="M44,120 Q32,130 22,140" stroke="#1B2608" stroke-width="1.5" fill="none" opacity=".28" stroke-linecap="round"/>
+
+  <!-- NEAR BACK FLIPPER — smaller, tucked toward tail -->
+  <path d="M168,104 Q178,122 180,138 Q174,141 169,131 Q163,137 162,125 Q154,129 158,115Z"
+        fill="#EAE09E" stroke="#1B2608" stroke-width="2.8" stroke-linejoin="round"/>
 </svg>
   </div>
 </div>
