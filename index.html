@@ -1057,6 +1057,7 @@ let state = {
   placed: Object.fromEntries(DAYS.map(d => [d.id, {}])),
   customActs: [],
   hiddenBase: [],
+  condoInfo: { address: '', doorCode: '', wifi: '', wifiPw: '', checkIn: '', checkOut: '', notes: '' },
   chat: [],
 };
 let ui = {
@@ -1139,7 +1140,7 @@ async function saveBin() {
     const r = await fetch(`${API_BASE}/b/${BIN_ID}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-      body: JSON.stringify({ placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, chat: state.chat }),
+      body: JSON.stringify({ placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat }),
     });
     setSyncState(r.ok ? 'ok' : 'err');
   } catch { setSyncState('err'); }
@@ -1185,6 +1186,7 @@ async function loadBin() {
     }
     if (record.customActs) state.customActs = record.customActs;
     if (record.hiddenBase) state.hiddenBase = record.hiddenBase;
+    if (record.condoInfo)  state.condoInfo  = { ...state.condoInfo, ...record.condoInfo };
     if (record.chat) {
       const prevLen = state.chat.length;
       state.chat = record.chat;
