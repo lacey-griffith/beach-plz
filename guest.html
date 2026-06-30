@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Trip Info 🌊</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ocean:#1B7A8A;--ocean-d:#0F5A6A;--sand:#FAF3E0;--tan-d:#C4A882;--border:#C5DDE3;
+  --teal:#1B8276;--text:#2C4A52;--muted:#4F7681;
+}
+body{
+  font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh;
+  background-color:var(--sand);
+  background-image:
+    radial-gradient(ellipse 500px 320px at 8% 10%, rgba(196,168,130,.32), transparent 60%),
+    radial-gradient(ellipse 600px 400px at 95% 30%, rgba(237,224,196,.6), transparent 65%),
+    radial-gradient(ellipse 400px 300px at 15% 90%, rgba(232,213,176,.38), transparent 60%);
+  background-attachment:fixed;
+}
+.hdr{background:linear-gradient(135deg,var(--ocean-d),var(--ocean));color:#fff;padding:20px 18px 16px;text-align:center}
+.hdr-wave{font-size:32px;margin-bottom:4px}
+.hdr-title{font-family:'Playfair Display',serif;font-size:22px}
+.hdr-sub{font-size:11px;opacity:.85;font-weight:700;margin-top:3px}
+.body{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+.section{margin-bottom:20px}
+.section-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-left:2px}
+
+/* CONDO CARD */
+.condo-card{background:linear-gradient(160deg,rgba(255,255,255,.92),rgba(212,245,234,.6));border:1px solid rgba(255,255,255,.7);border-radius:18px 22px 16px 20px / 20px 16px 22px 18px;padding:16px 18px;box-shadow:0 3px 12px rgba(15,90,106,.12)}
+.info-row{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid rgba(197,221,227,.4)}
+.info-row:last-child{border-bottom:none}
+.info-ico{font-size:20px;flex-shrink:0;margin-top:1px}
+.info-body{flex:1;min-width:0}
+.info-lbl{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.info-val{font-size:14px;font-weight:700;color:var(--text);margin-top:2px;word-break:break-all}
+.info-val.code{font-family:monospace;font-size:16px;font-weight:900;color:var(--ocean-d);letter-spacing:.05em}
+.copy-btn{flex-shrink:0;background:var(--ocean-d);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-family:'Nunito';font-size:11px;font-weight:800;cursor:pointer;margin-top:4px}
+.copy-btn.copied{background:var(--teal)}
+
+/* DAY PLANS */
+.day-card{background:linear-gradient(160deg,rgba(255,255,255,.9),rgba(212,245,234,.45));border:1px solid rgba(255,255,255,.65);border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(15,90,106,.09)}
+.day-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.day-name{font-family:'Playfair Display',serif;font-size:17px;color:var(--ocean-d)}
+.day-date{font-size:11px;color:var(--muted);font-weight:700}
+.day-label{font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--ocean);color:#fff}
+.act-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-top:1px solid rgba(197,221,227,.35)}
+.act-time{font-size:11px;font-weight:800;color:var(--ocean-d);flex-shrink:0;width:52px}
+.act-name{font-size:13px;font-weight:700;flex:1}
+.act-cost{font-size:10px;color:var(--muted);flex-shrink:0}
+.no-acts{font-size:12px;color:var(--muted);font-style:italic;padding:4px 0}
+
+/* FOOTER */
+.footer{text-align:center;padding:10px 0 0;font-size:10px;color:var(--muted);font-weight:700}
+.footer a{color:var(--ocean);text-decoration:none}
+
+/* LOADING */
+.loading{text-align:center;padding:60px 20px;font-size:14px;color:var(--muted)}
+.error{background:rgba(184,84,58,.1);border-radius:12px;padding:16px;text-align:center;font-size:13px;color:#B8543A;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-wave">🌊</div>
+  <div class="hdr-title" id="hdrTitle">Trip Info</div>
+  <div class="hdr-sub" id="hdrSub">Loading...</div>
+</div>
+
+<div class="body">
+  <div id="content"><div class="loading">🐚 Loading trip info...</div></div>
+</div>
+
+<div class="footer">🌊 beach-plz · <a href="home.html">Plan your own trip</a></div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const BIN_ID   = params.get('binId');
+const TRIP_NAME= params.get('name')  || 'Trip Info';
+const DATES    = params.get('dates') || '';
+const LOC      = params.get('loc')   || '';
+const API_KEY  = '$2a$10$fB8HdKHZXxwyK6Qj087K3OdEXwetiR4n4BeQaWd9prgKSfVY2kp2u';
+
+document.getElementById('hdrTitle').textContent = TRIP_NAME;
+document.getElementById('hdrSub').textContent   = [DATES, LOC].filter(Boolean).join(' · ');
+
+// Time helpers
+const H_START = 7;
+function slotToTime(s) {
+  const m = H_START * 60 + s * 30;
+  const h = Math.floor(m/60), min = m%60;
+  const ap = h < 12 ? 'am' : 'pm', h12 = h===0?12:h>12?h-12:h;
+  return `${h12}:${String(min).padStart(2,'0')}${ap}`;
+}
+function durLabel(slots) {
+  const m = slots*30; if(m<60) return m+'min'; if(m===60) return '1 hr';
+  return (m/60)+'hrs';
+}
+
+const DAYS_ORDER = ['wed','thu','fri','sat','sun','mon','tue'];
+const DAY_LABELS = {wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday',mon:'Monday',tue:'Tuesday'};
+
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+async function load() {
+  if (!BIN_ID) {
+    document.getElementById('content').innerHTML = '<div class="error">No trip info found. Ask whoever sent you this link to regenerate it.</div>';
+    return;
+  }
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+    const { record } = await r.json();
+    renderAll(record);
+  } catch(e) {
+    document.getElementById('content').innerHTML = '<div class="error">Couldn\'t load trip info right now. Try again in a moment.</div>';
+  }
+}
+
+function renderAll(record) {
+  const ci = record.condoInfo || {};
+  const placed = record.placed || {};
+  let html = '';
+
+  // --- CONDO CARD ---
+  const condoFields = [
+    ci.address   && { ico:'📍', lbl:'Address',      val: ci.address,   copyable: true },
+    ci.checkIn   && { ico:'⏰', lbl:'Check-in',     val: ci.checkIn,   copyable: false },
+    ci.checkOut  && { ico:'🕙', lbl:'Checkout',     val: ci.checkOut,  copyable: false },
+    ci.doorCode  && { ico:'🔐', lbl:'Door code',    val: ci.doorCode,  copyable: true, code: true },
+    ci.wifi      && { ico:'📶', lbl:'WiFi network', val: ci.wifi,      copyable: true },
+    ci.wifiPw    && { ico:'🔑', lbl:'WiFi password',val: ci.wifiPw,    copyable: true, code: true },
+    ci.notes     && { ico:'📝', lbl:'Notes',        val: ci.notes,     copyable: false },
+  ].filter(Boolean);
+
+  if (condoFields.length) {
+    html += `<div class="section"><div class="section-title">Condo info</div><div class="condo-card">`;
+    condoFields.forEach((f, idx) => {
+      html += `<div class="info-row">
+        <div class="info-ico">${f.ico}</div>
+        <div class="info-body">
+          <div class="info-lbl">${f.lbl}</div>
+          <div class="info-val${f.code?' code':''}">${f.val}</div>
+          ${f.copyable ? `<button class="copy-btn" onclick="copyText('${f.val.replace(/'/g,"\\'")}',this)">Copy</button>` : ''}
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // --- DAY PLANS ---
+  const dayKeys = Object.keys(placed).sort((a,b) => DAYS_ORDER.indexOf(a) - DAYS_ORDER.indexOf(b));
+  const hasAny = dayKeys.some(d => Object.keys(placed[d]).length > 0);
+  if (hasAny) {
+    html += `<div class="section"><div class="section-title">The plan</div>`;
+    dayKeys.forEach(dayId => {
+      const daySlots = placed[dayId];
+      const acts = [];
+      Object.keys(daySlots).sort((a,b)=>Number(a)-Number(b)).forEach(s => {
+        const e = daySlots[s];
+        if (e?.isStart) {
+          const eff = e.override || {};
+          acts.push({ slot: Number(s), name: (eff.name||e.actId||'Activity'), span: e.span||1, cost: eff.cost!==undefined?eff.cost:null, e: eff.e||'📅' });
+        }
+      });
+      if (!acts.length) return;
+      const dayName = DAY_LABELS[dayId] || dayId.charAt(0).toUpperCase()+dayId.slice(1);
+      html += `<div class="day-card">
+        <div class="day-hdr"><div class="day-name">${dayName}</div></div>`;
+      acts.forEach(a => {
+        html += `<div class="act-row">
+          <div class="act-time">${slotToTime(a.slot)}</div>
+          <div class="act-name">${a.e} ${a.name}</div>
+          <div class="act-cost">${a.cost===0||a.cost==='0'?'Free':a.cost?'$'+a.cost+'/p':''}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (!condoFields.length && !hasAny) {
+    html = '<div class="loading">🐚 The trip planners haven\'t added any details yet. Check back soon!</div>';
+  }
+
+  document.getElementById('content').innerHTML = html;
+}
+
+load();
+</script>
+</body>
+</html>
