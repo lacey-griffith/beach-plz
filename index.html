@@ -118,9 +118,9 @@ body {
 .ac-del:hover { background: var(--coral); color: #fff; }
 
 /* ── CALENDAR ── */
-.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; border: 3px solid transparent; border-radius: 16px 20px 14px 22px / 18px 14px 22px 16px; transition: border-color .2s; background: linear-gradient(160deg, rgba(255,255,255,.3), rgba(212,245,234,.18)); }
-body.active-lacey .cal-wrap { border-color: var(--lacey-c); }
-body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
+.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; border: 3px solid transparent; border-radius: 16px 20px 14px 22px / 18px 14px 22px 16px; transition: border-color .25s, background .25s; background: linear-gradient(160deg, rgba(255,255,255,.3), rgba(212,245,234,.18)); }
+body.active-lacey .cal-wrap { border-color: var(--lacey-c); background: linear-gradient(165deg, rgba(232,184,194,.38), rgba(255,255,255,.22) 55%, rgba(232,184,194,.22)); }
+body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear-gradient(165deg, rgba(174,232,224,.4), rgba(255,255,255,.22) 55%, rgba(174,232,224,.24)); }
 .cal-grid { display: grid; }
 /* Desktop: 5 col, Mobile: 1 col — set by JS */
 .col-hdr { text-align: center; padding: 6px 3px; font-size: 10.5px; font-weight: 800; color: var(--ocean-d); background: var(--sky-l); border: 1px solid var(--border); border-bottom: 2.5px solid var(--teal); position: sticky; top: 0; z-index: 10; }
@@ -192,8 +192,12 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .jelly:nth-child(3) { animation-delay: .5s; }
 .jelly-cap { width: 40px; height: 26px; border-radius: 50% 50% 42% 42%; position: relative; box-shadow: 0 3px 8px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .jelly-cap.move { background: linear-gradient(160deg, var(--mint-l), var(--teal)); }
-.jelly-cap.share { background: linear-gradient(160deg, var(--lacey-l), var(--nicole-l)); }
-.jelly-cap.share .jelly-txt { font-size: 11px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.jelly-cap.share { width: 44px; height: 26px; padding: 0; gap: 1px; background: rgba(255,255,255,.5); }
+.jelly-seg { flex: 1; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: rgba(255,255,255,.9); cursor: pointer; transition: background .15s, opacity .15s; }
+.jelly-seg.lacey { border-radius: 50% 0 0 42% / 42% 0 0 42%; background: var(--lacey-l); opacity: .45; }
+.jelly-seg.lacey.on { background: var(--lacey-d); opacity: 1; }
+.jelly-seg.nicole { border-radius: 0 50% 42% 0 / 0 42% 42% 0; background: var(--nicole-l); opacity: .45; }
+.jelly-seg.nicole.on { background: var(--nicole-d); opacity: 1; }
 .jelly-cap.del { background: linear-gradient(160deg, #F4A98F, #C9613F); }
 .jelly-cap.del .jelly-x { position: relative; width: 13px; height: 13px; }
 .jelly-cap.del .jelly-x::before, .jelly-cap.del .jelly-x::after { content: ''; position: absolute; top: 50%; left: 50%; width: 100%; height: 2.4px; background: #fff; border-radius: 2px; }
@@ -315,6 +319,9 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .beach-footer { height: 90px; position: relative; overflow: hidden; flex-shrink: 0; background: var(--tan-d); }
 .beach-footer .sand-layer { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--sand-d) 0%, var(--tan) 40%, var(--tan-d) 100%); }
 .beach-footer svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 90px; }
+.t-weed { transform-origin: bottom center; animation: weed-sway 3.6s ease-in-out infinite; }
+.t-weed-b { animation-delay: .8s; animation-duration: 4.2s; }
+@keyframes weed-sway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 
 /* ── LEGEND ── */
 .legend-row { display: flex; gap: 7px; flex-wrap: wrap; padding: 5px 14px; background: var(--sky-l); border-bottom: 1px solid var(--border); align-items: center; font-size: 9.5px; color: var(--muted); flex-shrink: 0; }
@@ -582,6 +589,42 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
       <ellipse cx="1" cy="-4" rx="4" ry="5" fill="none" stroke="#C8A878" stroke-width=".5" transform="rotate(15)"/>
       <ellipse cx="1.5" cy="-5.5" rx="2.5" ry="3" fill="none" stroke="#C8A878" stroke-width=".4" transform="rotate(15)"/>
     </g>
+    <!-- ALGAE / SEAWEED clusters, swaying -->
+    <g transform="translate(30,90)"><g class="t-weed">
+      <path d="M-3,0 Q-9,-18 -2,-28 Q4,-36 -1,-46" stroke="#3A7A52" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M3,0 Q9,-14 4,-24 Q-1,-32 5,-40" stroke="#4F9A62" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M0,0 Q3,-10 -2,-18" stroke="#2E6A45" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </g></g>
+    <g transform="translate(490,90)"><g class="t-weed t-weed-b">
+      <path d="M-2,0 Q-8,-16 -1,-26 Q5,-34 0,-42" stroke="#357A50" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <path d="M4,0 Q10,-12 5,-22" stroke="#52A068" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </g></g>
+    <!-- REEF cluster: rock + coral polyps -->
+    <g transform="translate(545,80)">
+      <ellipse cx="0" cy="8" rx="26" ry="9" fill="#8A7A68" stroke="#5E5042" stroke-width="1"/>
+      <ellipse cx="-14" cy="3" rx="9" ry="9" fill="#7A6C5A" stroke="#5E5042" stroke-width=".8"/>
+      <ellipse cx="12" cy="2" rx="10" ry="10" fill="#8A7A68" stroke="#5E5042" stroke-width=".8"/>
+      <circle cx="-16" cy="-3" r="3.4" fill="#E8826A" opacity=".85"/>
+      <circle cx="-9" cy="-5" r="2.6" fill="#F2A088" opacity=".85"/>
+      <circle cx="10" cy="-6" r="3.6" fill="#E8826A" opacity=".85"/>
+      <circle cx="17" cy="-3" r="2.4" fill="#F2A088" opacity=".85"/>
+      <circle cx="2" cy="-2" r="2.2" fill="#E8826A" opacity=".7"/>
+    </g>
+    <g transform="translate(685,90)"><g class="t-weed">
+      <path d="M0,0 Q-6,-14 0,-22 Q5,-30 1,-38" stroke="#3A7A52" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M5,0 Q11,-10 6,-18" stroke="#4F9A62" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </g></g>
+    <!-- REEF cluster 2: smaller -->
+    <g transform="translate(955,82)">
+      <ellipse cx="0" cy="6" rx="18" ry="7" fill="#8A7A68" stroke="#5E5042" stroke-width="1"/>
+      <circle cx="-7" cy="-2" r="2.8" fill="#F2A088" opacity=".85"/>
+      <circle cx="5" cy="-4" r="3.2" fill="#E8826A" opacity=".85"/>
+      <circle cx="0" cy="0" r="2" fill="#F2A088" opacity=".7"/>
+    </g>
+    <g transform="translate(1115,90)"><g class="t-weed t-weed-b">
+      <path d="M-2,0 Q-8,-16 -1,-26 Q5,-34 0,-42" stroke="#357A50" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <path d="M4,0 Q10,-12 5,-22" stroke="#52A068" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </g></g>
   </svg>
 </div>
 
@@ -1013,10 +1056,17 @@ function renderDayTabs() {
   DAYS.forEach(d => {
     const tab = document.createElement('div');
     tab.className = 'day-tab' + (d.id === ui.curDay ? ' on' : '');
+    tab.dataset.dayId = d.id;
     const dc = dayCost(d.id);
     tab.innerHTML = `<div class="dt-name">${d.name}</div><div class="dt-date">${d.date}</div>${dc > 0 ? `<div class="dt-cost">$${dc}/p</div>` : ''}`;
     tab.onclick = () => { ui.curDay = d.id; renderAll(); };
     el.appendChild(tab);
+  });
+}
+
+function highlightDayTab(dayId) {
+  document.querySelectorAll('#dayTabs .day-tab').forEach(t => {
+    t.classList.toggle('on', t.dataset.dayId === dayId);
   });
 }
 
@@ -1145,26 +1195,25 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
   overlay.addEventListener('touchstart', closeJellyMenu, { passive: true });
 
   const isShared = attendees.includes('lacey') && attendees.includes('nicole');
-  const soloOwner = !isShared ? (attendees[0] || entry.who || 'lacey') : null;
 
-  // Cycle: Lacey-only → Nicole-only → Both → Lacey-only ...
-  // Reassigning solo also corrects `who` (the creator record), so this
-  // doubles as the fix for historic items mislabeled before attendees existed.
-  let nextState;
-  if (isShared) nextState = { attendees: ['lacey'], who: 'lacey', icon: 'L', lbl: 'Lacey' };
-  else if (soloOwner === 'lacey') nextState = { attendees: ['nicole'], who: 'nicole', icon: 'N', lbl: 'Nicole' };
-  else nextState = { attendees: ['lacey', 'nicole'], who: entry.who, icon: 'L·N', lbl: 'Both' };
-  const currentIcon = isShared ? 'L·N' : (soloOwner === 'nicole' ? 'N' : 'L');
-  const currentLbl = isShared ? 'Both' : (soloOwner === 'nicole' ? 'Nicole' : 'Lacey');
+  const toggleAttendee = (person) => {
+    let current = attendees.slice();
+    if (current.includes(person)) {
+      if (current.length === 1) return; // must keep at least one attendee
+      current = current.filter(p => p !== person);
+    } else {
+      current = [...current, person];
+    }
+    const newWho = current.length === 1 ? current[0] : entry.who;
+    for (let i = slot; i < slot + entry.span; i++) {
+      state.placed[dayId][i] = { ...state.placed[dayId][i], attendees: current, who: newWho };
+    }
+    closeJellyMenu(); renderCalendar(); saveBin();
+  };
 
   const items = [
     { cls: 'move', icon: '🕐', lbl: 'Move', action: () => { closeJellyMenu(); openMoveTpicker(dayId, slot, entry, act); } },
-    { cls: 'share', icon: `<span class="jelly-txt">${currentIcon}</span>`, lbl: currentLbl, action: () => {
-        for (let i = slot; i < slot + entry.span; i++) {
-          state.placed[dayId][i] = { ...state.placed[dayId][i], attendees: nextState.attendees, who: nextState.who };
-        }
-        closeJellyMenu(); renderCalendar(); saveBin();
-      } },
+    { cls: 'share', special: 'attendees', lbl: 'Who', action: null },
     { cls: 'del', icon: '<span class="jelly-x"></span>', lbl: 'Remove', action: () => { closeJellyMenu(); removeAct(dayId, slot, entry.span); } },
   ];
 
@@ -1185,12 +1234,31 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
   items.forEach((it, i) => {
     const j = document.createElement('div');
     j.className = 'jelly jelly-spawn';
-    j.innerHTML = `<div class="jelly-cap ${it.cls}">${it.icon}</div><div class="jelly-tentacles"></div><div class="jelly-lbl">${it.lbl}</div>`;
-    j.style.left = `${originX}px`;
-    j.style.top = `${originY}px`;
-    j.style.opacity = '0';
-    j.addEventListener('click', e => { e.stopPropagation(); it.action(); });
-    document.body.appendChild(j);
+    if (it.special === 'attendees') {
+      const lOn = attendees.includes('lacey'), nOn = attendees.includes('nicole');
+      j.innerHTML = `
+        <div class="jelly-cap share">
+          <div class="jelly-seg lacey ${lOn ? 'on' : ''}" data-p="lacey">L</div>
+          <div class="jelly-seg nicole ${nOn ? 'on' : ''}" data-p="nicole">N</div>
+        </div>
+        <div class="jelly-tentacles"></div>
+        <div class="jelly-lbl">${it.lbl}</div>
+      `;
+      j.style.left = `${originX}px`;
+      j.style.top = `${originY}px`;
+      j.style.opacity = '0';
+      document.body.appendChild(j);
+      j.querySelectorAll('.jelly-seg').forEach(seg => {
+        seg.addEventListener('click', e => { e.stopPropagation(); toggleAttendee(seg.dataset.p); });
+      });
+    } else {
+      j.innerHTML = `<div class="jelly-cap ${it.cls}">${it.icon}</div><div class="jelly-tentacles"></div><div class="jelly-lbl">${it.lbl}</div>`;
+      j.style.left = `${originX}px`;
+      j.style.top = `${originY}px`;
+      j.style.opacity = '0';
+      j.addEventListener('click', e => { e.stopPropagation(); it.action(); });
+      document.body.appendChild(j);
+    }
     jellyEls.push(j);
   });
 
@@ -1250,6 +1318,7 @@ function renderCardCalendar(grid) {
   colsToRender.forEach(day => {
     const col = document.createElement('div');
     col.className = 'cc-col';
+    col.dataset.dayId = day.id;
     const dc = dayCost(day.id);
     const hdr = document.createElement('div');
     hdr.className = 'cc-col-hdr';
@@ -1314,6 +1383,28 @@ function renderCardCalendar(grid) {
   });
 
   grid.appendChild(wrap);
+
+  if (!isDayView) {
+    let scrollTimer = null;
+    wrap.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        const wrapRect = wrap.getBoundingClientRect();
+        const centerX = wrapRect.left + wrapRect.width / 2;
+        let closest = null, closestDist = Infinity;
+        wrap.querySelectorAll('.cc-col').forEach(col => {
+          const r = col.getBoundingClientRect();
+          const colCenter = r.left + r.width / 2;
+          const dist = Math.abs(colCenter - centerX);
+          if (dist < closestDist) { closestDist = dist; closest = col.dataset.dayId; }
+        });
+        if (closest && closest !== ui.curDay) {
+          ui.curDay = closest;
+          highlightDayTab(closest);
+        }
+      }, 120);
+    }, { passive: true });
+  }
 }
 
 function renderCalendar() {
@@ -1674,10 +1765,10 @@ const Turtle = {
     const svg = document.getElementById('t-svg');
     const W = window.innerWidth, midY = window.innerHeight * 0.38;
 
-    // Reset position — start off right edge, facing left (scaleX -1)
+    // Reset position — start off right edge, facing left (its natural drawn orientation)
     stage.classList.add('active');
     Object.assign(wrap.style, { transition: 'none', position: 'absolute', left: `${W + 180}px`, top: `${midY}px` });
-    svg.style.transform = 'scaleX(-1)';
+    svg.style.transform = 'scaleX(1)';
 
     const spawnBubble = () => {
       const b = document.createElement('div');
