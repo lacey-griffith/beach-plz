@@ -20,7 +20,17 @@
   --lacey-c: #C9798A; --lacey-l: #E8B8C2; --lacey-d: #A8556A;
   --nicole-c: #6FCFC4; --nicole-l: #AEE8E0; --nicole-d: #1F7A6F;
 }
-body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--text); font-size: 13px; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--sand);
+  background-image:
+    radial-gradient(ellipse 380px 220px at 8% 12%, rgba(196,168,130,.30), transparent 60%),
+    radial-gradient(ellipse 420px 260px at 92% 28%, rgba(237,224,196,.55), transparent 65%),
+    radial-gradient(ellipse 320px 200px at 18% 78%, rgba(232,213,176,.40), transparent 60%),
+    radial-gradient(ellipse 360px 240px at 85% 85%, rgba(196,168,130,.22), transparent 65%);
+  background-attachment: fixed;
+  color: var(--text); font-size: 13px; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+}
 
 /* ── HEADER ── */
 .hdr { background: linear-gradient(135deg, var(--ocean-d), var(--ocean), var(--ocean-l)); color: #fff; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; position: relative; overflow: hidden; flex-shrink: 0; }
@@ -108,7 +118,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--
 .ac-del:hover { background: var(--coral); color: #fff; }
 
 /* ── CALENDAR ── */
-.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; border: 3px solid transparent; transition: border-color .2s; }
+.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; border: 3px solid transparent; border-radius: 16px 20px 14px 22px / 18px 14px 22px 16px; transition: border-color .2s; background: linear-gradient(160deg, rgba(255,255,255,.3), rgba(212,245,234,.18)); }
 body.active-lacey .cal-wrap { border-color: var(--lacey-c); }
 body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .cal-grid { display: grid; }
@@ -126,9 +136,9 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .tslot.drag-over { background: var(--mint-l) !important; outline: 2px dashed var(--teal); }
 
 /* ── SEA GLASS ACTIVITY BLOCKS ── */
-.pa { position: absolute; left: 2px; right: 2px; top: 2px; border-radius: 7px; padding: 4px 8px; font-size: 10.5px; font-weight: 700; color: #fff; overflow: hidden; z-index: 5; cursor: grab; user-select: none; display: flex; flex-direction: column; gap: 1px; }
+.pa { position: absolute; left: 2px; right: 2px; top: 2px; border-radius: 9px 13px 8px 12px / 12px 8px 13px 9px; padding: 4px 8px; font-size: 10.5px; font-weight: 700; color: #fff; overflow: hidden; z-index: 5; cursor: grab; user-select: none; display: flex; flex-direction: column; gap: 1px; box-shadow: 0 2px 7px rgba(15,90,106,.18), inset 0 1px 0 rgba(255,255,255,.35); border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(1.5px); }
 .pa:active { cursor: grabbing; }
-.pa::before { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,.18); border-radius: 7px 7px 0 0; height: 40%; pointer-events: none; }
+.pa::before { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255,255,255,.32), rgba(255,255,255,.05) 55%); border-radius: inherit; pointer-events: none; }
 .pa-name { font-size: 10.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pa-dur { font-size: 9px; font-weight: 600; opacity: .85; }
 .pa-meta { font-size: 9px; font-weight: 600; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -146,13 +156,14 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .cc-wrap { display: flex; gap: 10px; overflow-x: auto; padding: 10px 10px 90px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
 .cc-col { flex-shrink: 0; width: 72vw; max-width: 230px; scroll-snap-align: start; }
 .cc-wrap-day .cc-col { width: 100%; max-width: unset; }
-.cc-col-hdr { text-align: center; padding: 7px 4px; border-radius: 10px 10px 0 0; background: var(--ocean); color: #fff; position: sticky; top: 0; z-index: 5; }
+.cc-col-hdr { text-align: center; padding: 7px 4px; border-radius: 14px 18px 10px 10px / 16px 12px 10px 10px; background: linear-gradient(160deg, var(--ocean-l), var(--ocean)); color: #fff; position: sticky; top: 0; z-index: 5; box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
 .cc-col-hdr .dn { font-size: 12px; font-weight: 800; }
 .cc-col-hdr .dd { font-size: 8.5px; opacity: .85; }
 .cc-col-hdr .dc { font-size: 8.5px; font-weight: 800; color: #A8FFE8; margin-top: 1px; }
-.cc-col-body { background: rgba(255,255,255,.5); border-radius: 0 0 10px 10px; min-height: 200px; padding: 8px 6px; }
+.cc-col-body { background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(212,245,234,.35)); border-radius: 10px 10px 14px 18px / 10px 10px 16px 12px; min-height: 200px; padding: 8px 6px; backdrop-filter: blur(2px); border: 1px solid rgba(255,255,255,.4); border-top: none; }
 .cc-empty { text-align: center; font-size: 10px; color: var(--muted); padding: 16px 4px; }
-.cc-card { display: flex; align-items: center; gap: 7px; background: #fff; border-radius: 11px; padding: 8px 9px; margin-bottom: 7px; box-shadow: 0 2px 6px rgba(0,0,0,.08); position: relative; }
+.cc-card { display: flex; align-items: center; gap: 7px; background: linear-gradient(160deg, rgba(255,255,255,.92), rgba(255,255,255,.78)); border-radius: 16px 12px 18px 13px / 13px 17px 12px 16px; padding: 8px 9px; margin-bottom: 7px; box-shadow: 0 3px 9px rgba(15,90,106,.13), inset 0 1px 0 rgba(255,255,255,.6); position: relative; border: 1px solid rgba(255,255,255,.6); backdrop-filter: blur(3px); overflow: hidden; }
+.cc-card::before { content: ''; position: absolute; top: -10px; left: -10px; width: 50%; height: 60%; background: radial-gradient(ellipse, rgba(255,255,255,.45), transparent 70%); pointer-events: none; }
 .cc-rail { width: 4px; align-self: stretch; border-radius: 4px; flex-shrink: 0; }
 .cc-rail.owner-lacey { background: linear-gradient(var(--lacey-l), var(--lacey-d)); }
 .cc-rail.owner-nicole { background: linear-gradient(var(--nicole-l), var(--nicole-d)); }
@@ -354,8 +365,8 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 <!-- WHO BAR (mobile) -->
 <div class="who-bar">
   <span class="who-lbl">I am:</span>
-  <button class="who-btn lacey on" id="mBtnL" onclick="setWho('lacey')">Lacey 💜</button>
-  <button class="who-btn nicole" id="mBtnN" onclick="setWho('nicole')">Nicole 🧡</button>
+  <button class="who-btn lacey on" id="mBtnL" onclick="setWho('lacey')">Lacey</button>
+  <button class="who-btn nicole" id="mBtnN" onclick="setWho('nicole')">Nicole</button>
   <label class="show-both-lbl">
     <input type="checkbox" class="show-both-cb" id="mShowBoth" onchange="setShowBoth(this.checked)">
     <span class="shell-ico">🐚</span>Show Both
@@ -393,8 +404,8 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
     <div class="sidebar-inner">
       <div class="who-bar" style="margin-bottom:8px;border-bottom:none;padding:0;background:transparent">
         <span class="who-lbl">I am:</span>
-        <button class="who-btn lacey on" id="dBtnL" onclick="setWho('lacey')">Lacey 💜</button>
-        <button class="who-btn nicole" id="dBtnN" onclick="setWho('nicole')">Nicole 🧡</button>
+        <button class="who-btn lacey on" id="dBtnL" onclick="setWho('lacey')">Lacey</button>
+        <button class="who-btn nicole" id="dBtnN" onclick="setWho('nicole')">Nicole</button>
         <label class="show-both-lbl">
           <input type="checkbox" class="show-both-cb" id="dShowBoth" onchange="setShowBoth(this.checked)">
           <span class="shell-ico">🐚</span>Show Both
@@ -1492,7 +1503,7 @@ const Chat = {
       const time = ts.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const day = ts.toLocaleDateString([], { month: 'short', day: 'numeric' });
       div.innerHTML = `
-        ${!isMe ? `<div class="chat-who ${m.who}">${m.who === 'nicole' ? 'Nicole 🧡' : 'Lacey 💜'}</div>` : ''}
+        ${!isMe ? `<div class="chat-who ${m.who}">${m.who === 'nicole' ? 'Nicole' : 'Lacey'}</div>` : ''}
         <div class="chat-bubble">${m.text}</div>
         <div class="chat-ts">${day} · ${time}</div>
       `;
