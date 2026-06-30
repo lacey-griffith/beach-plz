@@ -250,6 +250,27 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 
 /* ── CUSTOM ACTIVITY MODAL ── */
 .modal-overlay { position: fixed; inset: 0; background: rgba(27,60,70,.55); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
+
+.sea-glass-modal { background: linear-gradient(160deg, rgba(255,255,255,.94), rgba(212,245,234,.7)); border-radius: 24px 24px 0 0; padding: 22px 20px 28px; width: 100%; max-width: 460px; max-height: 82vh; overflow-y: auto; box-shadow: 0 -8px 30px rgba(15,90,106,.25); }
+.dm-hdr { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+.dm-emoji { font-size: 30px; line-height: 1; }
+.dm-title { flex: 1; }
+.dm-title h3 { font-family: 'Playfair Display', serif; color: var(--ocean-d); font-size: 19px; line-height: 1.2; }
+.dm-close { width: 26px; height: 26px; border-radius: 50%; background: rgba(15,90,106,.1); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ocean-d); font-weight: 800; flex-shrink: 0; }
+.dm-badges { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 14px; }
+.dm-badge { font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 14px; background: var(--sky-l); color: var(--ocean-d); }
+.dm-badge.owner { color: #fff; }
+.dm-badge.owner.lacey { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); }
+.dm-badge.owner.nicole { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); }
+.dm-badge.owner.both { background: linear-gradient(to left, var(--nicole-c), var(--lacey-c)); }
+.dm-section { margin-bottom: 14px; }
+.dm-section .lbl { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+.dm-section .val { font-size: 13.5px; color: var(--text); line-height: 1.45; }
+.dm-actions { display: flex; gap: 8px; margin-top: 18px; }
+.dm-btn { flex: 1; text-align: center; padding: 11px; border-radius: 14px; font-weight: 800; font-size: 13px; text-decoration: none; cursor: pointer; }
+.dm-btn.maps { background: var(--teal); color: #fff; }
+.dm-btn.site { background: #fff; color: var(--ocean-d); border: 1.5px solid var(--ocean); }
+.dm-closed-note { background: rgba(184,84,58,.1); color: var(--coral); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; font-weight: 700; }
 .modal-card { background: var(--white); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px; padding: 20px 18px 32px; max-height: 88vh; overflow-y: auto; }
 .modal-card h3 { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--ocean-d); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
 .mfield { margin-bottom: 10px; }
@@ -655,6 +676,11 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
   </div>
 </div>
 
+<!-- EVENT DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal" style="display:none" onclick="if(event.target===this)closeDetailModal()">
+  <div class="sea-glass-modal" id="detailModalBody"></div>
+</div>
+
 <!-- CUSTOM ACTIVITY MODAL -->
 <div class="modal-overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal-card">
@@ -826,10 +852,10 @@ const BASE_ACTS = [
   {id:'beach',e:'🏖️',name:'Beach Day',type:'beach',dur:6,cost:0,cl:[],n:'Sun, sand, Gulf vibes.'},
   {id:'nightwalk',e:'🌙',name:'Night Beach Walk',type:'beach',dur:2,cost:0,cl:[],n:'Watch for turtle tracks. Red light only near nests.'},
   {id:'pier',e:'🎣',name:'Horace Caldwell Pier',type:'beach',dur:3,cost:3,cl:[],n:'$3 day pass. Pole rentals on site.'},
-  {id:'ark',e:'🐢',name:'ARK Turtle Rehab',type:'turtle',dur:2,cost:0,cl:['thu','sat','sun'],n:'PRE-REGISTER: utmsi.utexas.edu · Wed & Fri 10am only'},
-  {id:'sealife',e:'🐢',name:'Texas Sealife Center',type:'turtle',dur:3,cost:9,cl:['wed'],n:'$9/person · Thu–Sat 10–4 · Sun 12–4 · ~35 min drive'},
+  {id:'ark',e:'🐢',name:'ARK Turtle Rehab',type:'turtle',dur:2,cost:0,cl:['thu','sat','sun'],n:'PRE-REGISTER: utmsi.utexas.edu · Wed & Fri 10am only',url:'https://utmsi.utexas.edu/amos-rehabilitation-keep/'},
+  {id:'sealife',e:'🐢',name:'Texas Sealife Center',type:'turtle',dur:3,cost:9,cl:['wed'],n:'$9/person · Thu–Sat 10–4 · Sun 12–4 · ~35 min drive',url:'https://www.texassealifecenter.org/'},
   {id:'jetty',e:'🪨',name:'South Jetty',type:'turtle',dur:2,cost:0,cl:[],n:'Turtles hang near granite rocks year-round.'},
-  {id:'utmsi',e:'🔬',name:'UT Marine Science',type:'nature',dur:2,cost:0,cl:['wed','sun'],n:'Free · Tue–Sat 10–4 · Seahorses, eels, whale jawbone.'},
+  {id:'utmsi',e:'🔬',name:'UT Marine Science',type:'nature',dur:2,cost:0,cl:['wed','sun'],n:'Free · Tue–Sat 10–4 · Seahorses, eels, whale jawbone.',url:'https://utmsi.utexas.edu/visit/port-aransas/'},
   {id:'birding',e:'🐦',name:'Leonabelle Birding',type:'nature',dur:2,cost:0,cl:[],n:'Free · Loaner binoculars · Sunrise to sunset'},
   {id:'roberts',e:'⛵',name:'Roberts Point Park',type:'nature',dur:2,cost:0,cl:[],n:'Ships, dolphins, best sunset on the island. Free.'},
   {id:'ferry',e:'⛴️',name:'Ferry Ride',type:'nature',dur:1,cost:0,cl:[],n:'Free! Dolphins ride the wake. Build in line time.'},
@@ -1369,7 +1395,7 @@ function renderCardCalendar(grid) {
         e.stopPropagation();
         showJellyMenu(card, day.id, s, entry, a, att);
       });
-      card.addEventListener('click', () => { ui.curDay = day.id; });
+      card.addEventListener('click', () => { ui.curDay = day.id; openDetailModal(day.id, s, entry, a); });
       body.appendChild(card);
     }
     if (count === 0) {
@@ -1509,6 +1535,11 @@ function renderCalendar() {
             removeAct(day.id, s, entry.span);
           });
 
+          pa.addEventListener('click', e => {
+            if (e.target.classList.contains('pa-resize')) return;
+            openDetailModal(day.id, s, entry, a);
+          });
+
           // Drag to move
           let grabOffset = 0;
           pa.addEventListener('dragstart', e => {
@@ -1623,6 +1654,51 @@ document.getElementById('ftabs').addEventListener('click', e => {
 
 // ── CUSTOM ACTIVITY ───────────────────────────────────────────────
 function openModal() { document.getElementById('modal').style.display = 'flex'; setTimeout(() => document.getElementById('mName').focus(), 60); }
+function openDetailModal(dayId, slot, entry, act) {
+  const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
+  const isShared = att.includes('lacey') && att.includes('nicole');
+  const ownerCls = isShared ? 'both' : (att[0] === 'nicole' ? 'nicole' : 'lacey');
+  const ownerLbl = isShared ? 'Both of us' : (att[0] === 'nicole' ? 'Nicole' : 'Lacey');
+  const day = DAYS.find(d => d.id === dayId);
+  const isClosedToday = act.cl && act.cl.includes(dayId);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.name + ', Port Aransas, TX')}`;
+
+  let html = `
+    <div class="dm-hdr">
+      <div class="dm-emoji">${act.e}</div>
+      <div class="dm-title"><h3>${act.name}</h3></div>
+      <div class="dm-close" onclick="closeDetailModal()">✕</div>
+    </div>
+    <div class="dm-badges">
+      <div class="dm-badge owner ${ownerCls}">${ownerLbl}</div>
+      <div class="dm-badge">${day ? `${day.name}, ${day.date}` : ''} · ${slotToTime(slot)}</div>
+      <div class="dm-badge">${durLabel(entry.span)}</div>
+      <div class="dm-badge">${act.cost === 0 ? 'Free' : `$${act.cost}/person`}</div>
+    </div>
+  `;
+  if (isClosedToday) {
+    html += `<div class="dm-closed-note">⚠️ Heads up — this is normally closed on ${day ? day.name : 'this day'}.</div>`;
+  }
+  if (act.n) {
+    html += `<div class="dm-section"><div class="lbl">Notes</div><div class="val">${act.n}</div></div>`;
+  }
+  if (act.loc) {
+    html += `<div class="dm-section"><div class="lbl">Location</div><div class="val">${act.loc}</div></div>`;
+  }
+  html += `
+    <div class="dm-actions">
+      <a class="dm-btn maps" href="${mapsUrl}" target="_blank" rel="noopener">🗺️ Directions</a>
+      ${act.url ? `<a class="dm-btn site" href="${act.url}" target="_blank" rel="noopener">🔗 Website</a>` : ''}
+    </div>
+  `;
+  document.getElementById('detailModalBody').innerHTML = html;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+
+function closeDetailModal() {
+  document.getElementById('detailModal').style.display = 'none';
+}
+
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
   ['mName','mEmoji','mCost','mNote'].forEach(id => document.getElementById(id).value = '');
