@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Lacey's Map · beach-plz 🌊</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --ocean:#1B7A8A;--ocean-d:#0F5A6A;--ocean-l:#3DA5B8;
+  --sand:#FAF3E0;--sand-d:#EDE0C4;--tan-d:#C4A882;--border:#C5DDE3;--sky-l:#E0F4FA;
+  --lacey-c:#C9798A;--lacey-l:#E8B8C2;--lacey-d:#A8556A;
+  --nicole-c:#6FCFC4;--nicole-l:#AEE8E0;--nicole-d:#1F7A6F;
+  --text:#2C4A52;--muted:#4F7681;--teal:#1B8276;
+}
+html,body{height:100%;font-family:'Nunito',sans-serif;color:var(--text);background:var(--sand)}
+body{
+  display:flex;flex-direction:column;min-height:100vh;
+  background-image:
+    radial-gradient(ellipse 500px 300px at 5% 10%, rgba(232,184,194,.28), transparent 60%),
+    radial-gradient(ellipse 600px 400px at 92% 25%, rgba(237,224,196,.6), transparent 65%),
+    radial-gradient(ellipse 400px 280px at 15% 88%, rgba(232,184,194,.22), transparent 60%);
+  background-attachment:fixed;
+}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--lacey-d),var(--lacey-c));color:#fff;padding:16px 18px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 14px rgba(168,85,106,.3)}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr-av{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900}
+.hdr-name{font-family:'Playfair Display',serif;font-size:18px}
+.hdr-sub{font-size:10px;opacity:.85;font-weight:700;margin-top:1px}
+.hdr-nav{display:flex;gap:8px}
+.nav-btn{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);border-radius:12px;color:#fff;font-family:'Nunito';font-weight:800;font-size:11px;padding:6px 11px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.nav-btn:active{background:rgba(255,255,255,.32)}
+.nav-btn.back{font-size:12px;padding:6px 10px}
+
+/* STATS BAR */
+.stats{display:flex;gap:10px;padding:14px 16px 0;overflow-x:auto;scroll-snap-type:x mandatory}
+.stat{flex-shrink:0;scroll-snap-align:start;background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.45));border:1px solid rgba(255,255,255,.6);border-radius:14px 18px 12px 16px / 16px 12px 18px 14px;padding:10px 14px;box-shadow:0 2px 8px rgba(168,85,106,.1)}
+.stat-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat-val{font-family:'Playfair Display',serif;font-size:22px;color:var(--lacey-d);line-height:1.1}
+.stat-unit{font-size:10px;color:var(--muted);font-weight:700;margin-top:1px}
+
+/* MAP */
+.map-wrap{flex:1;margin:14px 16px 0;border-radius:18px 22px 16px 20px / 20px 16px 22px 18px;overflow:hidden;border:2px solid rgba(201,121,138,.35);box-shadow:0 4px 16px rgba(15,90,106,.15);min-height:300px}
+#map{height:380px}
+
+/* QUICK LINKS */
+.section{padding:14px 16px 0}
+.section-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.links{display:flex;gap:10px;flex-wrap:wrap}
+.link-card{flex:1;min-width:calc(50% - 5px);background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.35));border:1px solid rgba(255,255,255,.6);border-radius:14px;padding:14px 14px;box-shadow:0 2px 8px rgba(15,90,106,.1);cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:10px;color:var(--text)}
+.link-card:active{transform:scale(.97)}
+.link-card .lc-ico{font-size:24px;flex-shrink:0}
+.link-card .lc-name{font-weight:800;font-size:13px;color:var(--lacey-d)}
+.link-card .lc-sub{font-size:10px;color:var(--muted);margin-top:1px}
+
+/* SPOTS LIST */
+.spots{padding:14px 16px 30px}
+.spot{display:flex;align-items:center;gap:10px;background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.3));border:1px solid rgba(255,255,255,.6);border-radius:12px 16px 10px 14px / 14px 10px 16px 12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;box-shadow:0 2px 6px rgba(15,90,106,.08)}
+.spot-ico{font-size:20px;flex-shrink:0}
+.spot-body{flex:1;min-width:0}
+.spot-name{font-weight:800;font-size:13px}
+.spot-meta{font-size:10.5px;color:var(--muted);margin-top:1px}
+.spot-dist{font-size:10px;font-weight:800;color:var(--lacey-d);flex-shrink:0}
+
+/* Custom Leaflet markers */
+.marker-condo{background:var(--lacey-d);width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.marker-act{background:var(--ocean);width:22px;height:22px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:11px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-av">L</div>
+    <div>
+      <div class="hdr-name">Lacey's Map</div>
+      <div class="hdr-sub">Port Aransas, TX · Jul 22–26</div>
+    </div>
+  </div>
+  <div class="hdr-nav">
+    <a class="nav-btn" href="index.html">🗓 Planner</a>
+    <a class="nav-btn back" href="home.html">↩</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-label">Port A In</div>
+    <div class="stat-val" id="daysLeft">--</div>
+    <div class="stat-unit">days</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Trip Length</div>
+    <div class="stat-val">5</div>
+    <div class="stat-unit">days</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Crew</div>
+    <div class="stat-val">5</div>
+    <div class="stat-unit">people</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Condo</div>
+    <div class="stat-val" style="font-size:15px;padding-top:3px">Unit 212</div>
+    <div class="stat-unit">Executive Keys</div>
+  </div>
+</div>
+
+<div class="map-wrap">
+  <div id="map"></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Quick links</div>
+  <div class="links">
+    <a class="link-card" href="index.html">
+      <span class="lc-ico">🗓</span>
+      <div><div class="lc-name">Trip Planner</div><div class="lc-sub">Calendar & activities</div></div>
+    </a>
+    <a class="link-card" href="lists.html">
+      <span class="lc-ico">📋</span>
+      <div><div class="lc-name">Lists</div><div class="lc-sub">Packing & grocery</div></div>
+    </a>
+    <a class="link-card" href="https://www.google.com/maps/place/Executive+Keys+Condominiums/@27.8350,-97.0598,15z" target="_blank" rel="noopener">
+      <span class="lc-ico">🏠</span>
+      <div><div class="lc-name">Our Condo</div><div class="lc-sub">Executive Keys, Unit 212</div></div>
+    </a>
+    <a class="link-card" href="nicole_map.html">
+      <span class="lc-ico" style="font-size:18px">N</span>
+      <div><div class="lc-name">Nicole's Map</div><div class="lc-sub">See her view</div></div>
+    </a>
+  </div>
+</div>
+
+<div class="spots">
+  <div class="section-title" style="margin-top:0">Key spots</div>
+  <!-- Spots rendered by JS -->
+</div>
+
+<script>
+// ── COUNTDOWN ──
+const tripStart = new Date('2026-07-22T00:00:00');
+const now = new Date();
+const diff = Math.ceil((tripStart - now) / (1000 * 60 * 60 * 24));
+const daysEl = document.getElementById('daysLeft');
+if (diff > 0) daysEl.textContent = diff;
+else if (diff < 0) daysEl.textContent = '🌊';
+else daysEl.textContent = 'NOW';
+
+// ── MAP ──
+const CONDO = [27.8350, -97.0598]; // Executive Keys approximate
+const map = L.map('map', { zoomControl: false }).setView(CONDO, 14);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 19
+}).addTo(map);
+
+// Custom icons
+function makeIcon(emoji, bg) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="background:${bg};width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:15px">${emoji}</div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
+  });
+}
+
+const condoIcon = L.divIcon({
+  className: '',
+  html: `<div style="background:#A8556A;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.3)"></div>`,
+  iconSize: [34, 34],
+  iconAnchor: [12, 34]
+});
+
+// Spots
+const SPOTS = [
+  { name: 'Our Condo', sub: 'Unit 212, Executive Keys', coords: [27.8350, -97.0598], emoji: '🏠', icon: condoIcon },
+  { name: 'Beach Access', sub: 'Mustang Island State Park', coords: [27.8280, -97.0515], emoji: '🏖️' },
+  { name: 'South Jetty', sub: 'Turtles & fishing · Free', coords: [27.8342, -97.0523], emoji: '🪨' },
+  { name: 'Horace Caldwell Pier', sub: '$3 day pass', coords: [27.8378, -97.0568], emoji: '🎣' },
+  { name: 'The Gaff', sub: 'Pirate dive bar', coords: [27.8370, -97.0577], emoji: '🏴‍☠️' },
+  { name: 'Roberts Point Park', sub: 'Best sunset on island', coords: [27.8395, -97.0572], emoji: '⛵' },
+  { name: 'ARK / UT Marine Science', sub: 'Turtle rehab · Wed & Fri', coords: [27.8558, -97.0726], emoji: '🐢' },
+  { name: 'Ferry Landing', sub: 'Free · dolphins ride the wake', coords: [27.8382, -97.0555], emoji: '⛴️' },
+];
+
+SPOTS.forEach(s => {
+  const icon = s.icon || makeIcon(s.emoji, '#1B7A8A');
+  L.marker(s.coords, { icon })
+    .addTo(map)
+    .bindPopup(`<b>${s.emoji} ${s.name}</b><br><span style="font-size:11px;color:#4F7681">${s.sub}</span>`);
+});
+
+// Spots list
+const spotsEl = document.querySelector('.spots');
+SPOTS.forEach((s, i) => {
+  const condoCoords = SPOTS[0].coords;
+  const dist = (Math.sqrt(Math.pow((s.coords[0]-condoCoords[0])*110, 2) + Math.pow((s.coords[1]-condoCoords[1])*90, 2)) * 0.62).toFixed(1);
+  const div = document.createElement('div');
+  div.className = 'spot';
+  div.innerHTML = `
+    <div class="spot-ico">${s.emoji}</div>
+    <div class="spot-body"><div class="spot-name">${s.name}</div><div class="spot-meta">${s.sub}</div></div>
+    ${i > 0 ? `<div class="spot-dist">~${dist}mi</div>` : '<div class="spot-dist">🏠 Home</div>'}
+  `;
+  div.addEventListener('click', () => {
+    map.setView(s.coords, 16);
+    const allLayers = [];
+    map.eachLayer(l => { if (l.getLatLng) allLayers.push(l); });
+    const marker = allLayers.find(l => {
+      const ll = l.getLatLng();
+      return Math.abs(ll.lat - s.coords[0]) < 0.0001 && Math.abs(ll.lng - s.coords[1]) < 0.0001;
+    });
+    if (marker && marker.openPopup) marker.openPopup();
+    document.querySelector('.map-wrap').scrollIntoView({ behavior: 'smooth' });
+  });
+  spotsEl.appendChild(div);
+});
+</script>
+</body>
+</html>
