@@ -91,7 +91,8 @@ body {
 
 /* ── SIDEBAR ── */
 .sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--white); border-right: 1.5px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-.sidebar-inner { padding: 10px; overflow-y: auto; flex: 1; }
+.sidebar-inner { padding: 10px; overflow: hidden; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+#acList { overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px; }
 .sidebar h2 { font-size: 9.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ocean); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 2px solid var(--teal); }
 .add-btn { width: 100%; padding: 8px; border-radius: 8px; border: 2px dashed var(--teal); background: var(--mint-l); color: var(--ocean-d); font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; cursor: pointer; margin-bottom: 8px; transition: all .14s; }
 .add-btn:hover { background: var(--teal); color: #fff; }
@@ -142,15 +143,14 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .pa-name { font-size: 10.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pa-dur { font-size: 9px; font-weight: 600; opacity: .85; }
 .pa-meta { font-size: 9px; font-weight: 600; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pa-rm { position: absolute; top: 3px; right: 4px; width: 15px; height: 15px; background: rgba(0,0,0,.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; cursor: pointer; opacity: 0; transition: opacity .12s; z-index: 6; }
-.pa:hover .pa-rm { opacity: 1; }
+.pa-menu-btn { position: absolute; top: 3px; right: 4px; width: 16px; height: 16px; border-radius: 50%; background: rgba(0,0,0,.28); color: #fff; font-size: 11px; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; letter-spacing: -1px; padding-bottom: 2px; z-index: 6; }
+.pa-menu-btn:hover { background: rgba(0,0,0,.45); }
 .pa-resize { position: absolute; bottom: 0; left: 0; right: 0; height: 10px; cursor: ns-resize; display: flex; align-items: center; justify-content: center; z-index: 7; opacity: 0; transition: opacity .15s; }
 .pa:hover .pa-resize { opacity: 1; }
 .pa-resize::after { content: ''; width: 24px; height: 3px; background: rgba(255,255,255,.6); border-radius: 2px; }
 .pa.owner-lacey { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); }
 .pa.owner-nicole { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); }
 .pa.owner-both { background: linear-gradient(to left, var(--nicole-c), var(--lacey-c)); }
-.who-badge { position: absolute; top: 3px; right: 5px; bottom: auto; font-size: 8px; font-weight: 800; color: #fff; opacity: 1; background: rgba(0,0,0,.32); border-radius: 6px; padding: 1px 4px; cursor: pointer; text-shadow: 0 1px 1px rgba(0,0,0,.2); }
 
 /* ── MOBILE CARD-COLUMN CALENDAR ── */
 .cc-wrap { display: flex; gap: 10px; overflow-x: auto; padding: 10px 10px 90px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
@@ -510,6 +510,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
         <div class="ftab" data-f="food">🍕</div>
         <div class="ftab" data-f="nature">🌿</div>
         <div class="ftab" data-f="beach">🏖️</div>
+        <div class="ftab" data-f="hidden" title="Removed activities">🚮</div>
       </div>
       <div id="acList"></div>
     </div>
@@ -876,6 +877,7 @@ const BASE_ACTS = [
 let state = {
   placed: Object.fromEntries(DAYS.map(d => [d.id, {}])),
   customActs: [],
+  hiddenBase: [],
   chat: [],
 };
 let ui = {
@@ -891,7 +893,7 @@ let ui = {
 };
 
 // ── HELPERS ───────────────────────────────────────────────────────
-function allActs() { return [...BASE_ACTS, ...state.customActs]; }
+function allActs() { return [...BASE_ACTS.filter(a => !state.hiddenBase.includes(a.id)), ...state.customActs]; }
 function getAct(id) { return allActs().find(a => a.id === id); }
 function isDesktop() { return window.innerWidth >= 768; }
 function slotH() { return isDesktop() ? SLOT_H_DESKTOP : SLOT_H_MOBILE; }
@@ -958,7 +960,7 @@ async function saveBin() {
     const r = await fetch(`${API_BASE}/b/${BIN_ID}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-      body: JSON.stringify({ placed: state.placed, customActs: state.customActs, chat: state.chat }),
+      body: JSON.stringify({ placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, chat: state.chat }),
     });
     setSyncState(r.ok ? 'ok' : 'err');
   } catch { setSyncState('err'); }
@@ -1003,6 +1005,7 @@ async function loadBin() {
       }
     }
     if (record.customActs) state.customActs = record.customActs;
+    if (record.hiddenBase) state.hiddenBase = record.hiddenBase;
     if (record.chat) {
       const prevLen = state.chat.length;
       state.chat = record.chat;
@@ -1112,20 +1115,38 @@ function buildActCard(a, forSheet = false) {
       ${closedText}
     </div>
     ${!used && !closed ? `<button class="ac-add" data-aid="${a.id}">＋</button>` : ''}
-    ${a.isCustom ? `<button class="ac-del" data-del="${a.id}">✕</button>` : ''}
+    <button class="ac-del" data-del="${a.id}" title="${a.isCustom ? 'Delete' : 'Remove from list'}">✕</button>
   `;
   if (!used && !closed) {
     div.querySelector('.ac-add').addEventListener('click', e => { e.stopPropagation(); pickActivity(a.id); });
   }
-  if (a.isCustom) {
-    div.querySelector('[data-del]')?.addEventListener('click', e => { e.stopPropagation(); deleteCustom(a.id); });
-  }
+  div.querySelector('[data-del]')?.addEventListener('click', e => {
+    e.stopPropagation();
+    a.isCustom ? deleteCustom(a.id) : hideBaseAct(a.id);
+  });
   return div;
 }
 
 function renderSidebar() {
   const list = document.getElementById('acList');
   const sheetList = document.getElementById('sheetAcList');
+  if (ui.curFilter === 'hidden') {
+    const hidden = BASE_ACTS.filter(a => state.hiddenBase.includes(a.id));
+    const empty = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:11px">Nothing hidden — removed activities show up here</div>';
+    const build = a => {
+      const div = document.createElement('div');
+      div.className = 'ac';
+      div.innerHTML = `
+        <div class="ac-left"><div class="ac-name">${a.e} ${a.name}</div></div>
+        <button class="ac-add" title="Restore to list">↺</button>
+      `;
+      div.querySelector('.ac-add').addEventListener('click', e => { e.stopPropagation(); restoreBaseAct(a.id); });
+      return div;
+    };
+    if (list) { list.innerHTML = ''; hidden.length ? hidden.forEach(a => list.appendChild(build(a))) : list.innerHTML = empty; }
+    if (sheetList) { sheetList.innerHTML = ''; hidden.length ? hidden.forEach(a => sheetList.appendChild(build(a))) : sheetList.innerHTML = empty; }
+    return;
+  }
   const acts = ui.curFilter === 'all' ? allActs()
     : ui.curFilter === 'custom' ? state.customActs
     : allActs().filter(a => a.type === ui.curFilter);
@@ -1495,8 +1516,6 @@ function renderCalendar() {
           const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
           const isShared = att.includes('lacey') && att.includes('nicole');
           const ownerClass = isShared ? 'owner-both' : (att[0] === 'nicole' ? 'owner-nicole' : 'owner-lacey');
-          const showBadge = true;
-          const badgeText = isShared ? 'L·N' : (att[0] === 'nicole' ? 'N' : 'L');
           const pa = document.createElement('div');
           pa.className = `pa ${ownerClass}`;
           pa.style.height = `${entry.span * sh - 4}px`;
@@ -1505,32 +1524,13 @@ function renderCalendar() {
             <div class="pa-name">${a.e} ${a.name}</div>
             <div class="pa-dur">⏱ ${durLabel(entry.span)}</div>
             <div class="pa-meta">${slotToTime(s)} · ${a.cost === 0 ? 'Free' : `$${a.cost}/p`}</div>
-            <div class="pa-rm" title="Remove">✕</div>
-            ${showBadge ? `<div class="who-badge" title="Tap to cycle: Lacey → Nicole → Both">${badgeText}</div>` : ''}
+            <div class="pa-menu-btn" title="Options">⋯</div>
             <div class="pa-resize" title="Drag to resize"></div>
           `;
 
-          const badgeEl = pa.querySelector('.who-badge');
-          if (badgeEl) {
-            badgeEl.addEventListener('click', e => {
-              e.stopPropagation();
-              const nowShared = att.includes('lacey') && att.includes('nicole');
-              const nowSolo = !nowShared ? (att[0] || entry.who || 'lacey') : null;
-              let next;
-              if (nowShared) next = { attendees: ['lacey'], who: 'lacey' };
-              else if (nowSolo === 'lacey') next = { attendees: ['nicole'], who: 'nicole' };
-              else next = { attendees: ['lacey', 'nicole'], who: entry.who };
-              for (let i = s; i < s + entry.span; i++) {
-                state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: next.attendees, who: next.who };
-              }
-              renderCalendar();
-              saveBin();
-            });
-          }
-
-          pa.querySelector('.pa-rm').addEventListener('click', e => {
+          pa.querySelector('.pa-menu-btn').addEventListener('click', e => {
             e.stopPropagation();
-            removeAct(day.id, s, entry.span);
+            showJellyMenu(pa, day.id, s, entry, a, att);
           });
 
           pa.addEventListener('click', e => {
@@ -1541,7 +1541,7 @@ function renderCalendar() {
           // Drag to move
           let grabOffset = 0;
           pa.addEventListener('dragstart', e => {
-            if (e.target.classList.contains('pa-resize') || e.target.classList.contains('pa-rm')) { e.preventDefault(); return; }
+            if (e.target.classList.contains('pa-resize') || e.target.classList.contains('pa-menu-btn')) { e.preventDefault(); return; }
             const rect = pa.getBoundingClientRect();
             grabOffset = Math.max(0, Math.min(Math.floor((e.clientY - rect.top) / sh), entry.span - 1));
             e.dataTransfer.effectAllowed = 'move';
@@ -1728,6 +1728,20 @@ function deleteCustom(id) {
   state.customActs = state.customActs.filter(a => a.id !== id);
   DAYS.forEach(d => { Object.keys(state.placed[d.id]).forEach(s => { if (state.placed[d.id][s]?.actId === id) delete state.placed[d.id][s]; }); });
   toast('Custom activity removed', 'w');
+  renderAll();
+  saveBin();
+}
+
+function hideBaseAct(id) {
+  if (!confirm('Remove this from the activity list? You can restore it later from Filters → Hidden.')) return;
+  if (!state.hiddenBase.includes(id)) state.hiddenBase.push(id);
+  toast('Removed from list', 'w');
+  renderAll();
+  saveBin();
+}
+
+function restoreBaseAct(id) {
+  state.hiddenBase = state.hiddenBase.filter(x => x !== id);
   renderAll();
   saveBin();
 }
