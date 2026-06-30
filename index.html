@@ -117,8 +117,10 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .col-hdr .dn { font-size: 12px; font-weight: 800; }
 .col-hdr .dd { font-size: 8.5px; font-weight: 600; color: var(--muted); }
 .col-hdr .dc { font-size: 8.5px; font-weight: 800; color: var(--coral); margin-top: 1px; }
-.tlabel { font-size: 8.5px; font-weight: 700; color: var(--muted); text-align: right; padding: 0 5px; height: 48px; display: flex; align-items: flex-start; padding-top: 3px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--white); flex-shrink: 0; }
-.tslot { height: 48px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); background: var(--sky-l); position: relative; cursor: pointer; }
+.tlabel { font-size: 8.5px; font-weight: 700; color: var(--muted); text-align: right; padding: 0 5px; height: 40px; display: flex; align-items: flex-start; padding-top: 3px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--white); flex-shrink: 0; position: relative; }
+.tlabel .tick15 { position: absolute; right: 5px; bottom: 2px; font-size: 6.5px; font-weight: 600; color: var(--border); }
+.tlabel .tick15::before { content: ''; position: absolute; right: -5px; bottom: 3px; width: 5px; height: 1px; background: var(--border); }
+.tslot { height: 40px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); background: var(--sky-l); position: relative; cursor: pointer; }
 .tslot:nth-child(even) { background: rgba(184,228,240,.22); }
 .tslot.occ { background: rgba(74,191,176,.12); cursor: default; }
 .tslot.drag-over { background: var(--mint-l) !important; outline: 2px dashed var(--teal); }
@@ -667,9 +669,9 @@ const DAYS = [
   { id:'sat', name:'Sat', date:'Jul 25', label:'Day 4' },
   { id:'sun', name:'Sun', date:'Jul 26', label:'Checkout' },
 ];
-const H_START = 6, H_END = 24;
+const H_START = 7, H_END = 24;
 const TOTAL_SLOTS = (H_END - H_START) * 2; // 30-min slots
-const SLOT_H_DESKTOP = 48, SLOT_H_MOBILE = 52;
+const SLOT_H_DESKTOP = 40, SLOT_H_MOBILE = 52;
 const REUSABLE_TYPES = new Set(['pool','food','travel','custom']);
 
 const BASE_ACTS = [
@@ -1094,6 +1096,10 @@ function renderCalendar() {
     const lbl = document.createElement('div');
     lbl.className = 'tlabel';
     if (s % 2 === 0) lbl.textContent = slotToTime(s);
+    const tick = document.createElement('span');
+    tick.className = 'tick15';
+    tick.textContent = ':' + (s % 2 === 0 ? '15' : '45');
+    lbl.appendChild(tick);
     grid.appendChild(lbl);
 
     activeDays.forEach(day => {
