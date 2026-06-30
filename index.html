@@ -226,7 +226,9 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 /* ── CHAT ── */
 .chat-fab { position: fixed; bottom: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--teal); border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(27,122,138,.4); z-index: 400; display: flex; align-items: center; justify-content: center; font-size: 24px; user-select: none; transition: box-shadow .2s; }
 .chat-fab:hover { box-shadow: 0 6px 20px rgba(27,122,138,.55); }
-.chat-fab.has-unread::after { content: ''; position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--coral); border: 2px solid white; }
+.chat-fab.has-unread::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--ocean-l); animation: wave-ping 1.6s ease-out infinite; pointer-events: none; }
+.chat-fab.has-unread::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--teal); animation: wave-ping 1.6s ease-out infinite .5s; pointer-events: none; }
+@keyframes wave-ping { 0% { transform: scale(.8); opacity: .9; } 100% { transform: scale(1.6); opacity: 0; } }
 .chat-panel { position: fixed; bottom: 80px; right: 20px; width: 300px; height: 380px; background: var(--white); border-radius: 16px; box-shadow: 0 8px 32px rgba(27,60,70,.22); border: 1.5px solid var(--border); z-index: 401; display: none; flex-direction: column; overflow: hidden; }
 .chat-panel.open { display: flex; }
 .chat-hdr { background: linear-gradient(135deg, var(--ocean-d), var(--teal)); color: white; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
@@ -239,7 +241,9 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .chat-bubble { padding: 7px 11px; border-radius: 12px; font-size: 12px; line-height: 1.45; word-break: break-word; }
 .chat-msg.me .chat-bubble { background: var(--teal); color: white; border-radius: 12px 12px 3px 12px; }
 .chat-msg.them .chat-bubble { background: var(--sky-l); color: var(--text); border-radius: 12px 12px 12px 3px; border: 1px solid var(--border); }
-.chat-who { font-size: 9px; font-weight: 800; color: var(--muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+.chat-who { font-size: 9.5px; font-weight: 800; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
+.chat-who.lacey { color: var(--lacey-d); }
+.chat-who.nicole { color: var(--nicole-d); }
 .chat-ts { font-size: 8.5px; color: var(--muted); margin-top: 2px; }
 .chat-empty { text-align: center; padding: 20px; color: var(--muted); font-size: 11px; font-style: italic; }
 .chat-input-row { display: flex; gap: 6px; padding: 8px 10px; border-top: 1px solid var(--border); flex-shrink: 0; background: var(--sand); }
@@ -809,7 +813,16 @@ async function loadBin() {
     const { record } = await r.json();
     if (record.placed) { DAYS.forEach(d => { state.placed[d.id] = record.placed[d.id] || {}; }); }
     if (record.customActs) state.customActs = record.customActs;
-    if (record.chat) state.chat = record.chat;
+    if (record.chat) {
+      const prevLen = state.chat.length;
+      state.chat = record.chat;
+      if (state.chat.length > prevLen) {
+        const latest = state.chat[state.chat.length - 1];
+        if (latest.who !== ui.currentWho && !ui.chatOpen) {
+          document.getElementById('chatFab')?.classList.add('has-unread');
+        }
+      }
+    }
     renderAll();
     Chat.renderMessages();
     setSyncState('ok');
@@ -1060,12 +1073,18 @@ function renderCardCalendar(grid) {
 function renderCalendar() {
   const grid = document.getElementById('calGrid');
   if (!grid) return;
+  const wrapEl = grid.closest('.cal-wrap');
+  const savedTop = wrapEl ? wrapEl.scrollTop : 0;
+  const innerScroll = grid.querySelector('.cc-wrap');
+  const savedLeft = innerScroll ? innerScroll.scrollLeft : (wrapEl ? wrapEl.scrollLeft : 0);
   grid.innerHTML = '';
   const desktop = isDesktop();
 
   if (!desktop) {
     renderCardCalendar(grid);
     document.getElementById('totalCost').textContent = `$${totalCost()}`;
+    const newWrap = grid.querySelector('.cc-wrap');
+    if (newWrap) newWrap.scrollLeft = savedLeft;
     return;
   }
 
@@ -1229,6 +1248,7 @@ function renderCalendar() {
   }
 
   document.getElementById('totalCost').textContent = `$${totalCost()}`;
+  if (wrapEl) { wrapEl.scrollTop = savedTop; wrapEl.scrollLeft = savedLeft; }
 }
 
 // ── RENDER ALL ────────────────────────────────────────────────────
@@ -1326,6 +1346,7 @@ const Chat = {
   renderMessages() {
     const el = document.getElementById('chatMessages');
     if (!el) return;
+    const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
     if (!state.chat.length) {
       el.innerHTML = '<div class="chat-empty">No messages yet — say hi! 🏈</div>';
       return;
@@ -1339,13 +1360,13 @@ const Chat = {
       const time = ts.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const day = ts.toLocaleDateString([], { month: 'short', day: 'numeric' });
       div.innerHTML = `
-        ${!isMe ? `<div class="chat-who">${m.who === 'nicole' ? 'Nicole 🧡' : 'Lacey 💜'}</div>` : ''}
+        ${!isMe ? `<div class="chat-who ${m.who}">${m.who === 'nicole' ? 'Nicole 🧡' : 'Lacey 💜'}</div>` : ''}
         <div class="chat-bubble">${m.text}</div>
         <div class="chat-ts">${day} · ${time}</div>
       `;
       el.appendChild(div);
     });
-    el.scrollTop = el.scrollHeight;
+    if (wasNearBottom) el.scrollTop = el.scrollHeight;
   },
 };
 
