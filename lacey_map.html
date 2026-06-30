@@ -10,66 +10,120 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --ocean:#1B7A8A;--ocean-d:#0F5A6A;--ocean-l:#3DA5B8;
-  --sand:#FAF3E0;--sand-d:#EDE0C4;--tan-d:#C4A882;--border:#C5DDE3;--sky-l:#E0F4FA;
+  --ocean:#1B7A8A;--ocean-d:#0F5A6A;--sand:#FAF3E0;--sand-d:#EDE0C4;--tan-d:#C4A882;--border:#C5DDE3;--sky-l:#E0F4FA;
   --lacey-c:#C9798A;--lacey-l:#E8B8C2;--lacey-d:#A8556A;
   --nicole-c:#6FCFC4;--nicole-l:#AEE8E0;--nicole-d:#1F7A6F;
-  --text:#2C4A52;--muted:#4F7681;--teal:#1B8276;
+  --text:#2C4A52;--muted:#4F7681;--teal:#1B8276;--coral:#B8543A;
+  --me-c: var(--lacey-d); --me-l: var(--lacey-l);
 }
-html,body{height:100%;font-family:'Nunito',sans-serif;color:var(--text);background:var(--sand)}
-body{
-  display:flex;flex-direction:column;min-height:100vh;
+html,body{font-family:'Nunito',sans-serif;color:var(--text);background:var(--sand)}
+body{display:flex;flex-direction:column;min-height:100vh;
   background-image:
-    radial-gradient(ellipse 500px 300px at 5% 10%, rgba(232,184,194,.28), transparent 60%),
-    radial-gradient(ellipse 600px 400px at 92% 25%, rgba(237,224,196,.6), transparent 65%),
-    radial-gradient(ellipse 400px 280px at 15% 88%, rgba(232,184,194,.22), transparent 60%);
+    radial-gradient(ellipse 500px 300px at 5% 10%, rgba(232,184,194,.26), transparent 60%),
+    radial-gradient(ellipse 600px 400px at 92% 25%, rgba(237,224,196,.55), transparent 65%),
+    radial-gradient(ellipse 400px 280px at 15% 88%, rgba(232,184,194,.20), transparent 60%);
   background-attachment:fixed;
 }
 
 /* HEADER */
-.hdr{background:linear-gradient(135deg,var(--lacey-d),var(--lacey-c));color:#fff;padding:16px 18px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 14px rgba(168,85,106,.3)}
-.hdr-left{display:flex;align-items:center;gap:10px}
-.hdr-av{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900}
-.hdr-name{font-family:'Playfair Display',serif;font-size:18px}
-.hdr-sub{font-size:10px;opacity:.85;font-weight:700;margin-top:1px}
-.hdr-nav{display:flex;gap:8px}
-.nav-btn{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);border-radius:12px;color:#fff;font-family:'Nunito';font-weight:800;font-size:11px;padding:6px 11px;cursor:pointer;text-decoration:none;white-space:nowrap}
-.nav-btn:active{background:rgba(255,255,255,.32)}
-.nav-btn.back{font-size:12px;padding:6px 10px}
+.hdr{background:linear-gradient(135deg,var(--lacey-d),var(--lacey-c));color:#fff;padding:16px 18px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 4px 14px rgba(168,85,106,.3)}
+.hdr-left{display:flex;align-items:center;gap:10px;min-width:0}
+.hdr-av{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;flex-shrink:0}
+.hdr-name{font-family:'Playfair Display',serif;font-size:18px;white-space:nowrap}
+.hdr-sub{font-size:9.5px;opacity:.82;font-weight:700;margin-top:1px}
+.hdr-nav{display:flex;gap:7px;flex-shrink:0}
+.nav-btn{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);border-radius:11px;color:#fff;font-family:'Nunito';font-weight:800;font-size:11px;padding:5px 10px;cursor:pointer;text-decoration:none;white-space:nowrap}
 
-/* STATS BAR */
-.stats{display:flex;gap:10px;padding:14px 16px 0;overflow-x:auto;scroll-snap-type:x mandatory}
-.stat{flex-shrink:0;scroll-snap-align:start;background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.45));border:1px solid rgba(255,255,255,.6);border-radius:14px 18px 12px 16px / 16px 12px 18px 14px;padding:10px 14px;box-shadow:0 2px 8px rgba(168,85,106,.1)}
+/* STATS */
+.stats{display:flex;gap:10px;padding:14px 16px 0;overflow-x:auto}
+.stat{flex-shrink:0;background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.4));border:1px solid rgba(255,255,255,.65);border-radius:14px 18px 12px 16px / 16px 12px 18px 14px;padding:10px 14px;box-shadow:0 2px 8px rgba(168,85,106,.1)}
 .stat-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.stat-val{font-family:'Playfair Display',serif;font-size:22px;color:var(--lacey-d);line-height:1.1}
+.stat-val{font-family:'Playfair Display',serif;font-size:21px;color:var(--lacey-d);line-height:1.1}
 .stat-unit{font-size:10px;color:var(--muted);font-weight:700;margin-top:1px}
 
-/* MAP */
-.map-wrap{flex:1;margin:14px 16px 0;border-radius:18px 22px 16px 20px / 20px 16px 22px 18px;overflow:hidden;border:2px solid rgba(201,121,138,.35);box-shadow:0 4px 16px rgba(15,90,106,.15);min-height:300px}
-#map{height:380px}
-
-/* QUICK LINKS */
+/* SECTION */
 .section{padding:14px 16px 0}
 .section-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-.links{display:flex;gap:10px;flex-wrap:wrap}
-.link-card{flex:1;min-width:calc(50% - 5px);background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.35));border:1px solid rgba(255,255,255,.6);border-radius:14px;padding:14px 14px;box-shadow:0 2px 8px rgba(15,90,106,.1);cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:10px;color:var(--text)}
-.link-card:active{transform:scale(.97)}
-.link-card .lc-ico{font-size:24px;flex-shrink:0}
-.link-card .lc-name{font-weight:800;font-size:13px;color:var(--lacey-d)}
-.link-card .lc-sub{font-size:10px;color:var(--muted);margin-top:1px}
 
-/* SPOTS LIST */
-.spots{padding:14px 16px 30px}
-.spot{display:flex;align-items:center;gap:10px;background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.3));border:1px solid rgba(255,255,255,.6);border-radius:12px 16px 10px 14px / 14px 10px 16px 12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;box-shadow:0 2px 6px rgba(15,90,106,.08)}
+/* CONDO CARD */
+.condo-card{background:linear-gradient(160deg,rgba(255,255,255,.92),rgba(232,184,194,.45));border:1px solid rgba(255,255,255,.7);border-radius:18px 22px 16px 20px / 20px 16px 22px 18px;padding:16px 18px;box-shadow:0 3px 12px rgba(168,85,106,.12);position:relative}
+.condo-rows{display:flex;flex-direction:column;gap:10px}
+.condo-row{display:flex;align-items:flex-start;gap:10px}
+.condo-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.condo-body{flex:1;min-width:0}
+.condo-lbl{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.condo-val{font-size:13px;font-weight:700;color:var(--text);margin-top:1px;word-break:break-all}
+.condo-empty{font-size:12px;color:var(--muted);font-style:italic}
+.condo-edit-btn{position:absolute;top:12px;right:12px;background:rgba(168,85,106,.12);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;color:var(--lacey-d);cursor:pointer}
+.condo-share-btn{display:flex;align-items:center;gap:6px;margin-top:14px;background:linear-gradient(135deg,var(--lacey-l),var(--lacey-d));color:#fff;border:none;border-radius:12px;padding:10px 16px;font-family:'Nunito';font-weight:800;font-size:13px;cursor:pointer;width:100%;justify-content:center;box-shadow:0 3px 10px rgba(168,85,106,.25)}
+
+/* MAP with old-world toggle */
+.map-section{padding:14px 16px 0;position:relative}
+.map-wrap{border-radius:18px 22px 16px 20px / 20px 16px 22px 18px;overflow:hidden;border:2px solid rgba(201,121,138,.3);box-shadow:0 4px 16px rgba(15,90,106,.15)}
+#map{height:320px}
+.oldworld-btn{position:absolute;bottom:22px;left:28px;z-index:800;background:linear-gradient(135deg,#C4A458,#8B6914);border:2px solid rgba(255,255,255,.6);border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.3);color:#fff}
+
+/* SPOTS */
+.spot{display:flex;align-items:center;gap:10px;background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.28));border:1px solid rgba(255,255,255,.6);border-radius:12px 16px 10px 14px / 14px 10px 16px 12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;box-shadow:0 2px 6px rgba(15,90,106,.08)}
 .spot-ico{font-size:20px;flex-shrink:0}
 .spot-body{flex:1;min-width:0}
 .spot-name{font-weight:800;font-size:13px}
 .spot-meta{font-size:10.5px;color:var(--muted);margin-top:1px}
 .spot-dist{font-size:10px;font-weight:800;color:var(--lacey-d);flex-shrink:0}
 
-/* Custom Leaflet markers */
-.marker-condo{background:var(--lacey-d);width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
-.marker-act{background:var(--ocean);width:22px;height:22px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:11px}
+/* QUICK LINKS */
+.links{display:flex;gap:10px;flex-wrap:wrap}
+.link-card{flex:1;min-width:calc(50% - 5px);background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,184,194,.3));border:1px solid rgba(255,255,255,.65);border-radius:14px;padding:13px;box-shadow:0 2px 8px rgba(15,90,106,.09);cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:9px;color:var(--text)}
+.link-card:active{transform:scale(.97)}
+.link-card .lc-ico{font-size:22px;flex-shrink:0}
+.link-card .lc-name{font-weight:800;font-size:12.5px;color:var(--lacey-d)}
+.link-card .lc-sub{font-size:9.5px;color:var(--muted);margin-top:1px}
+
+/* SHARE MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(15,50,60,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center}
+.share-sheet{background:linear-gradient(160deg,rgba(255,255,255,.96),rgba(232,184,194,.6));border-radius:24px 24px 0 0;padding:24px 22px 36px;width:100%;max-width:480px;box-shadow:0 -8px 30px rgba(168,85,106,.2)}
+.share-title{font-family:'Playfair Display',serif;color:var(--lacey-d);font-size:20px;margin-bottom:4px}
+.share-sub{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:20px}
+.share-url{background:rgba(255,255,255,.8);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--ocean-d);word-break:break-all;margin-bottom:14px}
+.share-btns{display:flex;gap:10px;margin-bottom:20px}
+.share-btn{flex:1;padding:11px;border-radius:14px;border:none;font-family:'Nunito';font-weight:800;font-size:12px;cursor:pointer;text-align:center}
+.share-btn.copy{background:var(--ocean-d);color:#fff}
+.share-btn.native{background:var(--lacey-d);color:#fff}
+.qr-wrap{text-align:center;margin-bottom:18px}
+.qr-wrap img{border-radius:12px;border:6px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.qr-lbl{font-size:10px;color:var(--muted);font-weight:700;margin-top:8px}
+.close-btn{width:100%;padding:12px;border-radius:14px;background:rgba(0,0,0,.07);border:none;font-family:'Nunito';font-weight:800;font-size:13px;cursor:pointer;color:var(--text)}
+
+/* CONDO EDIT MODAL */
+.edit-sheet{background:linear-gradient(160deg,rgba(255,255,255,.96),rgba(232,184,194,.55));border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-width:480px;box-shadow:0 -8px 30px rgba(168,85,106,.2);max-height:88vh;overflow-y:auto}
+.edit-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.edit-lbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.edit-inp{background:rgba(255,255,255,.88);border:1.5px solid var(--border);border-radius:10px;padding:9px 11px;font-family:'Nunito';font-size:13px;color:var(--text);outline:none;width:100%}
+.edit-inp:focus{border-color:var(--lacey-c)}
+.save-btn{width:100%;padding:13px;border-radius:14px;background:linear-gradient(135deg,var(--lacey-l),var(--lacey-d));color:#fff;border:none;font-family:'Nunito';font-weight:800;font-size:14px;cursor:pointer;margin-top:4px}
+
+/* OLD WORLD MAP MODAL */
+.ow-overlay{position:fixed;inset:0;z-index:2000;background:rgba(10,30,20,.7);display:flex;align-items:center;justify-content:center;padding:16px}
+.ow-modal{position:relative;width:100%;max-width:540px;background:#E8D5A0;border-radius:6px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:unfold .5s cubic-bezier(.34,1.2,.64,1) both}
+@keyframes unfold{from{transform:scaleX(.08) scaleY(.08);opacity:.3}to{transform:scaleX(1) scaleY(1);opacity:1}}
+.ow-paper{
+  position:relative;padding:0 0 60px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(255,240,180,.4), transparent),
+    repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(139,100,20,.05) 25px),
+    repeating-linear-gradient(90deg, transparent, transparent 24px, rgba(139,100,20,.05) 25px),
+    linear-gradient(170deg,#EDD98A 0%,#D4B86A 35%,#C9A84C 70%,#B8963C 100%);
+}
+.ow-border{position:absolute;inset:8px;border:3px solid rgba(100,60,10,.35);border-radius:4px;pointer-events:none;z-index:10}
+.ow-border::before{content:'';position:absolute;inset:5px;border:1.5px solid rgba(100,60,10,.2);border-radius:3px}
+.ow-header{position:relative;z-index:5;padding:18px 20px 10px;text-align:center}
+.ow-header h2{font-family:'Playfair Display',serif;font-size:20px;color:#3D2000;text-shadow:1px 1px 2px rgba(255,220,100,.5)}
+.ow-header p{font-size:10px;color:#6B4010;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.ow-map-wrap{margin:0 14px;border-radius:4px;overflow:hidden;border:4px solid rgba(100,60,10,.3);box-shadow:inset 0 0 20px rgba(100,60,10,.15)}
+#owMap{height:320px;filter:sepia(80%) brightness(.9) saturate(.7) contrast(1.1)}
+.ow-compass{position:absolute;bottom:68px;right:26px;z-index:800;width:44px;height:44px;opacity:.85}
+.ow-close{position:absolute;top:10px;right:10px;z-index:20;background:rgba(100,60,10,.2);border:1.5px solid rgba(100,60,10,.3);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#3D2000;font-weight:900}
+.ow-footer{padding:8px 20px 0;text-align:center;font-size:9.5px;font-weight:800;color:#6B4010;letter-spacing:.06em;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -79,150 +133,300 @@ body{
     <div class="hdr-av">L</div>
     <div>
       <div class="hdr-name">Lacey's Map</div>
-      <div class="hdr-sub">Port Aransas, TX · Jul 22–26</div>
+      <div class="hdr-sub">Port Aransas · Jul 22–26, 2026</div>
     </div>
   </div>
   <div class="hdr-nav">
     <a class="nav-btn" href="index.html">🗓 Planner</a>
-    <a class="nav-btn back" href="home.html">↩</a>
+    <a class="nav-btn" href="home.html">↩</a>
   </div>
 </div>
 
 <div class="stats">
-  <div class="stat">
-    <div class="stat-label">Port A In</div>
-    <div class="stat-val" id="daysLeft">--</div>
-    <div class="stat-unit">days</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Trip Length</div>
-    <div class="stat-val">5</div>
-    <div class="stat-unit">days</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Crew</div>
-    <div class="stat-val">5</div>
-    <div class="stat-unit">people</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Condo</div>
-    <div class="stat-val" style="font-size:15px;padding-top:3px">Unit 212</div>
-    <div class="stat-unit">Executive Keys</div>
-  </div>
+  <div class="stat"><div class="stat-label">Port A In</div><div class="stat-val" id="daysLeft">--</div><div class="stat-unit">days</div></div>
+  <div class="stat"><div class="stat-label">Trip</div><div class="stat-val">5</div><div class="stat-unit">days</div></div>
+  <div class="stat"><div class="stat-label">Crew</div><div class="stat-val">5</div><div class="stat-unit">people</div></div>
+  <div class="stat"><div class="stat-label">Condo</div><div class="stat-val" style="font-size:14px;padding-top:4px">Unit 212</div><div class="stat-unit">Executive Keys</div></div>
 </div>
 
-<div class="map-wrap">
-  <div id="map"></div>
-</div>
-
+<!-- CONDO INFO -->
 <div class="section">
+  <div class="section-title">Condo info</div>
+  <div class="condo-card">
+    <button class="condo-edit-btn" onclick="openCondoEdit()">✏️ Edit</button>
+    <div class="condo-rows" id="condoRows">
+      <div class="condo-empty">Tap Edit to add condo details — address, door code, WiFi...</div>
+    </div>
+    <button class="condo-share-btn" onclick="openShare()">
+      🔗 Share trip info with family
+    </button>
+  </div>
+</div>
+
+<!-- MAP -->
+<div class="map-section">
+  <div class="section-title" style="padding:0 0 10px">Map</div>
+  <div class="map-wrap">
+    <div id="map"></div>
+  </div>
+  <button class="oldworld-btn" onclick="openOldWorld()" title="Old-world explorer map">🗺️</button>
+</div>
+
+<!-- QUICK LINKS -->
+<div class="section" style="padding-bottom:0">
   <div class="section-title">Quick links</div>
   <div class="links">
-    <a class="link-card" href="index.html">
-      <span class="lc-ico">🗓</span>
-      <div><div class="lc-name">Trip Planner</div><div class="lc-sub">Calendar & activities</div></div>
-    </a>
-    <a class="link-card" href="lists.html">
-      <span class="lc-ico">📋</span>
-      <div><div class="lc-name">Lists</div><div class="lc-sub">Packing & grocery</div></div>
-    </a>
-    <a class="link-card" href="https://www.google.com/maps/place/Executive+Keys+Condominiums/@27.8350,-97.0598,15z" target="_blank" rel="noopener">
-      <span class="lc-ico">🏠</span>
-      <div><div class="lc-name">Our Condo</div><div class="lc-sub">Executive Keys, Unit 212</div></div>
-    </a>
-    <a class="link-card" href="nicole_map.html">
-      <span class="lc-ico" style="font-size:18px">N</span>
-      <div><div class="lc-name">Nicole's Map</div><div class="lc-sub">See her view</div></div>
-    </a>
+    <a class="link-card" href="index.html"><span class="lc-ico">🗓</span><div><div class="lc-name">Planner</div><div class="lc-sub">Calendar & activities</div></div></a>
+    <a class="link-card" href="lists.html"><span class="lc-ico">📋</span><div><div class="lc-name">Lists</div><div class="lc-sub">Packing & grocery</div></div></a>
+    <a class="link-card" href="https://www.google.com/maps/search/Executive+Keys+Condominiums+Port+Aransas+TX" target="_blank"><span class="lc-ico">🏠</span><div><div class="lc-name">Directions</div><div class="lc-sub">to the condo</div></div></a>
+    <a class="link-card" href="nicole_map.html"><span class="lc-ico" style="width:22px;height:22px;background:var(--nicole-d);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900">N</span><div><div class="lc-name">Nicole's Map</div><div class="lc-sub">Her view</div></div></a>
   </div>
 </div>
 
-<div class="spots">
-  <div class="section-title" style="margin-top:0">Key spots</div>
-  <!-- Spots rendered by JS -->
+<!-- SPOTS -->
+<div class="section" style="padding-bottom:30px">
+  <div class="section-title" style="margin-top:14px">Key spots</div>
+  <div id="spotsList"></div>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="shareModal" class="modal-ov" style="display:none" onclick="if(event.target===this)closeShare()">
+  <div class="share-sheet">
+    <div class="share-title">Share trip info 🌊</div>
+    <div class="share-sub">Husbands, teens, the whole crew — read-only, no login needed</div>
+    <div class="share-url" id="shareUrl">Loading...</div>
+    <div class="share-btns">
+      <button class="share-btn copy" onclick="copyShareUrl()">📋 Copy link</button>
+      <button class="share-btn native" onclick="nativeShare()">📤 Share...</button>
+    </div>
+    <div class="qr-wrap">
+      <img id="qrImg" src="" width="180" height="180" alt="QR Code">
+      <div class="qr-lbl">Scan to open on any phone</div>
+    </div>
+    <button class="close-btn" onclick="closeShare()">Done</button>
+  </div>
+</div>
+
+<!-- CONDO EDIT MODAL -->
+<div id="condoEditModal" class="modal-ov" style="display:none" onclick="if(event.target===this)closeCondoEdit()">
+  <div class="edit-sheet">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--lacey-d)">Condo Details</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;margin-top:2px">Saved & synced with Nicole</div>
+      </div>
+      <div onclick="closeCondoEdit()" style="cursor:pointer;font-size:18px;color:var(--muted)">✕</div>
+    </div>
+    <div class="edit-field"><label class="edit-lbl">📍 Address</label><input class="edit-inp" id="ci_address" placeholder="123 Beach Blvd, Port Aransas, TX 78373"></div>
+    <div class="edit-field"><label class="edit-lbl">🔐 Door code</label><input class="edit-inp" id="ci_doorCode" placeholder="e.g. 4821#"></div>
+    <div class="edit-field"><label class="edit-lbl">📶 WiFi name</label><input class="edit-inp" id="ci_wifi" placeholder="e.g. BeachVibes_5G"></div>
+    <div class="edit-field"><label class="edit-lbl">🔑 WiFi password</label><input class="edit-inp" id="ci_wifiPw" placeholder=""></div>
+    <div style="display:flex;gap:10px">
+      <div class="edit-field" style="flex:1"><label class="edit-lbl">⏰ Check-in</label><input class="edit-inp" id="ci_checkIn" placeholder="e.g. 4:00 PM Jul 22"></div>
+      <div class="edit-field" style="flex:1"><label class="edit-lbl">🕙 Checkout</label><input class="edit-inp" id="ci_checkOut" placeholder="e.g. 11:00 AM Jul 26"></div>
+    </div>
+    <div class="edit-field"><label class="edit-lbl">📝 Notes for guests</label><textarea class="edit-inp" id="ci_notes" rows="3" placeholder="Parking pass in glove box, pool code is 1234..."></textarea></div>
+    <button class="save-btn" onclick="saveCondo()">💾 Save & share</button>
+  </div>
+</div>
+
+<!-- OLD WORLD MAP MODAL -->
+<div id="owOverlay" class="ow-overlay" style="display:none" onclick="if(event.target===this)closeOldWorld()">
+  <div class="ow-modal">
+    <div class="ow-paper">
+      <div class="ow-border"></div>
+      <div class="ow-close" onclick="closeOldWorld()">✕</div>
+      <div class="ow-header">
+        <h2>Port Aransas, TX</h2>
+        <p>The Expedition · July 2026</p>
+      </div>
+      <div class="ow-map-wrap">
+        <div id="owMap"></div>
+      </div>
+      <!-- SVG compass rose -->
+      <svg class="ow-compass" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="21" fill="#D4B86A" stroke="rgba(100,60,10,.4)" stroke-width="1.5"/>
+        <polygon points="22,4 25,20 22,18 19,20" fill="#3D2000"/>
+        <polygon points="22,40 25,24 22,26 19,24" fill="rgba(100,60,10,.45)"/>
+        <polygon points="4,22 20,19 18,22 20,25" fill="rgba(100,60,10,.45)"/>
+        <polygon points="40,22 24,19 26,22 24,25" fill="#3D2000"/>
+        <circle cx="22" cy="22" r="4" fill="#8B6914"/>
+        <circle cx="22" cy="22" r="2" fill="#3D2000"/>
+        <text x="22" y="8" text-anchor="middle" fill="#3D2000" font-size="6" font-weight="800" font-family="serif">N</text>
+        <text x="22" y="42" text-anchor="middle" fill="#6B4010" font-size="5" font-family="serif">S</text>
+        <text x="3" y="24" text-anchor="middle" fill="#6B4010" font-size="5" font-family="serif">W</text>
+        <text x="42" y="24" text-anchor="middle" fill="#3D2000" font-size="5" font-weight="800" font-family="serif">E</text>
+      </svg>
+      <div class="ow-footer">Charted for the expedition · Port A 2026</div>
+    </div>
+  </div>
 </div>
 
 <script>
+const API_KEY = '$2a$10$fB8HdKHZXxwyK6Qj087K3OdEXwetiR4n4BeQaWd9prgKSfVY2kp2u';
+const BIN_ID  = '6a401210da38895dfe08580f';
+const API_BASE= 'https://api.jsonbin.io/v3';
+const PERSON  = 'lacey';
+const TRIP_NAME = 'Port Aransas 2026';
+const GUEST_BASE = window.location.origin + window.location.pathname.replace(/lacey_map\.html$/, '') + 'guest.html';
+
+let condoInfo = { address:'', doorCode:'', wifi:'', wifiPw:'', checkIn:'', checkOut:'', notes:'' };
+
 // ── COUNTDOWN ──
-const tripStart = new Date('2026-07-22T00:00:00');
-const now = new Date();
-const diff = Math.ceil((tripStart - now) / (1000 * 60 * 60 * 24));
-const daysEl = document.getElementById('daysLeft');
-if (diff > 0) daysEl.textContent = diff;
-else if (diff < 0) daysEl.textContent = '🌊';
-else daysEl.textContent = 'NOW';
+const diff = Math.ceil((new Date('2026-07-22') - new Date()) / 864e5);
+document.getElementById('daysLeft').textContent = diff > 0 ? diff : (diff === 0 ? 'NOW' : '🌊');
 
-// ── MAP ──
-const CONDO = [27.8350, -97.0598]; // Executive Keys approximate
-const map = L.map('map', { zoomControl: false }).setView(CONDO, 14);
-L.control.zoom({ position: 'bottomright' }).addTo(map);
+// ── LOAD DATA FROM BIN ──
+async function loadBin() {
+  try {
+    const r = await fetch(`${API_BASE}/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+    const { record } = await r.json();
+    if (record.condoInfo) { condoInfo = { ...condoInfo, ...record.condoInfo }; renderCondo(); }
+  } catch(e) { console.warn('Could not load bin', e); }
+}
+loadBin();
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  maxZoom: 19
-}).addTo(map);
-
-// Custom icons
-function makeIcon(emoji, bg) {
-  return L.divIcon({
-    className: '',
-    html: `<div style="background:${bg};width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:15px">${emoji}</div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15]
-  });
+// ── SAVE CONDO ──
+async function saveBinPartial() {
+  try {
+    const r = await fetch(`${API_BASE}/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+    const { record } = await r.json();
+    record.condoInfo = condoInfo;
+    await fetch(`${API_BASE}/b/${BIN_ID}`, { method:'PUT', headers:{ 'Content-Type':'application/json','X-Master-Key':API_KEY }, body: JSON.stringify(record) });
+  } catch(e) { console.warn('Save failed', e); }
 }
 
-const condoIcon = L.divIcon({
-  className: '',
-  html: `<div style="background:#A8556A;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.3)"></div>`,
-  iconSize: [34, 34],
-  iconAnchor: [12, 34]
-});
+// ── CONDO RENDER ──
+function renderCondo() {
+  const el = document.getElementById('condoRows');
+  const ci = condoInfo;
+  const rows = [
+    ci.address   && { icon:'📍', lbl:'Address',   val: ci.address },
+    ci.doorCode  && { icon:'🔐', lbl:'Door code', val: ci.doorCode },
+    ci.wifi      && { icon:'📶', lbl:'WiFi',      val: ci.wifi },
+    ci.wifiPw    && { icon:'🔑', lbl:'Password',  val: ci.wifiPw },
+    ci.checkIn   && { icon:'⏰', lbl:'Check-in',  val: ci.checkIn },
+    ci.checkOut  && { icon:'🕙', lbl:'Checkout',  val: ci.checkOut },
+    ci.notes     && { icon:'📝', lbl:'Notes',     val: ci.notes },
+  ].filter(Boolean);
+  if (!rows.length) { el.innerHTML = '<div class="condo-empty">Tap Edit to add condo details — address, door code, WiFi...</div>'; return; }
+  el.innerHTML = rows.map(r => `
+    <div class="condo-row">
+      <div class="condo-icon">${r.icon}</div>
+      <div class="condo-body"><div class="condo-lbl">${r.lbl}</div><div class="condo-val">${r.val}</div></div>
+    </div>`).join('');
+}
 
-// Spots
+// ── CONDO EDIT ──
+function openCondoEdit() {
+  document.getElementById('ci_address').value  = condoInfo.address  || '';
+  document.getElementById('ci_doorCode').value = condoInfo.doorCode || '';
+  document.getElementById('ci_wifi').value     = condoInfo.wifi     || '';
+  document.getElementById('ci_wifiPw').value   = condoInfo.wifiPw   || '';
+  document.getElementById('ci_checkIn').value  = condoInfo.checkIn  || '';
+  document.getElementById('ci_checkOut').value = condoInfo.checkOut || '';
+  document.getElementById('ci_notes').value    = condoInfo.notes    || '';
+  document.getElementById('condoEditModal').style.display = 'flex';
+}
+function closeCondoEdit() { document.getElementById('condoEditModal').style.display = 'none'; }
+async function saveCondo() {
+  condoInfo = {
+    address:  document.getElementById('ci_address').value.trim(),
+    doorCode: document.getElementById('ci_doorCode').value.trim(),
+    wifi:     document.getElementById('ci_wifi').value.trim(),
+    wifiPw:   document.getElementById('ci_wifiPw').value.trim(),
+    checkIn:  document.getElementById('ci_checkIn').value.trim(),
+    checkOut: document.getElementById('ci_checkOut').value.trim(),
+    notes:    document.getElementById('ci_notes').value.trim(),
+  };
+  renderCondo();
+  closeCondoEdit();
+  await saveBinPartial();
+}
+
+// ── SHARE ──
+function getShareUrl() {
+  return `${GUEST_BASE}?binId=${BIN_ID}&name=${encodeURIComponent(TRIP_NAME)}&dates=${encodeURIComponent('Jul 22–26, 2026')}&loc=${encodeURIComponent('Port Aransas, TX')}`;
+}
+function openShare() {
+  const url = getShareUrl();
+  document.getElementById('shareUrl').textContent = url;
+  document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}&bgcolor=FFFFFF&color=0F5A6A&margin=10`;
+  document.getElementById('shareModal').style.display = 'flex';
+}
+function closeShare() { document.getElementById('shareModal').style.display = 'none'; }
+function copyShareUrl() {
+  navigator.clipboard.writeText(getShareUrl()).then(() => {
+    const btn = document.querySelector('.share-btn.copy');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy link', 2000);
+  });
+}
+function nativeShare() {
+  if (navigator.share) {
+    navigator.share({ title: `${TRIP_NAME} — trip info`, text: `${TRIP_NAME} · Jul 22–26 · Condo info & plans`, url: getShareUrl() });
+  } else { copyShareUrl(); }
+}
+
+// ── MAP ──
+const CONDO = [27.8378, -97.0590];
+const map = L.map('map', { zoomControl: false }).setView(CONDO, 14);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(map);
+
+function makeIcon(emoji, bg) {
+  return L.divIcon({ className:'', html:`<div style="background:${bg};width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:15px">${emoji}</div>`, iconSize:[30,30], iconAnchor:[15,15] });
+}
+const condoIcon = L.divIcon({ className:'', html:`<div style="background:#A8556A;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.3)"></div>`, iconSize:[34,34], iconAnchor:[12,34] });
+
 const SPOTS = [
-  { name: 'Our Condo', sub: 'Unit 212, Executive Keys', coords: [27.8350, -97.0598], emoji: '🏠', icon: condoIcon },
-  { name: 'Beach Access', sub: 'Mustang Island State Park', coords: [27.8280, -97.0515], emoji: '🏖️' },
-  { name: 'South Jetty', sub: 'Turtles & fishing · Free', coords: [27.8342, -97.0523], emoji: '🪨' },
-  { name: 'Horace Caldwell Pier', sub: '$3 day pass', coords: [27.8378, -97.0568], emoji: '🎣' },
-  { name: 'The Gaff', sub: 'Pirate dive bar', coords: [27.8370, -97.0577], emoji: '🏴‍☠️' },
-  { name: 'Roberts Point Park', sub: 'Best sunset on island', coords: [27.8395, -97.0572], emoji: '⛵' },
-  { name: 'ARK / UT Marine Science', sub: 'Turtle rehab · Wed & Fri', coords: [27.8558, -97.0726], emoji: '🐢' },
-  { name: 'Ferry Landing', sub: 'Free · dolphins ride the wake', coords: [27.8382, -97.0555], emoji: '⛴️' },
+  { name:'Our Condo', sub:'Unit 212, Executive Keys', coords:[27.8378,-97.0590], emoji:'🏠', icon:condoIcon },
+  { name:'Beach Access', sub:'Mustang Island · miles of Gulf', coords:[27.8290,-97.0510], emoji:'🏖️' },
+  { name:'South Jetty', sub:'Turtles & fishing · Free', coords:[27.8342,-97.0523], emoji:'🪨' },
+  { name:'Horace Caldwell Pier', sub:'$3 day pass', coords:[27.8378,-97.0568], emoji:'🎣' },
+  { name:'The Gaff', sub:'Pirate dive bar · belt sander races', coords:[27.8370,-97.0577], emoji:'🏴‍☠️' },
+  { name:'Roberts Point Park', sub:'Best sunset on the island', coords:[27.8395,-97.0572], emoji:'⛵' },
+  { name:'ARK Turtle Rehab', sub:'Wed & Fri 10am · register first', coords:[27.8558,-97.0726], emoji:'🐢' },
+  { name:'Ferry Landing', sub:'Free · dolphins love the wake', coords:[27.8382,-97.0555], emoji:'⛴️' },
+  { name:'Port Aransas Park', sub:'Beach camping & sunsets', coords:[27.8270,-97.0525], emoji:'🌅' },
 ];
 
 SPOTS.forEach(s => {
   const icon = s.icon || makeIcon(s.emoji, '#1B7A8A');
-  L.marker(s.coords, { icon })
-    .addTo(map)
-    .bindPopup(`<b>${s.emoji} ${s.name}</b><br><span style="font-size:11px;color:#4F7681">${s.sub}</span>`);
+  L.marker(s.coords, { icon }).addTo(map).bindPopup(`<b>${s.emoji} ${s.name}</b><br><span style="font-size:11px;color:#4F7681">${s.sub}</span>`);
 });
 
 // Spots list
-const spotsEl = document.querySelector('.spots');
+const spotsEl = document.getElementById('spotsList');
 SPOTS.forEach((s, i) => {
-  const condoCoords = SPOTS[0].coords;
-  const dist = (Math.sqrt(Math.pow((s.coords[0]-condoCoords[0])*110, 2) + Math.pow((s.coords[1]-condoCoords[1])*90, 2)) * 0.62).toFixed(1);
-  const div = document.createElement('div');
-  div.className = 'spot';
-  div.innerHTML = `
-    <div class="spot-ico">${s.emoji}</div>
-    <div class="spot-body"><div class="spot-name">${s.name}</div><div class="spot-meta">${s.sub}</div></div>
-    ${i > 0 ? `<div class="spot-dist">~${dist}mi</div>` : '<div class="spot-dist">🏠 Home</div>'}
-  `;
-  div.addEventListener('click', () => {
-    map.setView(s.coords, 16);
-    const allLayers = [];
-    map.eachLayer(l => { if (l.getLatLng) allLayers.push(l); });
-    const marker = allLayers.find(l => {
-      const ll = l.getLatLng();
-      return Math.abs(ll.lat - s.coords[0]) < 0.0001 && Math.abs(ll.lng - s.coords[1]) < 0.0001;
-    });
-    if (marker && marker.openPopup) marker.openPopup();
-    document.querySelector('.map-wrap').scrollIntoView({ behavior: 'smooth' });
-  });
+  const [lat0, lng0] = SPOTS[0].coords;
+  const dist = (Math.sqrt(Math.pow((s.coords[0]-lat0)*111,2)+Math.pow((s.coords[1]-lng0)*91,2))*0.621371).toFixed(1);
+  const div = document.createElement('div'); div.className = 'spot';
+  div.innerHTML = `<div class="spot-ico">${s.emoji}</div><div class="spot-body"><div class="spot-name">${s.name}</div><div class="spot-meta">${s.sub}</div></div><div class="spot-dist">${i===0?'🏠 Home':'~'+dist+'mi'}</div>`;
+  div.addEventListener('click', () => { map.setView(s.coords,16); document.querySelector('.map-wrap').scrollIntoView({behavior:'smooth'}); });
   spotsEl.appendChild(div);
 });
+
+// ── OLD WORLD MAP ──
+let owMap = null;
+function openOldWorld() {
+  document.getElementById('owOverlay').style.display = 'flex';
+  if (!owMap) {
+    setTimeout(() => {
+      owMap = L.map('owMap', { zoomControl: false }).setView(CONDO, 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OSM', maxZoom:19 }).addTo(owMap);
+      const parchmentIcon = (emoji) => L.divIcon({ className:'', html:`<div style="background:#C4A458;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2.5px solid rgba(100,60,10,.5);box-shadow:0 2px 5px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:12px"><div style="transform:rotate(45deg)">${emoji}</div></div>`, iconSize:[28,28], iconAnchor:[10,28] });
+      SPOTS.forEach(s => {
+        L.marker(s.coords, { icon: parchmentIcon(s.emoji) }).addTo(owMap)
+          .bindPopup(`<b style="font-family:serif;color:#3D2000">${s.emoji} ${s.name}</b>`);
+      });
+      L.polyline(SPOTS.map(s => s.coords), { color: 'rgba(100,60,10,.3)', weight:1.5, dashArray:'5,6' }).addTo(owMap);
+    }, 100);
+  } else {
+    setTimeout(() => owMap.invalidateSize(), 100);
+  }
+}
+function closeOldWorld() { document.getElementById('owOverlay').style.display = 'none'; }
 </script>
 </body>
 </html>
