@@ -59,6 +59,12 @@ body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--
 .who-btn.lacey.on { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); color: #fff; }
 .who-btn.nicole { border-color: var(--nicole-d); color: var(--nicole-d); }
 .who-btn.nicole.on { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); color: #fff; }
+.show-both-lbl { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--ocean-d); margin-left: 8px; cursor: pointer; user-select: none; padding: 4px 10px; border-radius: 20px; background: var(--sand); border: 1.5px solid var(--tan-d); }
+.show-both-lbl .shell-ico { font-size: 11px; }
+.show-both-cb { appearance: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--tan-d); background: var(--white); cursor: pointer; display: grid; place-content: center; flex-shrink: 0; }
+.show-both-cb::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--lacey-c), var(--nicole-c)); transform: scale(0); transition: transform .12s; }
+.show-both-cb:checked::before { transform: scale(1); }
+.show-both-cb:checked { border-color: var(--ocean); }
 
 /* ── DAY TABS (mobile only) ── */
 .day-tabs { display: flex; background: var(--white); border-bottom: 2px solid var(--border); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
@@ -297,6 +303,10 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
   <span class="who-lbl">I am:</span>
   <button class="who-btn lacey on" id="mBtnL" onclick="setWho('lacey')">Lacey 💜</button>
   <button class="who-btn nicole" id="mBtnN" onclick="setWho('nicole')">Nicole 🧡</button>
+  <label class="show-both-lbl">
+    <input type="checkbox" class="show-both-cb" id="mShowBoth" onchange="setShowBoth(this.checked)">
+    <span class="shell-ico">🐚</span>Show Both
+  </label>
 </div>
 
 <!-- DAY TABS (mobile) -->
@@ -328,6 +338,10 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
         <span class="who-lbl">I am:</span>
         <button class="who-btn lacey on" id="dBtnL" onclick="setWho('lacey')">Lacey 💜</button>
         <button class="who-btn nicole" id="dBtnN" onclick="setWho('nicole')">Nicole 🧡</button>
+        <label class="show-both-lbl">
+          <input type="checkbox" class="show-both-cb" id="dShowBoth" onchange="setShowBoth(this.checked)">
+          <span class="shell-ico">🐚</span>Show Both
+        </label>
       </div>
       <button class="add-btn" onclick="openModal()">✦ Add custom activity</button>
       <h2>Activities</h2>
@@ -674,6 +688,7 @@ let ui = {
   curDay: 'wed',
   curFilter: 'all',
   currentWho: localStorage.getItem('portA_who') || 'lacey',
+  showBoth: localStorage.getItem('portA_showBoth') !== 'false',
   pendingAct: null,
   lastEtag: null,
   pollTimer: null,
@@ -784,6 +799,14 @@ function setWho(who) {
   document.body.classList.toggle('active-nicole', who === 'nicole');
   ['mBtnL','dBtnL'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'who-btn lacey' + (who==='lacey'?' on':''); });
   ['mBtnN','dBtnN'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'who-btn nicole' + (who==='nicole'?' on':''); });
+  renderCalendar();
+}
+
+function setShowBoth(checked) {
+  ui.showBoth = checked;
+  localStorage.setItem('portA_showBoth', checked ? 'true' : 'false');
+  ['mShowBoth','dShowBoth'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = checked; });
+  renderCalendar();
 }
 
 // ── COUNTDOWN ─────────────────────────────────────────────────────
@@ -974,7 +997,8 @@ function renderCalendar() {
 
       if (entry?.isStart) {
         const a = getAct(entry.actId);
-        if (a) {
+        const att0 = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
+        if (a && (ui.showBoth || att0.includes(ui.currentWho))) {
           const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
           const isShared = att.includes('lacey') && att.includes('nicole');
           const ownerClass = isShared ? 'owner-both' : (att[0] === 'nicole' ? 'owner-nicole' : 'owner-lacey');
@@ -1355,6 +1379,7 @@ window.addEventListener('resize', () => {
 // ── INIT ──────────────────────────────────────────────────────────
 setSyncState('busy');
 setWho(ui.currentWho);
+['mShowBoth','dShowBoth'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = ui.showBoth; });
 renderAll();
 startCountdown();
 loadBin().then(() => { startPolling(); setSyncState('ok'); }).catch(() => { setSyncState('err'); renderAll(); });
