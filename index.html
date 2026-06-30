@@ -269,6 +269,16 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .dm-actions { display: flex; gap: 8px; margin-top: 18px; }
 .dm-btn { flex: 1; text-align: center; padding: 11px; border-radius: 14px; font-weight: 800; font-size: 13px; text-decoration: none; cursor: pointer; }
 .dm-btn.maps { background: var(--teal); color: #fff; }
+.dm-btn.edit-btn { background: var(--sand-d); color: var(--ocean-d); border: 1.5px solid var(--tan-d); }
+.edit-form { display: flex; flex-direction: column; gap: 12px; }
+.edit-row { display: flex; gap: 10px; }
+.edit-field { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.edit-field.half { flex: 0 0 calc(50% - 5px); }
+.edit-lbl { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.edit-inp { background: rgba(255,255,255,.85); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 11px; font-family: 'Nunito', sans-serif; font-size: 13px; color: var(--text); outline: none; width: 100%; }
+.edit-inp:focus { border-color: var(--ocean); }
+.edit-inp.center { text-align: center; font-size: 22px; padding: 6px; }
+.edit-ta { resize: vertical; min-height: 70px; }
 .dm-btn.site { background: #fff; color: var(--ocean-d); border: 1.5px solid var(--ocean); }
 .dm-closed-note { background: rgba(184,84,58,.1); color: var(--coral); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; font-weight: 700; }
 .modal-card { background: var(--white); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px; padding: 20px 18px 32px; max-height: 88vh; overflow-y: auto; }
@@ -1392,6 +1402,7 @@ function renderCardCalendar(grid) {
       if (!entry?.isStart) continue;
       const a = getAct(entry.actId);
       if (!a) continue;
+      const eff = getEffective(entry, a);
       const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
       if (!ui.showBoth && !att.includes(ui.currentWho)) continue;
       count++;
@@ -1404,7 +1415,7 @@ function renderCardCalendar(grid) {
       card.innerHTML = `
         <div class="cc-rail ${ownerClass}"></div>
         <div class="cc-time"><div class="h">${timeParts ? timeParts[1] : slotToTime(s)}</div><div class="m">${timeParts ? timeParts[2].toUpperCase() : ''}</div></div>
-        <div class="cc-body"><div class="nm">${a.e} ${a.name}</div><div class="mt">${durLabel(entry.span)} · ${a.cost === 0 ? 'Free' : `$${a.cost}/p`}</div></div>
+        <div class="cc-body"><div class="nm">${eff.e} ${eff.name}</div><div class="mt">${durLabel(entry.span)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div></div>
         <div class="cc-who" title="Tap to cycle: Lacey → Nicole → Both">
           ${isShared ? `<div class="av lacey">L</div><div class="av nicole">N</div>` : `<div class="av ${att[0]}">${att[0] === 'nicole' ? 'N' : 'L'}</div>`}
         </div>
@@ -1526,6 +1537,7 @@ function renderCalendar() {
         const a = getAct(entry.actId);
         const att0 = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
         if (a && (ui.showBoth || att0.includes(ui.currentWho))) {
+          const eff = getEffective(entry, a);
           const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
           const isShared = att.includes('lacey') && att.includes('nicole');
           const ownerClass = isShared ? 'owner-both' : (att[0] === 'nicole' ? 'owner-nicole' : 'owner-lacey');
@@ -1534,9 +1546,9 @@ function renderCalendar() {
           pa.style.height = `${entry.span * sh - 4}px`;
           pa.draggable = true;
           pa.innerHTML = `
-            <div class="pa-name">${a.e} ${a.name}</div>
+            <div class="pa-name">${eff.e} ${eff.name}</div>
             <div class="pa-dur">⏱ ${durLabel(entry.span)}</div>
-            <div class="pa-meta">${slotToTime(s)} · ${a.cost === 0 ? 'Free' : `$${a.cost}/p`}</div>
+            <div class="pa-meta">${slotToTime(s)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div>
             <div class="pa-menu-btn" title="Options">⋯</div>
             <div class="pa-resize" title="Drag to resize"></div>
           `;
@@ -1665,6 +1677,17 @@ document.getElementById('ftabs').addEventListener('click', e => {
 
 // ── CUSTOM ACTIVITY ───────────────────────────────────────────────
 function openModal() { document.getElementById('modal').style.display = 'flex'; setTimeout(() => document.getElementById('mName').focus(), 60); }
+function getEffective(entry, act) {
+  const o = entry.override || {};
+  return {
+    e:    o.e    !== undefined ? o.e    : act.e,
+    name: o.name !== undefined ? o.name : act.name,
+    cost: o.cost !== undefined ? o.cost : act.cost,
+    n:    o.n    !== undefined ? o.n    : (act.n || ''),
+    url:  o.url  !== undefined ? o.url  : (act.url || ''),
+  };
+}
+
 function openDetailModal(dayId, slot, entry, act) {
   const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
   const isShared = att.includes('lacey') && att.includes('nicole');
@@ -1672,38 +1695,119 @@ function openDetailModal(dayId, slot, entry, act) {
   const ownerLbl = isShared ? 'Both of us' : (att[0] === 'nicole' ? 'Nicole' : 'Lacey');
   const day = DAYS.find(d => d.id === dayId);
   const isClosedToday = act.cl && act.cl.includes(dayId);
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.name + ', Port Aransas, TX')}`;
+  const eff = getEffective(entry, act);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eff.name + ', Port Aransas, TX')}`;
 
   let html = `
     <div class="dm-hdr">
-      <div class="dm-emoji">${act.e}</div>
-      <div class="dm-title"><h3>${act.name}</h3></div>
+      <div class="dm-emoji" id="dmEmoji">${eff.e}</div>
+      <div class="dm-title"><h3 id="dmName">${eff.name}</h3></div>
       <div class="dm-close" onclick="closeDetailModal()">✕</div>
     </div>
     <div class="dm-badges">
       <div class="dm-badge owner ${ownerCls}">${ownerLbl}</div>
       <div class="dm-badge">${day ? `${day.name}, ${day.date}` : ''} · ${slotToTime(slot)}</div>
       <div class="dm-badge">${durLabel(entry.span)}</div>
-      <div class="dm-badge">${act.cost === 0 ? 'Free' : `$${act.cost}/person`}</div>
+      <div class="dm-badge" id="dmCostBadge">${eff.cost === 0 ? 'Free' : `$${eff.cost}/person`}</div>
     </div>
   `;
-  if (isClosedToday) {
-    html += `<div class="dm-closed-note">⚠️ Heads up — this is normally closed on ${day ? day.name : 'this day'}.</div>`;
-  }
-  if (act.n) {
-    html += `<div class="dm-section"><div class="lbl">Notes</div><div class="val">${act.n}</div></div>`;
-  }
-  if (act.loc) {
-    html += `<div class="dm-section"><div class="lbl">Location</div><div class="val">${act.loc}</div></div>`;
-  }
+  if (isClosedToday) html += `<div class="dm-closed-note">⚠️ Heads up — this is normally closed on ${day ? day.name : 'this day'}.</div>`;
+  if (eff.n) html += `<div class="dm-section"><div class="lbl">Notes</div><div class="val" id="dmNotes">${eff.n}</div></div>`;
+  if (act.loc) html += `<div class="dm-section"><div class="lbl">Location</div><div class="val">${act.loc}</div></div>`;
+
   html += `
     <div class="dm-actions">
       <a class="dm-btn maps" href="${mapsUrl}" target="_blank" rel="noopener">🗺️ Directions</a>
-      ${act.url ? `<a class="dm-btn site" href="${act.url}" target="_blank" rel="noopener">🔗 Website</a>` : ''}
+      ${eff.url ? `<a class="dm-btn site" href="${eff.url}" target="_blank" rel="noopener">🔗 Website</a>` : ''}
+      <button class="dm-btn edit-btn" onclick="openEditMode('${dayId}',${slot})">✏️ Edit</button>
     </div>
   `;
   document.getElementById('detailModalBody').innerHTML = html;
   document.getElementById('detailModal').style.display = 'flex';
+  // stash for edit mode
+  document.getElementById('detailModal').dataset.dayId = dayId;
+  document.getElementById('detailModal').dataset.slot = slot;
+  document.getElementById('detailModal').dataset.actId = entry.actId;
+}
+
+function openEditMode(dayId, slot) {
+  const entry = state.placed[dayId][slot];
+  if (!entry) return;
+  const act = getAct(entry.actId);
+  if (!act) return;
+  const eff = getEffective(entry, act);
+
+  document.getElementById('detailModalBody').innerHTML = `
+    <div class="dm-hdr">
+      <div class="dm-title"><h3>Edit Event</h3></div>
+      <div class="dm-close" onclick="closeDetailModal()">✕</div>
+    </div>
+    <div class="edit-form">
+      <div class="edit-row">
+        <div class="edit-field half">
+          <label class="edit-lbl">Emoji</label>
+          <input class="edit-inp center" id="editEmoji" maxlength="4" value="${eff.e}">
+        </div>
+        <div class="edit-field half">
+          <label class="edit-lbl">Cost / person ($)</label>
+          <input class="edit-inp" id="editCost" type="number" min="0" value="${eff.cost}">
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Title</label>
+        <input class="edit-inp" id="editName" maxlength="60" value="${eff.name.replace(/"/g,'&quot;')}">
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Notes</label>
+        <textarea class="edit-inp edit-ta" id="editNotes" rows="3">${eff.n}</textarea>
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Website URL</label>
+        <input class="edit-inp" id="editUrl" type="url" placeholder="https://..." value="${eff.url}">
+      </div>
+      <div class="dm-actions" style="margin-top:16px">
+        <button class="dm-btn maps" onclick="saveEdit('${dayId}',${slot})">💾 Save</button>
+        <button class="dm-btn site" onclick="clearOverride('${dayId}',${slot})">↺ Reset to default</button>
+      </div>
+    </div>
+  `;
+}
+
+function saveEdit(dayId, slot) {
+  const entry = state.placed[dayId][slot];
+  if (!entry) return;
+  const act = getAct(entry.actId);
+  const emoji = document.getElementById('editEmoji').value.trim() || act.e;
+  const name  = document.getElementById('editName').value.trim() || act.name;
+  const cost  = Math.max(0, parseInt(document.getElementById('editCost').value) || 0);
+  const n     = document.getElementById('editNotes').value.trim();
+  const url   = document.getElementById('editUrl').value.trim();
+
+  const override = { e: emoji, name, cost, n, url };
+  // Stamp all span slots with updated entry
+  for (let i = slot; i < slot + entry.span; i++) {
+    if (state.placed[dayId][i]) state.placed[dayId][i] = { ...state.placed[dayId][i], override };
+  }
+  renderCalendar();
+  saveBin();
+  openDetailModal(dayId, slot, state.placed[dayId][slot], act);
+  toast('Changes saved ✓', 'ok');
+}
+
+function clearOverride(dayId, slot) {
+  const entry = state.placed[dayId][slot];
+  if (!entry) return;
+  const act = getAct(entry.actId);
+  for (let i = slot; i < slot + entry.span; i++) {
+    if (state.placed[dayId][i]) {
+      const { override: _, ...rest } = state.placed[dayId][i];
+      state.placed[dayId][i] = rest;
+    }
+  }
+  renderCalendar();
+  saveBin();
+  openDetailModal(dayId, slot, state.placed[dayId][slot], act);
+  toast('Reset to default ✓', 'ok');
 }
 
 function closeDetailModal() {
