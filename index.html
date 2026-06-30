@@ -1713,7 +1713,12 @@ function completeLogin(who) {
   document.getElementById('loginGate').style.display = 'none';
 }
 if (!localStorage.getItem('portA_onboarded')) {
-  document.getElementById('loginGate').style.display = 'flex';
+  if (localStorage.getItem('portA_who')) {
+    // Returning user from before the login gate existed — don't block them.
+    localStorage.setItem('portA_onboarded', 'true');
+  } else {
+    document.getElementById('loginGate').style.display = 'flex';
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────
