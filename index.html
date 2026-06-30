@@ -193,6 +193,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .jelly-cap { width: 40px; height: 26px; border-radius: 50% 50% 42% 42%; position: relative; box-shadow: 0 3px 8px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .jelly-cap.move { background: linear-gradient(160deg, var(--mint-l), var(--teal)); }
 .jelly-cap.share { background: linear-gradient(160deg, var(--lacey-l), var(--nicole-l)); }
+.jelly-cap.share .jelly-txt { font-size: 11px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
 .jelly-cap.del { background: linear-gradient(160deg, #F4A98F, #C9613F); }
 .jelly-cap.del .jelly-x { position: relative; width: 13px; height: 13px; }
 .jelly-cap.del .jelly-x::before, .jelly-cap.del .jelly-x::after { content: ''; position: absolute; top: 50%; left: 50%; width: 100%; height: 2.4px; background: #fff; border-radius: 2px; }
@@ -1144,13 +1145,23 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
   overlay.addEventListener('touchstart', closeJellyMenu, { passive: true });
 
   const isShared = attendees.includes('lacey') && attendees.includes('nicole');
+  const soloOwner = !isShared ? (attendees[0] || entry.who || 'lacey') : null;
+
+  // Cycle: Lacey-only → Nicole-only → Both → Lacey-only ...
+  // Reassigning solo also corrects `who` (the creator record), so this
+  // doubles as the fix for historic items mislabeled before attendees existed.
+  let nextState;
+  if (isShared) nextState = { attendees: ['lacey'], who: 'lacey', icon: 'L', lbl: 'Lacey' };
+  else if (soloOwner === 'lacey') nextState = { attendees: ['nicole'], who: 'nicole', icon: 'N', lbl: 'Nicole' };
+  else nextState = { attendees: ['lacey', 'nicole'], who: entry.who, icon: 'L·N', lbl: 'Both' };
+  const currentIcon = isShared ? 'L·N' : (soloOwner === 'nicole' ? 'N' : 'L');
+  const currentLbl = isShared ? 'Both' : (soloOwner === 'nicole' ? 'Nicole' : 'Lacey');
 
   const items = [
     { cls: 'move', icon: '🕐', lbl: 'Move', action: () => { closeJellyMenu(); openMoveTpicker(dayId, slot, entry, act); } },
-    { cls: 'share', icon: isShared ? '🙋' : '🙌', lbl: isShared ? 'Solo' : 'Both', action: () => {
-        const newAttendees = isShared ? [entry.who || ui.currentWho] : ['lacey', 'nicole'];
+    { cls: 'share', icon: `<span class="jelly-txt">${currentIcon}</span>`, lbl: currentLbl, action: () => {
         for (let i = slot; i < slot + entry.span; i++) {
-          state.placed[dayId][i] = { ...state.placed[dayId][i], attendees: newAttendees };
+          state.placed[dayId][i] = { ...state.placed[dayId][i], attendees: nextState.attendees, who: nextState.who };
         }
         closeJellyMenu(); renderCalendar(); saveBin();
       } },
@@ -1267,16 +1278,20 @@ function renderCardCalendar(grid) {
         <div class="cc-rail ${ownerClass}"></div>
         <div class="cc-time"><div class="h">${timeParts ? timeParts[1] : slotToTime(s)}</div><div class="m">${timeParts ? timeParts[2].toUpperCase() : ''}</div></div>
         <div class="cc-body"><div class="nm">${a.e} ${a.name}</div><div class="mt">${durLabel(entry.span)} · ${a.cost === 0 ? 'Free' : `$${a.cost}/p`}</div></div>
-        <div class="cc-who" title="Tap to toggle 'both of us'">
+        <div class="cc-who" title="Tap to cycle: Lacey → Nicole → Both">
           ${isShared ? `<div class="av lacey">L</div><div class="av nicole">N</div>` : `<div class="av ${att[0]}">${att[0] === 'nicole' ? 'N' : 'L'}</div>`}
         </div>
         <div class="cc-menu-btn" title="Options">⋯</div>
       `;
       card.querySelector('.cc-who').addEventListener('click', e => {
         e.stopPropagation();
-        const newAttendees = isShared ? [entry.who || ui.currentWho] : ['lacey', 'nicole'];
+        const soloOwner = !isShared ? (att[0] || entry.who || 'lacey') : null;
+        let next;
+        if (isShared) next = { attendees: ['lacey'], who: 'lacey' };
+        else if (soloOwner === 'lacey') next = { attendees: ['nicole'], who: 'nicole' };
+        else next = { attendees: ['lacey', 'nicole'], who: entry.who };
         for (let i = s; i < s + entry.span; i++) {
-          state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: newAttendees };
+          state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: next.attendees, who: next.who };
         }
         renderCalendar();
         saveBin();
@@ -1376,7 +1391,7 @@ function renderCalendar() {
             <div class="pa-dur">⏱ ${durLabel(entry.span)}</div>
             <div class="pa-meta">${slotToTime(s)} · ${a.cost === 0 ? 'Free' : `$${a.cost}/p`}</div>
             <div class="pa-rm" title="Remove">✕</div>
-            ${showBadge ? `<div class="who-badge" title="Tap to toggle 'both of us'">${badgeText}</div>` : ''}
+            ${showBadge ? `<div class="who-badge" title="Tap to cycle: Lacey → Nicole → Both">${badgeText}</div>` : ''}
             <div class="pa-resize" title="Drag to resize"></div>
           `;
 
@@ -1385,9 +1400,13 @@ function renderCalendar() {
             badgeEl.addEventListener('click', e => {
               e.stopPropagation();
               const nowShared = att.includes('lacey') && att.includes('nicole');
-              const newAttendees = nowShared ? [entry.who || ui.currentWho] : ['lacey', 'nicole'];
+              const nowSolo = !nowShared ? (att[0] || entry.who || 'lacey') : null;
+              let next;
+              if (nowShared) next = { attendees: ['lacey'], who: 'lacey' };
+              else if (nowSolo === 'lacey') next = { attendees: ['nicole'], who: 'nicole' };
+              else next = { attendees: ['lacey', 'nicole'], who: entry.who };
               for (let i = s; i < s + entry.span; i++) {
-                state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: newAttendees };
+                state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: next.attendees, who: next.who };
               }
               renderCalendar();
               saveBin();
