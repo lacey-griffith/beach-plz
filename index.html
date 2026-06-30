@@ -12,13 +12,13 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
   --ocean: #1B7A8A; --ocean-d: #0F5A6A; --ocean-l: #3DA5B8;
-  --teal: #4ABFB0; --mint-l: #D4F5EA;
+  --teal: #1B8276; --mint-l: #D4F5EA;
   --sand: #FAF3E0; --sand-d: #EDE0C4; --tan: #E8D5B0; --tan-d: #C4A882;
-  --coral: #E8816A; --sky-l: #E0F4FA; --border: #C5DDE3;
-  --text: #2C4A52; --muted: #6B9099; --white: #fff;
+  --coral: #B8543A; --sky-l: #E0F4FA; --border: #C5DDE3;
+  --text: #2C4A52; --muted: #4F7681; --white: #fff;
   --sidebar-w: 264px;
   --lacey-c: #C9798A; --lacey-l: #E8B8C2; --lacey-d: #A8556A;
-  --nicole-c: #6FCFC4; --nicole-l: #AEE8E0; --nicole-d: #3DA89C;
+  --nicole-c: #6FCFC4; --nicole-l: #AEE8E0; --nicole-d: #1F7A6F;
 }
 body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--text); font-size: 13px; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
@@ -118,8 +118,8 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .col-hdr .dd { font-size: 8.5px; font-weight: 600; color: var(--muted); }
 .col-hdr .dc { font-size: 8.5px; font-weight: 800; color: var(--coral); margin-top: 1px; }
 .tlabel { font-size: 8.5px; font-weight: 700; color: var(--muted); text-align: right; padding: 0 5px; height: 40px; display: flex; align-items: flex-start; padding-top: 3px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--white); flex-shrink: 0; position: relative; }
-.tlabel .tick15 { position: absolute; right: 5px; bottom: 2px; font-size: 6.5px; font-weight: 600; color: var(--border); }
-.tlabel .tick15::before { content: ''; position: absolute; right: -5px; bottom: 3px; width: 5px; height: 1px; background: var(--border); }
+.tlabel .tick15 { position: absolute; right: 5px; bottom: 2px; font-size: 6.5px; font-weight: 700; color: #6B95A0; }
+.tlabel .tick15::before { content: ''; position: absolute; right: -5px; bottom: 3px; width: 5px; height: 1px; background: #6B95A0; }
 .tslot { height: 40px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); background: var(--sky-l); position: relative; cursor: pointer; }
 .tslot:nth-child(even) { background: rgba(184,228,240,.22); }
 .tslot.occ { background: rgba(74,191,176,.12); cursor: default; }
@@ -140,7 +140,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .pa.owner-lacey { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); }
 .pa.owner-nicole { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); }
 .pa.owner-both { background: linear-gradient(to left, var(--nicole-c), var(--lacey-c)); }
-.who-badge { position: absolute; top: 3px; right: 5px; bottom: auto; font-size: 8px; font-weight: 800; opacity: .92; background: rgba(255,255,255,.3); border-radius: 6px; padding: 1px 4px; cursor: pointer; }
+.who-badge { position: absolute; top: 3px; right: 5px; bottom: auto; font-size: 8px; font-weight: 800; color: #fff; opacity: 1; background: rgba(0,0,0,.32); border-radius: 6px; padding: 1px 4px; cursor: pointer; text-shadow: 0 1px 1px rgba(0,0,0,.2); }
 
 /* ── MOBILE CARD-COLUMN CALENDAR ── */
 .cc-wrap { display: flex; gap: 10px; overflow-x: auto; padding: 10px 10px 90px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
@@ -367,8 +367,8 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 <!-- LEGEND -->
 <div class="legend-row">
   <span style="font-weight:800;color:var(--ocean)">Who:</span>
-  <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#7B68EE;margin-right:2px;vertical-align:middle"></span>Lacey</span>
-  <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--coral);margin-right:2px;vertical-align:middle"></span>Nicole</span>
+  <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--lacey-d);margin-right:2px;vertical-align:middle"></span>Lacey</span>
+  <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--nicole-d);margin-right:2px;vertical-align:middle"></span>Nicole</span>
   <span style="margin:0 4px;color:var(--border)">·</span>
   <span style="font-weight:800;color:var(--ocean)">Colors:</span>
   <span><span class="ld" style="background:rgba(56,178,178,.8)"></span>Pool</span>
