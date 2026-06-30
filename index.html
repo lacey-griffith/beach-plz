@@ -668,7 +668,7 @@ let state = {
 let ui = {
   curDay: 'wed',
   curFilter: 'all',
-  currentWho: 'lacey',
+  currentWho: localStorage.getItem('portA_who') || 'lacey',
   pendingAct: null,
   lastEtag: null,
   pollTimer: null,
@@ -774,6 +774,7 @@ function startPolling() {
 // ── WHO ───────────────────────────────────────────────────────────
 function setWho(who) {
   ui.currentWho = who;
+  localStorage.setItem('portA_who', who);
   ['mBtnL','dBtnL'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'who-btn lacey' + (who==='lacey'?' on':''); });
   ['mBtnN','dBtnN'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'who-btn nicole' + (who==='nicole'?' on':''); });
 }
@@ -1327,6 +1328,7 @@ window.addEventListener('resize', () => {
 
 // ── INIT ──────────────────────────────────────────────────────────
 setSyncState('busy');
+setWho(ui.currentWho);
 renderAll();
 startCountdown();
 loadBin().then(() => { startPolling(); setSyncState('ok'); }).catch(() => { setSyncState('err'); renderAll(); });
