@@ -402,12 +402,110 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .login-glass { position: absolute; top: -14px; left: -14px; width: 60%; height: 70%; background: radial-gradient(ellipse, rgba(255,255,255,.4), transparent 70%); pointer-events: none; }
 .login-note { font-size: 10px; color: var(--muted); margin-bottom: 0; }
 
+/* ── TRIPS HOME SCREEN ── */
+.trips-home { position: fixed; inset: 0; z-index: 2000; overflow-y: auto;
+  background-color: var(--sand);
+  background-image: radial-gradient(ellipse 420px 260px at 10% 15%, rgba(196,168,130,.32), transparent 60%),
+    radial-gradient(ellipse 460px 280px at 90% 30%, rgba(237,224,196,.6), transparent 65%),
+    radial-gradient(ellipse 360px 220px at 20% 80%, rgba(232,213,176,.42), transparent 60%);
+}
+.trips-home-inner { max-width: 480px; margin: 0 auto; padding: 40px 20px 60px; }
+.trips-hero { text-align: center; margin-bottom: 32px; }
+.trips-logo { font-size: 48px; margin-bottom: 4px; }
+.trips-title { font-family: 'Playfair Display', serif; color: var(--ocean-d); font-size: 32px; margin-bottom: 2px; }
+.trips-sub { color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.trips-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.trip-card { background: linear-gradient(160deg, rgba(255,255,255,.92), rgba(212,245,234,.6));
+  border-radius: 18px 22px 16px 20px / 20px 16px 22px 18px;
+  border: 1px solid rgba(255,255,255,.6); box-shadow: 0 4px 16px rgba(15,90,106,.13);
+  padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: transform .12s, box-shadow .12s; }
+.trip-card:active { transform: scale(.98); }
+.trip-card-emoji { font-size: 32px; flex-shrink: 0; }
+.trip-card-body { flex: 1; min-width: 0; }
+.trip-card-name { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--ocean-d); }
+.trip-card-meta { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+.trip-card-crew { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.trip-card-status { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; flex-shrink: 0; }
+.trip-status-upcoming { background: var(--sky-l); color: var(--ocean-d); }
+.trip-status-past { background: var(--sand-d); color: var(--muted); }
+.trip-status-live { background: #D4EDDA; color: #155724; }
+.trips-new-btn { width: 100%; padding: 15px; border-radius: 16px; border: 2.5px dashed var(--tan-d);
+  background: rgba(255,255,255,.55); color: var(--ocean-d); font-family: 'Nunito'; font-weight: 800;
+  font-size: 15px; cursor: pointer; transition: background .12s; }
+.trips-new-btn:active { background: rgba(255,255,255,.85); }
+.trips-toggle-btn { background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.35);
+  border-radius: 10px; color: #fff; font-size: 16px; padding: 4px 8px; cursor: pointer;
+  flex-shrink: 0; }
+
 </style>
 
 </head>
 <body>
 
-<!-- LOGIN GATE (first visit per device only) -->
+<!-- TRIPS HOME SCREEN -->
+<div id="tripsHome" class="trips-home" style="display:none">
+  <div class="trips-home-inner">
+    <div class="trips-hero">
+      <div class="trips-logo">🌊</div>
+      <h1 class="trips-title">beach-plz</h1>
+      <p class="trips-sub">your trip planner</p>
+    </div>
+    <div class="trips-list" id="tripsList"></div>
+    <button class="trips-new-btn" onclick="openNewTripForm()">＋ Plan a new trip</button>
+  </div>
+</div>
+
+<!-- NEW TRIP FORM -->
+<div class="modal-overlay" id="newTripModal" style="display:none" onclick="if(event.target===this)closeNewTripForm()">
+  <div class="sea-glass-modal" style="max-width:460px;border-radius:20px">
+    <div class="dm-hdr" style="margin-bottom:16px">
+      <div class="dm-emoji">🗺️</div>
+      <div class="dm-title"><h3>New Trip</h3></div>
+      <div class="dm-close" onclick="closeNewTripForm()">✕</div>
+    </div>
+    <div class="edit-form">
+      <div class="edit-row">
+        <div class="edit-field" style="flex:0 0 60px">
+          <label class="edit-lbl">Emoji</label>
+          <input class="edit-inp center" id="ntEmoji" maxlength="4" value="🏖️">
+        </div>
+        <div class="edit-field">
+          <label class="edit-lbl">Trip name</label>
+          <input class="edit-inp" id="ntName" placeholder="e.g. Galveston 2027">
+        </div>
+      </div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-lbl">Start date</label>
+          <input class="edit-inp" id="ntStart" type="date">
+        </div>
+        <div class="edit-field">
+          <label class="edit-lbl">End date</label>
+          <input class="edit-inp" id="ntEnd" type="date">
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Destination</label>
+        <input class="edit-inp" id="ntLocation" placeholder="e.g. Galveston, TX">
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Accommodation</label>
+        <input class="edit-inp" id="ntAddress" placeholder="e.g. Unit 14, Beachcomber Condos">
+      </div>
+      <div class="edit-field">
+        <label class="edit-lbl">Crew (comma-separated)</label>
+        <input class="edit-inp" id="ntCrew" placeholder="Nicole, RJ, Tyler, Gracie">
+      </div>
+      <div id="ntStatus" class="edit-lbl" style="color:var(--coral);min-height:16px"></div>
+      <div class="dm-actions" style="margin-top:12px">
+        <button class="dm-btn maps" id="ntSubmitBtn" onclick="submitNewTrip()">🌊 Create Trip</button>
+        <button class="dm-btn site" onclick="closeNewTripForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="loginGate" class="login-gate" style="display:none">
   <div class="login-card">
     <div class="login-wave">🌊</div>
@@ -427,9 +525,12 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 
 <!-- HEADER -->
 <div class="hdr">
-  <div>
-    <h1>🌊 Port A Planner</h1>
-    <div class="sub">July 22–26, 2026 · Nicole · RJ · Tyler · Gracie · Lacey · LIVE</div>
+  <div style="display:flex;align-items:center;gap:8px;min-width:0">
+    <button class="trips-toggle-btn" onclick="showTripsHome()" title="All trips">🗺️</button>
+    <div style="min-width:0">
+      <h1 id="hdrTitle">🌊 beach-plz</h1>
+      <div class="sub" id="hdrSub">Loading trip...</div>
+    </div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
     <div class="sync-pill"><div class="sdot" id="sdot"></div><span class="slbl" id="slbl">Connecting...</span></div>
@@ -723,7 +824,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 <!-- CHAT PANEL -->
 <div class="chat-panel" id="chatPanel">
   <div class="chat-hdr">
-    <h4>🐚 Notes with Nicole</h4>
+    <h4>🏈 NFL Chat</h4>
     <button class="ch-close" onclick="Chat.toggle()">✕</button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
@@ -844,19 +945,68 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 <script>
 'use strict';
 
+// ── TRIP MANIFEST ─────────────────────────────────────────────────
+const TRIPS_KEY = 'beachplz_trips';
+const ACTIVE_TRIP_KEY = 'beachplz_activeTrip';
+const PORT_A_DEFAULT = {
+  id: 'port-a-2026',
+  name: 'Port Aransas 2026',
+  emoji: '🌊',
+  startDate: '2026-07-22',
+  endDate: '2026-07-26',
+  location: 'Port Aransas, TX',
+  address: 'Unit 212, Executive Keys Condos, Mustang Island',
+  crew: ['Nicole', 'RJ', 'Tyler', 'Gracie', 'Lacey'],
+  binId: '6a401210da38895dfe08580f',
+  createdAt: 1700000000000,
+  days: [
+    {id:'wed',name:'Wed',date:'Jul 22',label:'Arrival'},
+    {id:'thu',name:'Thu',date:'Jul 23',label:'Day 2'},
+    {id:'fri',name:'Fri',date:'Jul 24',label:'Day 3'},
+    {id:'sat',name:'Sat',date:'Jul 25',label:'Day 4'},
+    {id:'sun',name:'Sun',date:'Jul 26',label:'Checkout'},
+  ]
+};
+
+function getTripManifest() {
+  try { return JSON.parse(localStorage.getItem(TRIPS_KEY) || 'null') || []; }
+  catch { return []; }
+}
+function saveTripManifest(trips) {
+  localStorage.setItem(TRIPS_KEY, JSON.stringify(trips));
+}
+function getActiveTripConfig() {
+  let manifest = getTripManifest();
+  if (!manifest.length) { manifest = [PORT_A_DEFAULT]; saveTripManifest(manifest); }
+  const activeId = localStorage.getItem(ACTIVE_TRIP_KEY) || manifest[0].id;
+  return manifest.find(t => t.id === activeId) || manifest[0];
+}
+function generateTripDays(startStr, endStr) {
+  const WD = ['sun','mon','tue','wed','thu','fri','sat'];
+  const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const start = new Date(startStr + 'T12:00:00');
+  const end   = new Date(endStr   + 'T12:00:00');
+  const total = Math.round((end - start) / 86400000) + 1;
+  return Array.from({length: total}, (_, i) => {
+    const d = new Date(start); d.setDate(d.getDate() + i);
+    return {
+      id: WD[d.getDay()] + String(d.getDate()),
+      name: WD[d.getDay()].charAt(0).toUpperCase() + WD[d.getDay()].slice(1),
+      date: `${MO[d.getMonth()]} ${d.getDate()}`,
+      label: i === 0 ? 'Arrival' : i === total - 1 ? 'Checkout' : `Day ${i + 1}`,
+    };
+  });
+}
+
+const _activeTrip = getActiveTripConfig();
+
 // ── CONFIG ────────────────────────────────────────────────────────
 const API_KEY = '$2a$10$fB8HdKHZXxwyK6Qj087K3OdEXwetiR4n4BeQaWd9prgKSfVY2kp2u';
-const BIN_ID  = '6a401210da38895dfe08580f';
+let BIN_ID  = _activeTrip.binId;
 const API_BASE = 'https://api.jsonbin.io/v3';
 
 // ── CONSTANTS ─────────────────────────────────────────────────────
-const DAYS = [
-  { id:'wed', name:'Wed', date:'Jul 22', label:'Arrival' },
-  { id:'thu', name:'Thu', date:'Jul 23', label:'Day 2' },
-  { id:'fri', name:'Fri', date:'Jul 24', label:'Day 3' },
-  { id:'sat', name:'Sat', date:'Jul 25', label:'Day 4' },
-  { id:'sun', name:'Sun', date:'Jul 26', label:'Checkout' },
-];
+let DAYS = _activeTrip.days;
 const H_START = 7, H_END = 24;
 const TOTAL_SLOTS = (H_END - H_START) * 2; // 30-min slots
 const SLOT_H_DESKTOP = 40, SLOT_H_MOBILE = 52;
@@ -2071,7 +2221,127 @@ if (!localStorage.getItem('portA_onboarded')) {
   }
 }
 
+// ── TRIPS HOME SCREEN ─────────────────────────────────────────────
+function tripStatus(trip) {
+  const now = Date.now();
+  const start = new Date(trip.startDate + 'T00:00:00').getTime();
+  const end   = new Date(trip.endDate   + 'T23:59:59').getTime();
+  if (now < start) return { label: 'Upcoming', cls: 'trip-status-upcoming' };
+  if (now > end)   return { label: 'Past',     cls: 'trip-status-past' };
+  return { label: '🟢 Live', cls: 'trip-status-live' };
+}
+
+function renderTripsHome() {
+  const manifest = getTripManifest();
+  const list = document.getElementById('tripsList');
+  list.innerHTML = '';
+  [...manifest].sort((a, b) => b.createdAt - a.createdAt).forEach(trip => {
+    const status = tripStatus(trip);
+    const crew = Array.isArray(trip.crew) ? trip.crew.join(', ') : trip.crew;
+    const card = document.createElement('div');
+    card.className = 'trip-card';
+    card.innerHTML = `
+      <div class="trip-card-emoji">${trip.emoji || '🌊'}</div>
+      <div class="trip-card-body">
+        <div class="trip-card-name">${trip.name}</div>
+        <div class="trip-card-meta">${trip.startDate ? new Date(trip.startDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''} · ${trip.location || ''}</div>
+        ${crew ? `<div class="trip-card-crew">👥 ${crew}</div>` : ''}
+      </div>
+      <span class="trip-card-status ${status.cls}">${status.label}</span>
+    `;
+    card.addEventListener('click', () => switchToTrip(trip.id));
+    list.appendChild(card);
+  });
+}
+
+function showTripsHome() {
+  renderTripsHome();
+  document.getElementById('tripsHome').style.display = 'block';
+}
+
+function hideTripsHome() {
+  document.getElementById('tripsHome').style.display = 'none';
+}
+
+function switchToTrip(tripId) {
+  localStorage.setItem(ACTIVE_TRIP_KEY, tripId);
+  window.location.reload();
+}
+
+function openNewTripForm() {
+  document.getElementById('newTripModal').style.display = 'flex';
+  document.getElementById('ntName').focus();
+}
+
+function closeNewTripForm() {
+  document.getElementById('newTripModal').style.display = 'none';
+  document.getElementById('ntStatus').textContent = '';
+}
+
+async function submitNewTrip() {
+  const emoji    = document.getElementById('ntEmoji').value.trim() || '🏖️';
+  const name     = document.getElementById('ntName').value.trim();
+  const startStr = document.getElementById('ntStart').value;
+  const endStr   = document.getElementById('ntEnd').value;
+  const location = document.getElementById('ntLocation').value.trim();
+  const address  = document.getElementById('ntAddress').value.trim();
+  const crewRaw  = document.getElementById('ntCrew').value;
+  const crew     = crewRaw.split(',').map(s => s.trim()).filter(Boolean);
+  const statusEl = document.getElementById('ntStatus');
+
+  if (!name || !startStr || !endStr) { statusEl.textContent = 'Name, start & end date are required.'; return; }
+  if (new Date(endStr) < new Date(startStr)) { statusEl.textContent = 'End date must be after start date.'; return; }
+  if ((new Date(endStr) - new Date(startStr)) > 1000*60*60*24*30) { statusEl.textContent = 'Trips must be 30 days or fewer.'; return; }
+
+  const btn = document.getElementById('ntSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  statusEl.textContent = '';
+
+  try {
+    const days = generateTripDays(startStr, endStr);
+    const initialState = {
+      placed: Object.fromEntries(days.map(d => [d.id, {}])),
+      customActs: [], hiddenBase: [], chat: []
+    };
+    const res = await fetch(`${API_BASE}/b`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+      body: JSON.stringify(initialState)
+    });
+    if (!res.ok) throw new Error('JSONBin error ' + res.status);
+    const { metadata } = await res.json();
+    const newBinId = metadata.id;
+
+    const trip = { id: 'trip-' + Date.now(), name, emoji, startDate: startStr, endDate: endStr,
+      location, address, crew, binId: newBinId, createdAt: Date.now(), days };
+    const manifest = getTripManifest();
+    manifest.push(trip);
+    saveTripManifest(manifest);
+    switchToTrip(trip.id);
+  } catch (err) {
+    statusEl.textContent = 'Could not create trip — check connection and try again.';
+    btn.disabled = false; btn.textContent = '🌊 Create Trip';
+  }
+}
+
+function hydrateHeader() {
+  const t = _activeTrip;
+  if (!t) return;
+  const hdrTitle = document.getElementById('hdrTitle');
+  const hdrSub   = document.getElementById('hdrSub');
+  if (hdrTitle) hdrTitle.textContent = `${t.emoji || '🌊'} ${t.name}`;
+  if (hdrSub) {
+    const start = t.startDate ? new Date(t.startDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+    const end   = t.endDate   ? new Date(t.endDate  +'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+    const crew  = Array.isArray(t.crew) ? t.crew.join(' · ') : (t.crew || '');
+    hdrSub.textContent = `${start}–${end}${crew ? ' · ' + crew : ''} · LIVE`;
+  }
+  // Also update desktop sidebar trip label if present
+  const deskTop = document.querySelector('.sidebar h2');
+}
+
 // ── INIT ──────────────────────────────────────────────────────────
+hydrateHeader();
 setSyncState('busy');
 setWho(ui.currentWho);
 ['mShowBoth','dShowBoth'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = ui.showBoth; });
