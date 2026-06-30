@@ -829,7 +829,15 @@ async function loadBin() {
     if (etag && etag === ui.lastEtag) return;
     ui.lastEtag = etag;
     const { record } = await r.json();
-    if (record.placed) { DAYS.forEach(d => { state.placed[d.id] = record.placed[d.id] || {}; }); }
+    if (record.placed) {
+      const incomingCount = DAYS.reduce((sum, d) => sum + Object.keys(record.placed[d.id] || {}).length, 0);
+      const localCount = DAYS.reduce((sum, d) => sum + Object.keys(state.placed[d.id] || {}).length, 0);
+      if (incomingCount === 0 && localCount > 0) {
+        console.warn('Skipped suspicious empty sync read — kept local calendar data.');
+      } else {
+        DAYS.forEach(d => { state.placed[d.id] = record.placed[d.id] || {}; });
+      }
+    }
     if (record.customActs) state.customActs = record.customActs;
     if (record.chat) {
       const prevLen = state.chat.length;
