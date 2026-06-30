@@ -324,9 +324,62 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
   .app-body { display: block; overflow: visible; }
   .cal-wrap { height: calc(100vh - 280px); overflow-y: auto; }
 }
+/* ── LOGIN GATE ── */
+.login-gate {
+  position: fixed; inset: 0; z-index: 5000;
+  background-color: var(--sand);
+  background-image:
+    radial-gradient(ellipse 420px 260px at 10% 15%, rgba(196,168,130,.32), transparent 60%),
+    radial-gradient(ellipse 460px 280px at 90% 30%, rgba(237,224,196,.6), transparent 65%),
+    radial-gradient(ellipse 360px 220px at 20% 80%, rgba(232,213,176,.42), transparent 60%),
+    radial-gradient(ellipse 400px 260px at 88% 88%, rgba(196,168,130,.24), transparent 65%);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.login-card {
+  background: linear-gradient(160deg, rgba(255,255,255,.85), rgba(212,245,234,.55));
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: 22px 28px 18px 26px / 24px 18px 28px 20px;
+  box-shadow: 0 16px 40px rgba(15,90,106,.22), inset 0 1px 0 rgba(255,255,255,.7);
+  backdrop-filter: blur(4px);
+  padding: 32px 26px; max-width: 320px; width: 100%; text-align: center;
+}
+.login-wave { font-size: 34px; margin-bottom: 6px; }
+.login-card h2 { font-family: 'Playfair Display', serif; color: var(--ocean-d); font-size: 21px; margin-bottom: 4px; }
+.login-card p { color: var(--muted); font-size: 12.5px; margin-bottom: 18px; }
+.login-opts { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.login-opt {
+  position: relative; overflow: hidden; cursor: pointer; border: 1.5px solid rgba(255,255,255,.7);
+  border-radius: 16px 12px 18px 13px / 13px 17px 12px 16px;
+  padding: 14px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #fff;
+  box-shadow: 0 4px 12px rgba(15,90,106,.18), inset 0 1px 0 rgba(255,255,255,.4);
+}
+.login-opt.lacey { background: linear-gradient(150deg, var(--lacey-l), var(--lacey-d)); }
+.login-opt.nicole { background: linear-gradient(150deg, var(--nicole-l), var(--nicole-d)); }
+.login-glass { position: absolute; top: -14px; left: -14px; width: 60%; height: 70%; background: radial-gradient(ellipse, rgba(255,255,255,.4), transparent 70%); pointer-events: none; }
+.login-note { font-size: 10px; color: var(--muted); margin-bottom: 0; }
+
 </style>
+
 </head>
 <body>
+
+<!-- LOGIN GATE (first visit per device only) -->
+<div id="loginGate" class="login-gate" style="display:none">
+  <div class="login-card">
+    <div class="login-wave">🌊</div>
+    <h2>Port A Planner</h2>
+    <p>Who's checking in?</p>
+    <div class="login-opts">
+      <button class="login-opt lacey" onclick="completeLogin('lacey')">
+        <span class="login-glass"></span>Lacey
+      </button>
+      <button class="login-opt nicole" onclick="completeLogin('nicole')">
+        <span class="login-glass"></span>Nicole
+      </button>
+    </div>
+    <p class="login-note">🐚 Remembered on this device — no need to choose again.</p>
+  </div>
+</div>
 
 <!-- HEADER -->
 <div class="hdr">
@@ -1652,6 +1705,16 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(renderAll, 150);
 });
+
+// ── LOGIN GATE ────────────────────────────────────────────────────
+function completeLogin(who) {
+  setWho(who);
+  localStorage.setItem('portA_onboarded', 'true');
+  document.getElementById('loginGate').style.display = 'none';
+}
+if (!localStorage.getItem('portA_onboarded')) {
+  document.getElementById('loginGate').style.display = 'flex';
+}
 
 // ── INIT ──────────────────────────────────────────────────────────
 setSyncState('busy');
