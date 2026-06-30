@@ -896,6 +896,27 @@ async function saveBin() {
   } catch { setSyncState('err'); }
 }
 
+function reconcileOwnership() {
+  // Repairs damage from the earlier bug where un-sharing an item could
+  // mislabel it under whoever was viewing it instead of who actually
+  // created it. `who` (set once at creation, never touched by that bug)
+  // is the source of truth; this realigns solo `attendees` to match it.
+  let changed = false;
+  DAYS.forEach(d => {
+    Object.keys(state.placed[d.id] || {}).forEach(slotKey => {
+      const entry = state.placed[d.id][slotKey];
+      if (!entry || !entry.isStart || !entry.who) return;
+      const att = entry.attendees;
+      const isShared = att && att.includes('lacey') && att.includes('nicole');
+      if (!isShared && (!att || att.length !== 1 || att[0] !== entry.who)) {
+        state.placed[d.id][slotKey] = { ...entry, attendees: [entry.who] };
+        changed = true;
+      }
+    });
+  });
+  return changed;
+}
+
 async function loadBin() {
   try {
     const r = await fetch(`${API_BASE}/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
@@ -927,6 +948,10 @@ async function loadBin() {
     renderAll();
     Chat.renderMessages();
     setSyncState('ok');
+    if (reconcileOwnership()) {
+      renderAll();
+      saveBin();
+    }
   } catch { /* silent on poll errors */ }
 }
 
