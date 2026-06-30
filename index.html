@@ -17,6 +17,8 @@
   --coral: #E8816A; --sky-l: #E0F4FA; --border: #C5DDE3;
   --text: #2C4A52; --muted: #6B9099; --white: #fff;
   --sidebar-w: 264px;
+  --lacey-c: #C9798A; --lacey-l: #E8B8C2; --lacey-d: #A8556A;
+  --nicole-c: #6FCFC4; --nicole-l: #AEE8E0; --nicole-d: #3DA89C;
 }
 body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--text); font-size: 13px; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
@@ -53,10 +55,10 @@ body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--
 .who-bar { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--sky-l); border-bottom: 1px solid var(--border); flex-shrink: 0; }
 .who-lbl { font-size: 10px; font-weight: 700; color: var(--muted); }
 .who-btn { font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; cursor: pointer; border: 2px solid transparent; background: var(--white); transition: all .14s; }
-.who-btn.lacey { border-color: #7B68EE; color: #7B68EE; }
-.who-btn.lacey.on { background: #7B68EE; color: #fff; }
-.who-btn.nicole { border-color: var(--coral); color: var(--coral); }
-.who-btn.nicole.on { background: var(--coral); color: #fff; }
+.who-btn.lacey { border-color: var(--lacey-d); color: var(--lacey-d); }
+.who-btn.lacey.on { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); color: #fff; }
+.who-btn.nicole { border-color: var(--nicole-d); color: var(--nicole-d); }
+.who-btn.nicole.on { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); color: #fff; }
 
 /* ── DAY TABS (mobile only) ── */
 .day-tabs { display: flex; background: var(--white); border-bottom: 2px solid var(--border); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
@@ -100,7 +102,9 @@ body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--
 .ac-del:hover { background: var(--coral); color: #fff; }
 
 /* ── CALENDAR ── */
-.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; }
+.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; border: 3px solid transparent; transition: border-color .2s; }
+body.active-lacey .cal-wrap { border-color: var(--lacey-c); }
+body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .cal-grid { display: grid; }
 /* Desktop: 5 col, Mobile: 1 col — set by JS */
 .col-hdr { text-align: center; padding: 6px 3px; font-size: 10.5px; font-weight: 800; color: var(--ocean-d); background: var(--sky-l); border: 1px solid var(--border); border-bottom: 2.5px solid var(--teal); position: sticky; top: 0; z-index: 10; }
@@ -125,9 +129,10 @@ body { font-family: 'Nunito', sans-serif; background: var(--sand); color: var(--
 .pa-resize { position: absolute; bottom: 0; left: 0; right: 0; height: 10px; cursor: ns-resize; display: flex; align-items: center; justify-content: center; z-index: 7; opacity: 0; transition: opacity .15s; }
 .pa:hover .pa-resize { opacity: 1; }
 .pa-resize::after { content: ''; width: 24px; height: 3px; background: rgba(255,255,255,.6); border-radius: 2px; }
-.who-ring-lacey { box-shadow: 0 0 0 2.5px #7B68EE, 0 2px 6px rgba(0,0,0,.15); }
-.who-ring-nicole { box-shadow: 0 0 0 2.5px var(--coral), 0 2px 6px rgba(0,0,0,.15); }
-.who-badge { position: absolute; bottom: 3px; right: 5px; font-size: 8px; font-weight: 800; opacity: .85; }
+.pa.owner-lacey { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); }
+.pa.owner-nicole { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); }
+.pa.owner-both { background: linear-gradient(to left, var(--nicole-c), var(--lacey-c)); }
+.who-badge { position: absolute; top: 3px; right: 5px; bottom: auto; font-size: 8px; font-weight: 800; opacity: .92; background: rgba(255,255,255,.3); border-radius: 6px; padding: 1px 4px; cursor: pointer; }
 
 /* Sea glass color palette */
 .ct-travel  { background: rgba(168,108,72,.75); }
@@ -775,6 +780,8 @@ function startPolling() {
 function setWho(who) {
   ui.currentWho = who;
   localStorage.setItem('portA_who', who);
+  document.body.classList.toggle('active-lacey', who === 'lacey');
+  document.body.classList.toggle('active-nicole', who === 'nicole');
   ['mBtnL','dBtnL'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'who-btn lacey' + (who==='lacey'?' on':''); });
   ['mBtnN','dBtnN'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'who-btn nicole' + (who==='nicole'?' on':''); });
 }
@@ -887,7 +894,7 @@ function placeAct(dayId, slot, actId) {
   if (slot + a.dur > TOTAL_SLOTS) { toast('Not enough time — try earlier slot.', 'w'); return; }
   if (hasConflict(dayId, slot, a.dur)) { toast(`⚠ Conflict at ${slotToTime(slot)} — move something first.`, 'w'); return; }
   for (let i = slot; i < slot + a.dur; i++) {
-    state.placed[dayId][i] = { actId, isStart: i === slot, span: a.dur, who: ui.currentWho };
+    state.placed[dayId][i] = { actId, isStart: i === slot, span: a.dur, who: ui.currentWho, attendees: [ui.currentWho] };
   }
   toast(`${a.e} ${a.name} added!`, 's', 1600);
   renderAll();
@@ -902,7 +909,7 @@ function removeAct(dayId, slot, span) {
   saveBin();
 }
 
-function moveAct(fromDay, fromSlot, toDay, toSlot, actId, span, who) {
+function moveAct(fromDay, fromSlot, toDay, toSlot, actId, span, who, attendees) {
   const a = getAct(actId);
   if (!a) return;
   toSlot = Math.max(0, Math.min(toSlot, TOTAL_SLOTS - span));
@@ -915,7 +922,7 @@ function moveAct(fromDay, fromSlot, toDay, toSlot, actId, span, who) {
     toast(`⚠ Conflict at ${slotToTime(toSlot)}`, 'w'); return;
   }
   for (let i = toSlot; i < toSlot + span; i++) {
-    state.placed[toDay][i] = { actId, isStart: i === toSlot, span, who: who || ui.currentWho };
+    state.placed[toDay][i] = { actId, isStart: i === toSlot, span, who: who || ui.currentWho, attendees: attendees || [who || ui.currentWho] };
   }
   if (fromDay !== toDay || fromSlot !== toSlot) {
     toast(`↕ Moved to ${DAYS.find(d=>d.id===toDay)?.name} at ${slotToTime(toSlot)}`, 's', 1800);
@@ -968,8 +975,13 @@ function renderCalendar() {
       if (entry?.isStart) {
         const a = getAct(entry.actId);
         if (a) {
+          const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
+          const isShared = att.includes('lacey') && att.includes('nicole');
+          const ownerClass = isShared ? 'owner-both' : (att[0] === 'nicole' ? 'owner-nicole' : 'owner-lacey');
+          const showBadge = a.isCustom || isShared;
+          const badgeText = isShared ? 'L·N' : (att[0] === 'nicole' ? 'N' : 'L');
           const pa = document.createElement('div');
-          pa.className = `pa ct-${a.isCustom ? 'custom' : a.type} who-ring-${entry.who || 'lacey'}`;
+          pa.className = `pa ${ownerClass}`;
           pa.style.height = `${entry.span * sh - 4}px`;
           pa.draggable = true;
           pa.innerHTML = `
@@ -977,9 +989,23 @@ function renderCalendar() {
             <div class="pa-dur">⏱ ${durLabel(entry.span)}</div>
             <div class="pa-meta">${slotToTime(s)} · ${a.cost === 0 ? 'Free' : `$${a.cost}/p`}</div>
             <div class="pa-rm" title="Remove">✕</div>
-            <div class="who-badge">${entry.who === 'nicole' ? 'N' : 'L'}</div>
+            ${showBadge ? `<div class="who-badge" title="Tap to toggle 'both of us'">${badgeText}</div>` : ''}
             <div class="pa-resize" title="Drag to resize"></div>
           `;
+
+          const badgeEl = pa.querySelector('.who-badge');
+          if (badgeEl) {
+            badgeEl.addEventListener('click', e => {
+              e.stopPropagation();
+              const nowShared = att.includes('lacey') && att.includes('nicole');
+              const newAttendees = nowShared ? [ui.currentWho] : ['lacey', 'nicole'];
+              for (let i = s; i < s + entry.span; i++) {
+                state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: newAttendees };
+              }
+              renderCalendar();
+              saveBin();
+            });
+          }
 
           pa.querySelector('.pa-rm').addEventListener('click', e => {
             e.stopPropagation();
@@ -993,7 +1019,7 @@ function renderCalendar() {
             const rect = pa.getBoundingClientRect();
             grabOffset = Math.max(0, Math.min(Math.floor((e.clientY - rect.top) / sh), entry.span - 1));
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('application/json', JSON.stringify({ fromDay: day.id, fromSlot: s, actId: entry.actId, span: entry.span, who: entry.who, grabOffset }));
+            e.dataTransfer.setData('application/json', JSON.stringify({ fromDay: day.id, fromSlot: s, actId: entry.actId, span: entry.span, who: entry.who, attendees: entry.attendees, grabOffset }));
             requestAnimationFrame(() => pa.style.opacity = '.3');
           });
           pa.addEventListener('dragend', () => { pa.style.opacity = '1'; });
@@ -1011,10 +1037,10 @@ function renderCalendar() {
               let ok = true;
               for (let i = s; i < s + newSpan; i++) { if (state.placed[day.id][i]) { ok = false; break; } }
               if (ok) {
-                for (let i = s; i < s + newSpan; i++) state.placed[day.id][i] = { actId: entry.actId, isStart: i === s, span: newSpan, who: entry.who };
+                for (let i = s; i < s + newSpan; i++) state.placed[day.id][i] = { actId: entry.actId, isStart: i === s, span: newSpan, who: entry.who, attendees: entry.attendees };
                 renderCalendar();
               } else {
-                for (let i = s; i < s + entry.span; i++) state.placed[day.id][i] = { actId: entry.actId, isStart: i === s, span: entry.span, who: entry.who };
+                for (let i = s; i < s + entry.span; i++) state.placed[day.id][i] = { actId: entry.actId, isStart: i === s, span: entry.span, who: entry.who, attendees: entry.attendees };
               }
             };
             return onMove;
@@ -1057,7 +1083,7 @@ function renderCalendar() {
         cell.classList.remove('drag-over');
         try {
           const d = JSON.parse(e.dataTransfer.getData('application/json'));
-          moveAct(d.fromDay, d.fromSlot, day.id, s - (d.grabOffset || 0), d.actId, d.span, d.who);
+          moveAct(d.fromDay, d.fromSlot, day.id, s - (d.grabOffset || 0), d.actId, d.span, d.who, d.attendees);
         } catch {}
       });
 
