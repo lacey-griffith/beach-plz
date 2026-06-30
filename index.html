@@ -145,6 +145,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 /* ── MOBILE CARD-COLUMN CALENDAR ── */
 .cc-wrap { display: flex; gap: 10px; overflow-x: auto; padding: 10px 10px 90px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
 .cc-col { flex-shrink: 0; width: 72vw; max-width: 230px; scroll-snap-align: start; }
+.cc-wrap-day .cc-col { width: 100%; max-width: unset; }
 .cc-col-hdr { text-align: center; padding: 7px 4px; border-radius: 10px 10px 0 0; background: var(--ocean); color: #fff; position: sticky; top: 0; z-index: 5; }
 .cc-col-hdr .dn { font-size: 12px; font-weight: 800; }
 .cc-col-hdr .dd { font-size: 8.5px; opacity: .85; }
@@ -358,6 +359,10 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
   <label class="show-both-lbl">
     <input type="checkbox" class="show-both-cb" id="mShowBoth" onchange="setShowBoth(this.checked)">
     <span class="shell-ico">🐚</span>Show Both
+  </label>
+  <label class="show-both-lbl">
+    <input type="checkbox" class="show-both-cb" id="mCalView" onchange="setCalView(this.checked ? 'all' : 'day')">
+    <span class="shell-ico">🌊</span>All Days
   </label>
 </div>
 
@@ -741,6 +746,7 @@ let ui = {
   curFilter: 'all',
   currentWho: localStorage.getItem('portA_who') || 'lacey',
   showBoth: localStorage.getItem('portA_showBoth') !== 'false',
+  calView: localStorage.getItem('portA_calView') || 'all',
   pendingAct: null,
   lastEtag: null,
   pollTimer: null,
@@ -875,6 +881,13 @@ function setShowBoth(checked) {
   ui.showBoth = checked;
   localStorage.setItem('portA_showBoth', checked ? 'true' : 'false');
   ['mShowBoth','dShowBoth'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = checked; });
+  renderCalendar();
+}
+
+function setCalView(view) {
+  ui.calView = view;
+  localStorage.setItem('portA_calView', view);
+  const el = document.getElementById('mCalView'); if (el) el.checked = view === 'all';
   renderCalendar();
 }
 
@@ -1119,8 +1132,11 @@ function renderCardCalendar(grid) {
   grid.style.minWidth = 'unset';
   const wrap = document.createElement('div');
   wrap.className = 'cc-wrap';
+  const isDayView = ui.calView === 'day';
+  if (isDayView) wrap.classList.add('cc-wrap-day');
+  const colsToRender = isDayView ? [DAYS.find(d => d.id === ui.curDay) || DAYS[0]] : DAYS;
 
-  DAYS.forEach(day => {
+  colsToRender.forEach(day => {
     const col = document.createElement('div');
     col.className = 'cc-col';
     const dc = dayCost(day.id);
@@ -1630,6 +1646,7 @@ window.addEventListener('resize', () => {
 setSyncState('busy');
 setWho(ui.currentWho);
 ['mShowBoth','dShowBoth'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = ui.showBoth; });
+document.getElementById('mCalView') && (document.getElementById('mCalView').checked = ui.calView === 'all');
 renderAll();
 startCountdown();
 loadBin().then(() => { startPolling(); setSyncState('ok'); }).catch(() => { setSyncState('err'); renderAll(); });
