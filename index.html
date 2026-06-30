@@ -493,9 +493,15 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
         <label class="edit-lbl">Accommodation</label>
         <input class="edit-inp" id="ntAddress" placeholder="e.g. Unit 14, Beachcomber Condos">
       </div>
-      <div class="edit-field">
-        <label class="edit-lbl">Crew (comma-separated)</label>
-        <input class="edit-inp" id="ntCrew" placeholder="Nicole, RJ, Tyler, Gracie">
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-lbl">Crew (comma-separated)</label>
+          <input class="edit-inp" id="ntCrew" placeholder="Nicole, RJ, Tyler, Gracie">
+        </div>
+        <div class="edit-field" style="flex:0 0 130px">
+          <label class="edit-lbl">Slug / short name</label>
+          <input class="edit-inp" id="ntSlug" placeholder="galveston-27" maxlength="32">
+        </div>
       </div>
       <div id="ntStatus" class="edit-lbl" style="color:var(--coral);min-height:16px"></div>
       <div class="dm-actions" style="margin-top:12px">
@@ -2287,6 +2293,7 @@ async function submitNewTrip() {
   const address  = document.getElementById('ntAddress').value.trim();
   const crewRaw  = document.getElementById('ntCrew').value;
   const crew     = crewRaw.split(',').map(s => s.trim()).filter(Boolean);
+  const slug     = document.getElementById('ntSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-') || null;
   const statusEl = document.getElementById('ntStatus');
 
   if (!name || !startStr || !endStr) { statusEl.textContent = 'Name, start & end date are required.'; return; }
@@ -2312,7 +2319,7 @@ async function submitNewTrip() {
     const { metadata } = await res.json();
     const newBinId = metadata.id;
 
-    const trip = { id: 'trip-' + Date.now(), name, emoji, startDate: startStr, endDate: endStr,
+    const trip = { id: 'trip-' + Date.now(), name, emoji, slug, startDate: startStr, endDate: endStr,
       location, address, crew, binId: newBinId, createdAt: Date.now(), days };
     const manifest = getTripManifest();
     manifest.push(trip);
