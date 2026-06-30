@@ -162,7 +162,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .cc-col-hdr .dc { font-size: 8.5px; font-weight: 800; color: #A8FFE8; margin-top: 1px; }
 .cc-col-body { background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(212,245,234,.35)); border-radius: 10px 10px 14px 18px / 10px 10px 16px 12px; min-height: 200px; padding: 8px 6px; backdrop-filter: blur(2px); border: 1px solid rgba(255,255,255,.4); border-top: none; }
 .cc-empty { text-align: center; font-size: 10px; color: var(--muted); padding: 16px 4px; }
-.cc-card { display: flex; align-items: center; gap: 7px; background: linear-gradient(160deg, rgba(255,255,255,.92), rgba(255,255,255,.78)); border-radius: 16px 12px 18px 13px / 13px 17px 12px 16px; padding: 8px 9px; margin-bottom: 7px; box-shadow: 0 3px 9px rgba(15,90,106,.13), inset 0 1px 0 rgba(255,255,255,.6); position: relative; border: 1px solid rgba(255,255,255,.6); backdrop-filter: blur(3px); overflow: hidden; }
+.cc-card { display: flex; align-items: center; gap: 7px; background: linear-gradient(160deg, rgba(255,255,255,.92), rgba(255,255,255,.78)); border-radius: 16px 12px 18px 13px / 13px 17px 12px 16px; padding: 8px 20px 8px 9px; margin-bottom: 7px; box-shadow: 0 3px 9px rgba(15,90,106,.13), inset 0 1px 0 rgba(255,255,255,.6); position: relative; border: 1px solid rgba(255,255,255,.6); backdrop-filter: blur(3px); overflow: hidden; }
 .cc-card::before { content: ''; position: absolute; top: -10px; left: -10px; width: 50%; height: 60%; background: radial-gradient(ellipse, rgba(255,255,255,.45), transparent 70%); pointer-events: none; }
 .cc-rail { width: 4px; align-self: stretch; border-radius: 4px; flex-shrink: 0; }
 .cc-rail.owner-lacey { background: linear-gradient(var(--lacey-l), var(--lacey-d)); }
@@ -179,14 +179,15 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .cc-who .av:first-child { margin-left: 0; }
 .cc-who .av.lacey { background: var(--lacey-d); }
 .cc-who .av.nicole { background: var(--nicole-d); }
-.cc-rm { position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--coral); color: #fff; font-size: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity .12s; }
-.cc-card:active .cc-rm, .cc-card:hover .cc-rm { opacity: 1; }
-.cc-card.lifted { transform: scale(1.04); box-shadow: 0 6px 18px rgba(0,0,0,.18); z-index: 20; }
+.cc-menu-btn { position: absolute; top: 4px; right: 5px; width: 18px; height: 18px; border-radius: 50%; background: rgba(15,90,106,.12); color: var(--ocean-d); font-size: 12px; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; letter-spacing: -1px; padding-bottom: 3px; }
+.cc-menu-btn:active { background: rgba(15,90,106,.22); }
+.cc-card.lifted { transform: scale(1.03); box-shadow: 0 6px 16px rgba(0,0,0,.16); z-index: 20; }
 
 /* ── JELLYFISH ACTION MENU ── */
 .jelly-overlay { position: fixed; inset: 0; z-index: 900; background: transparent; }
-.jelly-menu { position: fixed; display: flex; gap: 10px; z-index: 901; transform: translate(-50%, -100%); }
-.jelly { width: 46px; height: 52px; cursor: pointer; animation: jelly-drift 2.2s ease-in-out infinite; display: flex; flex-direction: column; align-items: center; }
+.jelly { position: fixed; width: 46px; height: 52px; cursor: pointer; animation: jelly-drift 2.2s ease-in-out infinite; display: flex; flex-direction: column; align-items: center; z-index: 901; }
+.jelly-spawn .jelly-cap { animation: jelly-pop .32s cubic-bezier(.34,1.6,.64,1) backwards; }
+@keyframes jelly-pop { from { transform: scale(.25); opacity: .4; } to { transform: scale(1); opacity: 1; } }
 .jelly:nth-child(2) { animation-delay: .25s; }
 .jelly:nth-child(3) { animation-delay: .5s; }
 .jelly-cap { width: 40px; height: 26px; border-radius: 50% 50% 42% 42%; position: relative; box-shadow: 0 3px 8px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: center; font-size: 16px; }
@@ -1106,54 +1107,16 @@ function moveAct(fromDay, fromSlot, toDay, toSlot, actId, span, who, attendees) 
 
 // ── RENDER CALENDAR ───────────────────────────────────────────────
 // ── MOBILE CARD-COLUMN CALENDAR ────────────────────────────────────
-function attachLongPress(card, dayId, slot, entry, act, attendees) {
-  let timer = null, startX = 0, startY = 0, moved = false;
-  const start = (e) => {
-    moved = false;
-    const pt = e.touches ? e.touches[0] : e;
-    startX = pt.clientX; startY = pt.clientY;
-    timer = setTimeout(() => {
-      if (moved) return;
-      card.classList.add('lifted');
-      if (navigator.vibrate) navigator.vibrate(12);
-      showJellyMenu(card, dayId, slot, entry, act, attendees);
-    }, 420);
-  };
-  const move = (e) => {
-    const pt = e.touches ? e.touches[0] : e;
-    const dx = Math.abs(pt.clientX - startX), dy = Math.abs(pt.clientY - startY);
-    if (dx > 12 || dy > 12) { moved = true; clearTimeout(timer); card.classList.remove('lifted'); }
-  };
-  const cancel = () => { clearTimeout(timer); card.classList.remove('lifted'); };
-  card.addEventListener('touchstart', start, { passive: true });
-  card.addEventListener('touchmove', move, { passive: true });
-  card.addEventListener('touchend', cancel);
-  card.addEventListener('touchcancel', cancel);
-  card.addEventListener('mousedown', start);
-  card.addEventListener('mouseup', cancel);
-  card.addEventListener('mouseleave', cancel);
-}
 
 function showJellyMenu(card, dayId, slot, entry, act, attendees) {
   closeJellyMenu();
   const rect = card.getBoundingClientRect();
+  card.classList.add('lifted');
   const overlay = document.createElement('div');
   overlay.className = 'jelly-overlay';
   overlay.id = 'jellyOverlay';
   overlay.addEventListener('click', closeJellyMenu);
   overlay.addEventListener('touchstart', closeJellyMenu, { passive: true });
-
-  const menu = document.createElement('div');
-  menu.className = 'jelly-menu';
-  const fitsAbove = rect.top > 95;
-  menu.style.left = `${Math.min(Math.max(rect.left + rect.width / 2, 80), window.innerWidth - 80)}px`;
-  if (fitsAbove) {
-    menu.style.top = `${rect.top}px`;
-  } else {
-    menu.style.top = `${rect.bottom}px`;
-    menu.style.transform = 'translate(-50%, 12px)';
-  }
-  menu.addEventListener('click', e => e.stopPropagation());
 
   const isShared = attendees.includes('lacey') && attendees.includes('nicole');
 
@@ -1169,21 +1132,51 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
     { cls: 'del', icon: '<span class="jelly-x"></span>', lbl: 'Remove', action: () => { closeJellyMenu(); removeAct(dayId, slot, entry.span); } },
   ];
 
-  items.forEach(it => {
+  // Target spots bordering the card's right edge: just outside the top-right
+  // corner, then around the corner down the right side, then just below that.
+  // (offsets account for the jelly's own ~46x52 box so left/top mark its visual center)
+  const HW = 23, HH = 22;
+  const maxLeft = window.innerWidth - 56;
+  const targets = [
+    { left: Math.min(rect.right - 6, maxLeft) - HW, top: rect.top - 6 - HH },
+    { left: Math.min(rect.right + 16, maxLeft) - HW, top: rect.top + rect.height * 0.42 - HH },
+    { left: Math.min(rect.right + 16, maxLeft) - HW, top: rect.top + rect.height * 0.42 + 44 - HH },
+  ];
+  const originX = rect.left + rect.width / 2 - HW;
+  const originY = rect.top + rect.height / 2 - HH;
+
+  const jellyEls = [];
+  items.forEach((it, i) => {
     const j = document.createElement('div');
-    j.className = 'jelly';
+    j.className = 'jelly jelly-spawn';
     j.innerHTML = `<div class="jelly-cap ${it.cls}">${it.icon}</div><div class="jelly-tentacles"></div><div class="jelly-lbl">${it.lbl}</div>`;
-    j.addEventListener('click', it.action);
-    menu.appendChild(j);
+    j.style.left = `${originX}px`;
+    j.style.top = `${originY}px`;
+    j.style.opacity = '0';
+    j.addEventListener('click', e => { e.stopPropagation(); it.action(); });
+    document.body.appendChild(j);
+    jellyEls.push(j);
   });
 
+  // Force layout, then animate each jelly out to its target spot, staggered.
+  requestAnimationFrame(() => {
+    jellyEls.forEach((j, i) => {
+      setTimeout(() => {
+        j.style.transition = 'left .42s cubic-bezier(.34,1.4,.64,1), top .42s cubic-bezier(.34,1.4,.64,1), opacity .25s ease';
+        j.style.left = `${targets[i].left}px`;
+        j.style.top = `${targets[i].top}px`;
+        j.style.opacity = '1';
+      }, i * 70);
+    });
+  });
+
+  overlay.jellyEls = jellyEls;
   document.body.appendChild(overlay);
-  document.body.appendChild(menu);
 }
 
 function closeJellyMenu() {
   document.getElementById('jellyOverlay')?.remove();
-  document.querySelector('.jelly-menu')?.remove();
+  document.querySelectorAll('.jelly').forEach(j => j.remove());
   document.querySelectorAll('.cc-card.lifted').forEach(c => c.classList.remove('lifted'));
 }
 
@@ -1252,7 +1245,7 @@ function renderCardCalendar(grid) {
         <div class="cc-who" title="Tap to toggle 'both of us'">
           ${isShared ? `<div class="av lacey">L</div><div class="av nicole">N</div>` : `<div class="av ${att[0]}">${att[0] === 'nicole' ? 'N' : 'L'}</div>`}
         </div>
-        <div class="cc-rm" title="Remove">✕</div>
+        <div class="cc-menu-btn" title="Options">⋯</div>
       `;
       card.querySelector('.cc-who').addEventListener('click', e => {
         e.stopPropagation();
@@ -1263,12 +1256,11 @@ function renderCardCalendar(grid) {
         renderCalendar();
         saveBin();
       });
-      card.querySelector('.cc-rm').addEventListener('click', e => {
+      card.querySelector('.cc-menu-btn').addEventListener('click', e => {
         e.stopPropagation();
-        removeAct(day.id, s, entry.span);
+        showJellyMenu(card, day.id, s, entry, a, att);
       });
       card.addEventListener('click', () => { ui.curDay = day.id; });
-      attachLongPress(card, day.id, s, entry, a, att);
       body.appendChild(card);
     }
     if (count === 0) {
