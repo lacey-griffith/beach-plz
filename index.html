@@ -169,6 +169,24 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); }
 .cc-who .av.nicole { background: var(--nicole-d); }
 .cc-rm { position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--coral); color: #fff; font-size: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity .12s; }
 .cc-card:active .cc-rm, .cc-card:hover .cc-rm { opacity: 1; }
+.cc-card.lifted { transform: scale(1.04); box-shadow: 0 6px 18px rgba(0,0,0,.18); z-index: 20; }
+
+/* ── JELLYFISH ACTION MENU ── */
+.jelly-overlay { position: fixed; inset: 0; z-index: 900; background: rgba(15,90,106,.08); }
+.jelly-menu { position: absolute; display: flex; gap: 10px; z-index: 901; transform: translate(-50%, -100%); }
+.jelly { width: 46px; height: 52px; cursor: pointer; animation: jelly-drift 2.2s ease-in-out infinite; display: flex; flex-direction: column; align-items: center; }
+.jelly:nth-child(2) { animation-delay: .25s; }
+.jelly:nth-child(3) { animation-delay: .5s; }
+.jelly-cap { width: 40px; height: 26px; border-radius: 50% 50% 42% 42%; position: relative; box-shadow: 0 3px 8px rgba(0,0,0,.15); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.jelly-cap.move { background: linear-gradient(160deg, var(--mint-l), var(--teal)); }
+.jelly-cap.share { background: linear-gradient(160deg, var(--lacey-l), var(--nicole-l)); }
+.jelly-cap.del { background: linear-gradient(160deg, #FFD9CE, var(--coral)); }
+.jelly-tentacles { width: 30px; height: 16px; margin-top: -3px; opacity: .55; background: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 6px); -webkit-mask: linear-gradient(to bottom, #000, transparent); mask: linear-gradient(to bottom, #000, transparent); }
+.jelly-cap.move ~ .jelly-tentacles { color: var(--teal); }
+.jelly-cap.share ~ .jelly-tentacles { color: var(--nicole-c); }
+.jelly-cap.del ~ .jelly-tentacles { color: var(--coral); }
+.jelly-lbl { font-size: 8px; font-weight: 800; color: var(--ocean-d); margin-top: 2px; text-shadow: 0 1px 2px rgba(255,255,255,.7); }
+@keyframes jelly-drift { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-7px) rotate(3deg); } }
 
 /* Sea glass color palette */
 .ct-travel  { background: rgba(168,108,72,.75); }
@@ -999,6 +1017,95 @@ function moveAct(fromDay, fromSlot, toDay, toSlot, actId, span, who, attendees) 
 
 // ── RENDER CALENDAR ───────────────────────────────────────────────
 // ── MOBILE CARD-COLUMN CALENDAR ────────────────────────────────────
+function attachLongPress(card, dayId, slot, entry, act, attendees) {
+  let timer = null, fired = false;
+  const start = () => {
+    fired = false;
+    timer = setTimeout(() => {
+      fired = true;
+      card.classList.add('lifted');
+      if (navigator.vibrate) navigator.vibrate(12);
+      showJellyMenu(card, dayId, slot, entry, act, attendees);
+    }, 480);
+  };
+  const cancel = () => { clearTimeout(timer); card.classList.remove('lifted'); };
+  card.addEventListener('touchstart', start, { passive: true });
+  card.addEventListener('touchend', cancel);
+  card.addEventListener('touchmove', cancel);
+  card.addEventListener('mousedown', start);
+  card.addEventListener('mouseup', cancel);
+  card.addEventListener('mouseleave', cancel);
+}
+
+function showJellyMenu(card, dayId, slot, entry, act, attendees) {
+  closeJellyMenu();
+  const rect = card.getBoundingClientRect();
+  const overlay = document.createElement('div');
+  overlay.className = 'jelly-overlay';
+  overlay.id = 'jellyOverlay';
+  overlay.addEventListener('click', closeJellyMenu);
+  overlay.addEventListener('touchstart', closeJellyMenu, { passive: true });
+
+  const menu = document.createElement('div');
+  menu.className = 'jelly-menu';
+  menu.style.left = `${rect.left + rect.width / 2}px`;
+  menu.style.top = `${rect.top}px`;
+  menu.addEventListener('click', e => e.stopPropagation());
+
+  const isShared = attendees.includes('lacey') && attendees.includes('nicole');
+
+  const items = [
+    { cls: 'move', icon: '🕐', lbl: 'Move', action: () => { closeJellyMenu(); openMoveTpicker(dayId, slot, entry, act); } },
+    { cls: 'share', icon: isShared ? '🙋' : '🙌', lbl: isShared ? 'Solo' : 'Both', action: () => {
+        const newAttendees = isShared ? [ui.currentWho] : ['lacey', 'nicole'];
+        for (let i = slot; i < slot + entry.span; i++) {
+          state.placed[dayId][i] = { ...state.placed[dayId][i], attendees: newAttendees };
+        }
+        closeJellyMenu(); renderCalendar(); saveBin();
+      } },
+    { cls: 'del', icon: '✕', lbl: 'Remove', action: () => { closeJellyMenu(); removeAct(dayId, slot, entry.span); } },
+  ];
+
+  items.forEach(it => {
+    const j = document.createElement('div');
+    j.className = 'jelly';
+    j.innerHTML = `<div class="jelly-cap ${it.cls}">${it.icon}</div><div class="jelly-tentacles"></div><div class="jelly-lbl">${it.lbl}</div>`;
+    j.addEventListener('click', it.action);
+    menu.appendChild(j);
+  });
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(menu);
+}
+
+function closeJellyMenu() {
+  document.getElementById('jellyOverlay')?.remove();
+  document.querySelector('.jelly-menu')?.remove();
+  document.querySelectorAll('.cc-card.lifted').forEach(c => c.classList.remove('lifted'));
+}
+
+function openMoveTpicker(dayId, slot, entry, act) {
+  document.getElementById('tpTitle').textContent = `Move ${act.e} ${act.name}`;
+  document.getElementById('tpSub').textContent = `Pick a new start time on ${DAYS.find(d=>d.id===dayId)?.name} · ~${durLabel(entry.span)}`;
+  const grid = document.getElementById('tpGrid');
+  grid.innerHTML = '';
+  for (let s = 0; s < TOTAL_SLOTS; s++) {
+    const btn = document.createElement('div');
+    const occupiedByThis = s >= slot && s < slot + entry.span;
+    const conflict = !occupiedByThis && (hasConflict(dayId, s, entry.span) || s + entry.span > TOTAL_SLOTS);
+    btn.className = 'tp-slot' + (conflict ? ' taken' : '') + (occupiedByThis ? ' taken' : '');
+    btn.textContent = slotToTime(s);
+    if (!conflict && !occupiedByThis) {
+      btn.addEventListener('click', () => {
+        closeTpicker();
+        moveAct(dayId, slot, dayId, s, entry.actId, entry.span, entry.who, entry.attendees);
+      });
+    }
+    grid.appendChild(btn);
+  }
+  document.getElementById('tpicker').style.display = 'flex';
+}
+
 function renderCardCalendar(grid) {
   grid.style.display = 'block';
   grid.style.minWidth = 'unset';
@@ -1055,6 +1162,7 @@ function renderCardCalendar(grid) {
         removeAct(day.id, s, entry.span);
       });
       card.addEventListener('click', () => { ui.curDay = day.id; });
+      attachLongPress(card, day.id, s, entry, a, att);
       body.appendChild(card);
     }
     if (count === 0) {
