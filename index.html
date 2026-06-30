@@ -1103,20 +1103,28 @@ function moveAct(fromDay, fromSlot, toDay, toSlot, actId, span, who, attendees) 
 // ── RENDER CALENDAR ───────────────────────────────────────────────
 // ── MOBILE CARD-COLUMN CALENDAR ────────────────────────────────────
 function attachLongPress(card, dayId, slot, entry, act, attendees) {
-  let timer = null, fired = false;
-  const start = () => {
-    fired = false;
+  let timer = null, startX = 0, startY = 0, moved = false;
+  const start = (e) => {
+    moved = false;
+    const pt = e.touches ? e.touches[0] : e;
+    startX = pt.clientX; startY = pt.clientY;
     timer = setTimeout(() => {
-      fired = true;
+      if (moved) return;
       card.classList.add('lifted');
       if (navigator.vibrate) navigator.vibrate(12);
       showJellyMenu(card, dayId, slot, entry, act, attendees);
-    }, 480);
+    }, 420);
+  };
+  const move = (e) => {
+    const pt = e.touches ? e.touches[0] : e;
+    const dx = Math.abs(pt.clientX - startX), dy = Math.abs(pt.clientY - startY);
+    if (dx > 12 || dy > 12) { moved = true; clearTimeout(timer); card.classList.remove('lifted'); }
   };
   const cancel = () => { clearTimeout(timer); card.classList.remove('lifted'); };
   card.addEventListener('touchstart', start, { passive: true });
+  card.addEventListener('touchmove', move, { passive: true });
   card.addEventListener('touchend', cancel);
-  card.addEventListener('touchmove', cancel);
+  card.addEventListener('touchcancel', cancel);
   card.addEventListener('mousedown', start);
   card.addEventListener('mouseup', cancel);
   card.addEventListener('mouseleave', cancel);
@@ -1142,7 +1150,7 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
   const items = [
     { cls: 'move', icon: '🕐', lbl: 'Move', action: () => { closeJellyMenu(); openMoveTpicker(dayId, slot, entry, act); } },
     { cls: 'share', icon: isShared ? '🙋' : '🙌', lbl: isShared ? 'Solo' : 'Both', action: () => {
-        const newAttendees = isShared ? [ui.currentWho] : ['lacey', 'nicole'];
+        const newAttendees = isShared ? [entry.who || ui.currentWho] : ['lacey', 'nicole'];
         for (let i = slot; i < slot + entry.span; i++) {
           state.placed[dayId][i] = { ...state.placed[dayId][i], attendees: newAttendees };
         }
@@ -1238,7 +1246,7 @@ function renderCardCalendar(grid) {
       `;
       card.querySelector('.cc-who').addEventListener('click', e => {
         e.stopPropagation();
-        const newAttendees = isShared ? [ui.currentWho] : ['lacey', 'nicole'];
+        const newAttendees = isShared ? [entry.who || ui.currentWho] : ['lacey', 'nicole'];
         for (let i = s; i < s + entry.span; i++) {
           state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: newAttendees };
         }
@@ -1350,7 +1358,7 @@ function renderCalendar() {
             badgeEl.addEventListener('click', e => {
               e.stopPropagation();
               const nowShared = att.includes('lacey') && att.includes('nicole');
-              const newAttendees = nowShared ? [ui.currentWho] : ['lacey', 'nicole'];
+              const newAttendees = nowShared ? [entry.who || ui.currentWho] : ['lacey', 'nicole'];
               for (let i = s; i < s + entry.span; i++) {
                 state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: newAttendees };
               }
