@@ -241,12 +241,23 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .tpicker { position: fixed; inset: 0; background: rgba(27,60,70,.55); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
 .tpicker-card { background: var(--white); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px; padding: 20px 18px 32px; }
 .tpicker-card h4 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--ocean-d); margin-bottom: 3px; }
-.tpicker-card .tp-sub { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.tpicker-card .tp-sub { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+.tp-day-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
+.tp-day-pill { flex-shrink: 0; padding: 6px 14px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--sand); font-size: 12px; font-weight: 800; color: var(--muted); cursor: pointer; transition: all .12s; }
+.tp-day-pill.on { background: var(--ocean); color: #fff; border-color: var(--ocean); }
 .tp-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; max-height: 250px; overflow-y: auto; }
 .tp-slot { padding: 9px 4px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--sky-l); text-align: center; cursor: pointer; font-size: 11px; font-weight: 700; transition: all .12s; }
 .tp-slot:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
 .tp-slot.taken { background: var(--sand-d); color: var(--muted); pointer-events: none; opacity: .5; }
+.tp-slot.current { background: rgba(27,122,138,.12); border-color: var(--ocean); color: var(--ocean-d); pointer-events: none; }
 .tp-cancel { width: 100%; margin-top: 12px; padding: 12px; border-radius: 10px; border: none; background: var(--sand-d); color: var(--muted); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; }
+
+/* DRAG HANDLE + GHOST */
+.cc-drag-handle { display: flex; flex-direction: column; gap: 2.5px; padding: 6px 6px 6px 2px; cursor: grab; flex-shrink: 0; opacity: .45; }
+.cc-drag-handle span { display: block; width: 16px; height: 2px; border-radius: 2px; background: var(--muted); }
+.cc-card.dragging { opacity: .25; }
+.cc-col.drag-over { background: rgba(27,122,138,.12); outline: 2px dashed var(--ocean-l); outline-offset: -4px; border-radius: 0 0 10px 18px; }
+#dragGhost { position: fixed; pointer-events: none; z-index: 9998; transition: none !important; transform: scale(1.05) rotate(-1deg); box-shadow: 0 12px 30px rgba(0,0,0,.25) !important; }
 
 /* ── CUSTOM ACTIVITY MODAL ── */
 .modal-overlay { position: fixed; inset: 0; background: rgba(27,60,70,.55); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
@@ -789,6 +800,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
   <div class="tpicker-card">
     <h4 id="tpTitle">Pick a time</h4>
     <div class="tp-sub" id="tpSub"></div>
+    <div class="tp-day-row" id="tpDayRow"></div>
     <div class="tp-grid" id="tpGrid"></div>
     <button class="tp-cancel" onclick="closeTpicker()">Cancel</button>
   </div>
@@ -1510,26 +1522,123 @@ function closeJellyMenu() {
   document.querySelectorAll('.cc-card.lifted').forEach(c => c.classList.remove('lifted'));
 }
 
-function openMoveTpicker(dayId, slot, entry, act) {
-  document.getElementById('tpTitle').textContent = `Move ${act.e} ${act.name}`;
-  document.getElementById('tpSub').textContent = `Pick a new start time on ${DAYS.find(d=>d.id===dayId)?.name} · ~${durLabel(entry.span)}`;
+// ── CROSS-DAY MOVE PICKER ─────────────────────────────────────────
+function openMoveTpicker(fromDayId, fromSlot, entry, act, preSelectDayId = null) {
+  const targetDayId = preSelectDayId || fromDayId;
+  const eff = getEffective(entry, act);
+  document.getElementById('tpTitle').textContent = `Move ${eff.e} ${eff.name}`;
+  document.getElementById('tpSub').textContent = `Pick a day + time · ~${durLabel(entry.span)}`;
+
+  // Day pills
+  const dayRow = document.getElementById('tpDayRow');
+  dayRow.innerHTML = '';
+  DAYS.forEach(d => {
+    const pill = document.createElement('div');
+    pill.className = 'tp-day-pill' + (d.id === targetDayId ? ' on' : '');
+    pill.textContent = d.name;
+    pill.dataset.dayId = d.id;
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.tp-day-pill').forEach(p => p.classList.remove('on'));
+      pill.classList.add('on');
+      renderMoveSlots(fromDayId, fromSlot, entry, d.id);
+    });
+    dayRow.appendChild(pill);
+  });
+
+  renderMoveSlots(fromDayId, fromSlot, entry, targetDayId);
+  document.getElementById('tpicker').style.display = 'flex';
+}
+
+function renderMoveSlots(fromDayId, fromSlot, entry, targetDayId) {
   const grid = document.getElementById('tpGrid');
   grid.innerHTML = '';
   for (let s = 0; s < TOTAL_SLOTS; s++) {
     const btn = document.createElement('div');
-    const occupiedByThis = s >= slot && s < slot + entry.span;
-    const conflict = !occupiedByThis && (hasConflict(dayId, s, entry.span) || s + entry.span > TOTAL_SLOTS);
-    btn.className = 'tp-slot' + (conflict ? ' taken' : '') + (occupiedByThis ? ' taken' : '');
+    const isCurrent = targetDayId === fromDayId && s >= fromSlot && s < fromSlot + entry.span;
+    const conflict = !isCurrent && (hasConflict(targetDayId, s, entry.span) || s + entry.span > TOTAL_SLOTS);
+    btn.className = 'tp-slot' + (isCurrent ? ' current' : conflict ? ' taken' : '');
     btn.textContent = slotToTime(s);
-    if (!conflict && !occupiedByThis) {
+    if (!isCurrent && !conflict) {
       btn.addEventListener('click', () => {
         closeTpicker();
-        moveAct(dayId, slot, dayId, s, entry.actId, entry.span, entry.who, entry.attendees);
+        moveAct(fromDayId, fromSlot, targetDayId, s, entry.actId, entry.span, entry.who, entry.attendees);
       });
     }
     grid.appendChild(btn);
   }
-  document.getElementById('tpicker').style.display = 'flex';
+}
+
+// ── TOUCH DRAG-AND-DROP BETWEEN COLUMNS ───────────────────────────
+let _drag = null;
+
+function startCardDrag(e, dayId, slot, entry, act) {
+  if (e.touches.length !== 1) return;
+  e.preventDefault(); e.stopPropagation();
+  const touch = e.touches[0];
+  const card = e.currentTarget.closest('.cc-card');
+  const rect = card.getBoundingClientRect();
+
+  // Ghost clone floats under finger
+  const ghost = card.cloneNode(true);
+  ghost.id = 'dragGhost';
+  ghost.style.left   = rect.left + 'px';
+  ghost.style.top    = rect.top  + 'px';
+  ghost.style.width  = rect.width + 'px';
+  ghost.style.opacity = '';
+  document.body.appendChild(ghost);
+
+  card.classList.add('dragging');
+
+  // Freeze horizontal scroll while dragging
+  const wrap = document.querySelector('.cc-wrap');
+  if (wrap) wrap.style.overflowX = 'hidden';
+
+  _drag = { dayId, slot, entry, act, card, ghost, wrap,
+    offX: touch.clientX - rect.left, offY: touch.clientY - rect.top };
+
+  document.addEventListener('touchmove', _onDragMove, { passive: false });
+  document.addEventListener('touchend',  _onDragEnd);
+  document.addEventListener('touchcancel', _onDragEnd);
+}
+
+function _onDragMove(e) {
+  if (!_drag) return; e.preventDefault();
+  const t = e.touches[0];
+  _drag.ghost.style.left = (t.clientX - _drag.offX) + 'px';
+  _drag.ghost.style.top  = (t.clientY - _drag.offY) + 'px';
+
+  // Highlight column under finger
+  _drag.ghost.style.pointerEvents = 'none';
+  const under = document.elementFromPoint(t.clientX, t.clientY);
+  _drag.ghost.style.pointerEvents = '';
+  const col = under?.closest('.cc-col');
+  document.querySelectorAll('.cc-col').forEach(c => c.classList.remove('drag-over'));
+  if (col) col.classList.add('drag-over');
+  _drag.hoverCol = col;
+}
+
+function _onDragEnd(e) {
+  if (!_drag) return;
+  document.removeEventListener('touchmove', _onDragMove);
+  document.removeEventListener('touchend',  _onDragEnd);
+  document.removeEventListener('touchcancel', _onDragEnd);
+
+  const t = e.changedTouches[0];
+  _drag.ghost.style.pointerEvents = 'none';
+  const col = document.elementFromPoint(t.clientX, t.clientY)?.closest('.cc-col') || _drag.hoverCol;
+  const targetDayId = col?.dataset.dayId;
+
+  // Cleanup
+  _drag.ghost.remove();
+  _drag.card.classList.remove('dragging');
+  document.querySelectorAll('.cc-col').forEach(c => c.classList.remove('drag-over'));
+  if (_drag.wrap) _drag.wrap.style.overflowX = '';
+
+  if (targetDayId) {
+    const act = getAct(_drag.entry.actId);
+    openMoveTpicker(_drag.dayId, _drag.slot, _drag.entry, act, targetDayId);
+  }
+  _drag = null;
 }
 
 function renderCardCalendar(grid) {
@@ -1571,6 +1680,7 @@ function renderCardCalendar(grid) {
       card.className = 'cc-card';
       const timeParts = slotToTime(s).match(/^(\d+:\d+)\s*([ap]m)$/i);
       card.innerHTML = `
+        <div class="cc-drag-handle" title="Drag to move"><span></span><span></span><span></span></div>
         <div class="cc-rail ${ownerClass}"></div>
         <div class="cc-time"><div class="h">${timeParts ? timeParts[1] : slotToTime(s)}</div><div class="m">${timeParts ? timeParts[2].toUpperCase() : ''}</div></div>
         <div class="cc-body"><div class="nm">${eff.e} ${eff.name}</div><div class="mt">${durLabel(entry.span)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div></div>
@@ -1579,6 +1689,11 @@ function renderCardCalendar(grid) {
         </div>
         <div class="cc-menu-btn" title="Options">⋯</div>
       `;
+
+      // Drag handle → touch drag
+      card.querySelector('.cc-drag-handle').addEventListener('touchstart', e => {
+        startCardDrag(e, day.id, s, entry, a);
+      }, { passive: false });
       card.querySelector('.cc-who').addEventListener('click', e => {
         e.stopPropagation();
         const soloOwner = !isShared ? (att[0] || entry.who || 'lacey') : null;
