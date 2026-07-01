@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>Port A Trip Planner 🌊</title>
+<title>beach-plz 🌊</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700;800&display=swap');
 
@@ -369,6 +369,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
   .sidebar { display: none; }
   .app-body { display: block; overflow: visible; }
   .cal-wrap { height: calc(100vh - 280px); overflow-y: auto; }
+  .drag-hint { display: none; }
 }
 /* ── LOGIN GATE ── */
 .login-gate {
@@ -594,12 +595,12 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
   <span style="margin:0 4px;color:var(--border)">·</span>
   <span style="font-weight:800;color:var(--ocean)">Colors:</span>
   <span><span class="ld" style="background:rgba(56,178,178,.8)"></span>Pool</span>
-  <span><span class="ld" style="background:rgba(72,160,104,.8)"></span>Turtle</span>
+  <span><span class="ld" style="background:rgba(72,160,104,.8)"></span>Nature</span>
   <span><span class="ld" style="background:rgba(200,128,88,.8)"></span>Bar</span>
   <span><span class="ld" style="background:rgba(72,136,192,.8)"></span>Beach</span>
   <span><span class="ld" style="background:rgba(88,168,128,.8)"></span>Free</span>
   <span><span class="ld" style="background:rgba(64,188,178,.8)"></span>Custom</span>
-  <span style="margin-left:auto;font-size:9px;color:var(--muted)">＋ to add · ✕ to remove · drag bottom edge to resize</span>
+  <span class="drag-hint" style="margin-left:auto;font-size:9px;color:var(--muted)">＋ to add · ✕ to remove · drag bottom edge to resize</span>
 </div>
 
 <!-- APP BODY -->
