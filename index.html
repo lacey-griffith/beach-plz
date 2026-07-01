@@ -339,15 +339,6 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 }
 
 /* ── TURTLE ANIMATION ── */
-#turtle-stage { position: fixed; inset: 0; pointer-events: none; z-index: 9000; overflow: hidden; display: none; }
-#turtle-stage.active { display: block; }
-.t-overlay { position: absolute; inset: 0; background: rgba(10,55,85,.0); transition: background 1s ease; }
-.t-overlay.tinted { background: rgba(10,55,85,.38); }
-#t-wrap { position: absolute; }
-.t-bubble { position: absolute; border-radius: 50%; background: rgba(170,225,240,.6); border: 1px solid rgba(200,235,245,.85); animation: bubble-rise linear forwards; }
-@keyframes bubble-rise { 0% { opacity: .9; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.5); } }
-.t-ripple { position: absolute; border-radius: 50%; border: 2px solid rgba(100,200,225,.65); animation: ripple-expand 1.1s ease-out forwards; }
-@keyframes ripple-expand { 0% { transform: scale(.4); opacity: .85; } 100% { transform: scale(3.5); opacity: 0; } }
 
 /* ── TOAST ── */
 .toast-c { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 5px; pointer-events: none; width: 90%; max-width: 320px; }
@@ -853,9 +844,6 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
   </div>
 </div>
 
-<!-- TURTLE STAGE -->
-<div id="turtle-stage">
-  <div class="t-overlay" id="tOverlay"></div>
   <div id="t-wrap">
     <svg id="t-svg" viewBox="0 0 240 170" width="240" height="170" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 6px 18px rgba(0,80,60,.5))">
   <!-- Sea turtle v3 — side-swimming, Olive Ridley proportions, bold ref-style outlines -->
@@ -1387,7 +1375,6 @@ function placeAct(dayId, slot, actId) {
   toast(`${a.e} ${a.name} added!`, 's', 1600);
   renderAll();
   saveBin();
-  Turtle.swim();
 }
 
 function removeAct(dayId, slot, span) {
@@ -2228,99 +2215,6 @@ const Chat = {
 document.getElementById('chatInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); Chat.send(); }
 });
-
-// ── TURTLE ANIMATION ──────────────────────────────────────────────
-const Turtle = {
-  running: false,
-
-  swim() {
-    if (this.running) return;
-    this.running = true;
-
-    const stage = document.getElementById('turtle-stage');
-    const wrap = document.getElementById('t-wrap');
-    const overlay = document.getElementById('tOverlay');
-    const svg = document.getElementById('t-svg');
-    const W = window.innerWidth, midY = window.innerHeight * 0.38;
-
-    // Reset position — start off right edge, facing left (its natural drawn orientation)
-    stage.classList.add('active');
-    Object.assign(wrap.style, { transition: 'none', position: 'absolute', left: `${W + 180}px`, top: `${midY}px` });
-    svg.style.transform = 'scaleX(1)';
-
-    const spawnBubble = () => {
-      const b = document.createElement('div');
-      b.className = 't-bubble';
-      const sz = 4 + Math.random() * 9;
-      const rect = wrap.getBoundingClientRect();
-      Object.assign(b.style, {
-        width: sz + 'px', height: sz + 'px',
-        left: (rect.left + 20 + Math.random() * 120) + 'px',
-        top: (rect.top + 10 + Math.random() * 60) + 'px',
-        animationDuration: (1 + Math.random() * 1.2) + 's',
-      });
-      stage.appendChild(b);
-      setTimeout(() => b.remove(), 2300);
-    };
-
-    const spawnRipple = (x, y) => {
-      const r = document.createElement('div');
-      r.className = 't-ripple';
-      const sz = 30;
-      Object.assign(r.style, { width: sz + 'px', height: sz + 'px', left: (x - sz/2) + 'px', top: (y - sz/2) + 'px' });
-      stage.appendChild(r);
-      setTimeout(() => r.remove(), 1300);
-    };
-
-    // Phase 1: Swim in from right
-    setTimeout(() => {
-      overlay.classList.add('tinted');
-      Object.assign(wrap.style, { transition: 'left 2.2s cubic-bezier(.4,0,.2,1), top 2s ease', left: `${W/2 - 80}px`, top: `${midY}px` });
-      const bubblesIn = setInterval(spawnBubble, 250);
-
-      // Phase 2: Face viewer, tap glass
-      setTimeout(() => {
-        clearInterval(bubblesIn);
-        svg.style.transition = 'transform .5s ease';
-        svg.style.transform = 'scaleX(1)';
-
-        setTimeout(() => {
-          const rect = wrap.getBoundingClientRect();
-          // Ripples
-          for (let i = 0; i < 3; i++) setTimeout(() => {
-            spawnRipple(rect.left + 80, rect.top + 55);
-            spawnBubble(); spawnBubble();
-          }, i * 340);
-
-          // Tap wiggle
-          const baseLeft = parseFloat(wrap.style.left);
-          let tapCount = 0;
-          const tapInterval = setInterval(() => {
-            wrap.style.transition = 'left .07s ease';
-            wrap.style.left = (baseLeft + (tapCount % 2 === 0 ? -10 : 10)) + 'px';
-            tapCount++;
-            if (tapCount >= 6) { clearInterval(tapInterval); wrap.style.left = baseLeft + 'px'; }
-          }, 85);
-
-          // Phase 3: Swim out left
-          setTimeout(() => {
-            const bubblesOut = setInterval(spawnBubble, 190);
-            Object.assign(wrap.style, { transition: 'left 2s cubic-bezier(.6,0,.8,0), top 2s ease', left: `${-220}px` });
-            setTimeout(() => {
-              clearInterval(bubblesOut);
-              overlay.classList.remove('tinted');
-              setTimeout(() => {
-                stage.classList.remove('active');
-                stage.querySelectorAll('.t-bubble,.t-ripple').forEach(el => el.remove());
-                this.running = false;
-              }, 900);
-            }, 2100);
-          }, 2200);
-        }, 600);
-      }, 2500);
-    }, 60);
-  },
-};
 
 // ── RESIZE HANDLER ────────────────────────────────────────────────
 let resizeTimer;
