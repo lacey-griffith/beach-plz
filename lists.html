@@ -192,6 +192,13 @@ body {
 .check-item label strong { font-weight: 800; }
 .tip { font-size: 10px; color: var(--coral); font-weight: 700; margin: 3px 0 5px 20px; }
 
+/* OWNER BADGE */
+.owner-tag { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; cursor: pointer; border: 2px solid rgba(197,221,227,.4); background: transparent; color: var(--muted); transition: all .12s; margin-top: 1px; user-select: none; }
+.owner-tag.lacey { background: linear-gradient(135deg, #E8B8C2, #A8556A); color: #fff; border-color: #A8556A; }
+.owner-tag.nicole { background: linear-gradient(135deg, #AEE8E0, #1F7A6F); color: #fff; border-color: #1F7A6F; }
+.owner-tag:not(.lacey):not(.nicole) { opacity: .35; }
+.owner-tag:not(.lacey):not(.nicole):hover { opacity: .7; }
+
 /* BEACH FOOTER */
 .footer-bar {
   margin-top: 28px;
@@ -339,6 +346,16 @@ body {
         <div class="check-item"><input type="checkbox" id="g36"><label for="g36">Aluminum foil + plastic wrap</label></div>
         <div class="check-item"><input type="checkbox" id="g37"><label for="g37">Plastic cups + plates <span class="note">(if condo is sparse)</span></label></div>
         <div class="check-item"><input type="checkbox" id="g38"><label for="g38">Coffee filters</label></div>
+        <div class="check-item"><input type="checkbox" id="g39"><label for="g39">Cooking spray or avocado oil</label></div>
+        <div class="check-item"><input type="checkbox" id="g40"><label for="g40">Pasta + jarred sauce <span class="note">(lazy night backup)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g41"><label for="g41">Cereal + milk <span class="note">(easy breakfast option)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g42"><label for="g42">American cheese slices <span class="note">(for burgers)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g43"><label for="g43">Pickles + lettuce <span class="note">(burger toppings)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g44"><label for="g44">Limes + cilantro <span class="note">(taco night)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g45"><label for="g45">Cotija or queso fresco</label></div>
+        <div class="check-item"><input type="checkbox" id="g46"><label for="g46">Ice <span class="note">(2 bags — cooler essential)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g47"><label for="g47">Individual snack bags <span class="note">(beach portioning)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="g48"><label for="g48">Laundry pods <span class="note">(5 days of beach clothes)</span></label></div>
       </div>
     </div>
 
@@ -529,15 +546,21 @@ body {
 </div>
 
 <script>
-// ── PERSISTENT CHECKBOXES ──────────────────────
-const STORAGE_KEY = 'porta-lists-v1';
+const STORAGE_KEY  = 'porta-lists-v1';
+const OWNERS_KEY   = 'porta-lists-owners-v1';
 
 function saveChecks() {
   const state = {};
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    state[cb.id] = cb.checked;
-  });
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => { state[cb.id] = cb.checked; });
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function saveOwners() {
+  const state = {};
+  document.querySelectorAll('.owner-tag').forEach(tag => {
+    state[tag.dataset.id] = tag.dataset.owner || '';
+  });
+  localStorage.setItem(OWNERS_KEY, JSON.stringify(state));
 }
 
 function loadChecks() {
@@ -553,6 +576,24 @@ function loadChecks() {
   } catch(e) {}
 }
 
+function loadOwners() {
+  try {
+    const state = JSON.parse(localStorage.getItem(OWNERS_KEY) || '{}');
+    document.querySelectorAll('.owner-tag').forEach(tag => {
+      const saved = state[tag.dataset.id];
+      if (saved) { tag.dataset.owner = saved; applyOwnerStyle(tag); }
+    });
+  } catch(e) {}
+}
+
+function applyOwnerStyle(tag) {
+  tag.classList.remove('lacey','nicole');
+  const o = tag.dataset.owner;
+  if (o === 'lacey')  { tag.classList.add('lacey');  tag.textContent = 'L'; }
+  else if (o === 'nicole') { tag.classList.add('nicole'); tag.textContent = 'N'; }
+  else { tag.textContent = '·'; }
+}
+
 function clearAll() {
   if (!confirm('Clear all checkboxes?')) return;
   localStorage.removeItem(STORAGE_KEY);
@@ -563,10 +604,28 @@ function clearAll() {
   });
 }
 
-// Wire up all checkboxes
-document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+// Inject owner badge into every check-item + wire checkbox
+document.querySelectorAll('.check-item').forEach(item => {
+  const cb = item.querySelector('input[type="checkbox"]');
+  if (!cb) return;
+
+  // Owner badge
+  const tag = document.createElement('div');
+  tag.className = 'owner-tag';
+  tag.dataset.id = cb.id;
+  tag.dataset.owner = '';
+  tag.textContent = '·';
+  tag.title = 'Tap to assign: L = Lacey, N = Nicole';
+  tag.addEventListener('click', () => {
+    const cycle = { '': 'lacey', 'lacey': 'nicole', 'nicole': '' };
+    tag.dataset.owner = cycle[tag.dataset.owner] ?? '';
+    applyOwnerStyle(tag);
+    saveOwners();
+  });
+  item.appendChild(tag);
+
+  // Checkbox
   cb.addEventListener('change', () => {
-    const item = cb.closest('.check-item');
     if (cb.checked) {
       item.style.opacity = '0.45';
       item.querySelector('label').style.textDecoration = 'line-through';
@@ -578,7 +637,8 @@ document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
   });
 });
 
-// Load saved state on open
+loadChecks();
+loadOwners();// Load saved state on open
 loadChecks();
 </script>
 
