@@ -62,14 +62,16 @@ body {
 .cd-done { font-family: 'Playfair Display', serif; font-size: 16px; color: #A8FFE8; font-style: italic; }
 
 /* ── WHO BAR (mobile only) ── */
-.who-bar { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--sky-l); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.who-bar { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; background: var(--sky-l); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.who-row1 { display: flex; align-items: center; gap: 8px; }
+.who-row2 { display: flex; align-items: center; gap: 8px; }
 .who-lbl { font-size: 10px; font-weight: 700; color: var(--muted); }
 .who-btn { font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; cursor: pointer; border: 2px solid transparent; background: var(--white); transition: all .14s; }
 .who-btn.lacey { border-color: var(--lacey-d); color: var(--lacey-d); }
 .who-btn.lacey.on { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); color: #fff; }
 .who-btn.nicole { border-color: var(--nicole-d); color: var(--nicole-d); }
 .who-btn.nicole.on { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); color: #fff; }
-.show-both-lbl { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--ocean-d); margin-left: 8px; cursor: pointer; user-select: none; padding: 4px 10px; border-radius: 20px; background: var(--sand); border: 1.5px solid var(--tan-d); }
+.show-both-lbl { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--ocean-d); cursor: pointer; user-select: none; padding: 5px 12px; border-radius: 20px; background: var(--sand); border: 1.5px solid var(--tan-d); }
 .show-both-lbl .shell-ico { font-size: 11px; }
 .show-both-cb { appearance: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--tan-d); background: var(--white); cursor: pointer; display: grid; place-content: center; flex-shrink: 0; }
 .show-both-cb::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--lacey-c), var(--nicole-c)); transform: scale(0); transition: transform .12s; }
@@ -96,8 +98,8 @@ body {
 .sidebar h2 { font-size: 9.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ocean); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 2px solid var(--teal); }
 .add-btn { width: 100%; padding: 8px; border-radius: 8px; border: 2px dashed var(--teal); background: var(--mint-l); color: var(--ocean-d); font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px; cursor: pointer; margin-bottom: 8px; transition: all .14s; }
 .add-btn:hover { background: var(--teal); color: #fff; }
-.ftabs { display: flex; gap: 3px; flex-wrap: wrap; margin-bottom: 8px; }
-.ftab { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); background: var(--white); color: var(--muted); transition: all .12s; user-select: none; }
+.ftabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.ftab { font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); background: var(--white); color: var(--muted); transition: all .12s; user-select: none; min-height: 30px; display: flex; align-items: center; }
 .ftab.on, .ftab:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
 
 /* ── ACTIVITY CARDS ── */
@@ -223,7 +225,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .ct-custom  { background: rgba(64,188,178,.72); }
 
 /* ── FAB (mobile add button) ── */
-.fab { position: fixed; bottom: 80px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: var(--teal); color: #fff; border: none; font-size: 26px; cursor: pointer; box-shadow: 0 4px 16px rgba(27,122,138,.35); z-index: 50; display: flex; align-items: center; justify-content: center; transition: all .14s; }
+.fab { position: fixed; bottom: 90px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: var(--teal); color: #fff; border: none; font-size: 26px; cursor: pointer; box-shadow: 0 4px 16px rgba(27,122,138,.35); z-index: 50; display: flex; align-items: center; justify-content: center; transition: all .14s; }
 .fab:active { background: var(--ocean); transform: scale(.94); }
 
 /* ── BOTTOM SHEET ── */
@@ -571,17 +573,21 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 
 <!-- WHO BAR (mobile) -->
 <div class="who-bar">
-  <span class="who-lbl">I am:</span>
-  <button class="who-btn lacey on" id="mBtnL" onclick="setWho('lacey')">Lacey</button>
-  <button class="who-btn nicole" id="mBtnN" onclick="setWho('nicole')">Nicole</button>
-  <label class="show-both-lbl">
-    <input type="checkbox" class="show-both-cb" id="mShowBoth" onchange="setShowBoth(this.checked)">
-    <span class="shell-ico">🐚</span>Show Both
-  </label>
-  <label class="show-both-lbl">
-    <input type="checkbox" class="show-both-cb" id="mCalView" onchange="setCalView(this.checked ? 'all' : 'day')">
-    <span class="shell-ico">🌊</span>All Days
-  </label>
+  <div class="who-row1">
+    <span class="who-lbl">I am:</span>
+    <button class="who-btn lacey on" id="mBtnL" onclick="setWho('lacey')">Lacey</button>
+    <button class="who-btn nicole" id="mBtnN" onclick="setWho('nicole')">Nicole</button>
+  </div>
+  <div class="who-row2">
+    <label class="show-both-lbl">
+      <input type="checkbox" class="show-both-cb" id="mShowBoth" onchange="setShowBoth(this.checked)">
+      <span class="shell-ico">🐚</span>Show Both
+    </label>
+    <label class="show-both-lbl">
+      <input type="checkbox" class="show-both-cb" id="mCalView" onchange="setCalView(this.checked ? 'all' : 'day')">
+      <span class="shell-ico">🌊</span>All Days
+    </label>
+  </div>
 </div>
 
 <!-- DAY TABS (mobile) -->
