@@ -263,9 +263,8 @@ body{display:flex;flex-direction:column;min-height:100vh;
 </div>
 
 <script>
-const API_KEY = '$2a$10$fB8HdKHZXxwyK6Qj087K3OdEXwetiR4n4BeQaWd9prgKSfVY2kp2u';
-const BIN_ID  = '6a401210da38895dfe08580f';
-const API_BASE= 'https://api.jsonbin.io/v3';
+const PROXY_BASE = 'https://beach-plz-proxy.lacey-griffith04.workers.dev';
+const DATA_PATH = 'port-a-2026.json';
 const PERSON  = 'nicole';
 const TRIP_NAME = 'Port Aransas 2026';
 const GUEST_BASE = window.location.origin + window.location.pathname.replace(/nicole_map\.html$/, '') + 'guest.html';
@@ -279,20 +278,26 @@ document.getElementById('daysLeft').textContent = diff > 0 ? diff : (diff === 0 
 // ── LOAD DATA FROM BIN ──
 async function loadBin() {
   try {
-    const r = await fetch(`${API_BASE}/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+    const r = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`);
+    if (!r.ok) return;
     const { record } = await r.json();
     if (record.condoInfo) { condoInfo = { ...condoInfo, ...record.condoInfo }; renderCondo(); }
-  } catch(e) { console.warn('Could not load bin', e); }
+  } catch(e) { console.warn('Could not load data', e); }
 }
 loadBin();
 
 // ── SAVE CONDO ──
 async function saveBinPartial() {
   try {
-    const r = await fetch(`${API_BASE}/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+    const r = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`);
+    if (!r.ok) throw new Error('fetch failed');
     const { record } = await r.json();
     record.condoInfo = condoInfo;
-    await fetch(`${API_BASE}/b/${BIN_ID}`, { method:'PUT', headers:{ 'Content-Type':'application/json','X-Master-Key':API_KEY }, body: JSON.stringify(record) });
+    await fetch(`${PROXY_BASE}/data/${DATA_PATH}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record),
+    });
   } catch(e) { console.warn('Save failed', e); }
 }
 
@@ -346,7 +351,7 @@ async function saveCondo() {
 
 // ── SHARE ──
 function getShareUrl() {
-  return `${GUEST_BASE}?binId=${BIN_ID}&name=${encodeURIComponent(TRIP_NAME)}&dates=${encodeURIComponent('Jul 22–26, 2026')}&loc=${encodeURIComponent('Port Aransas, TX')}`;
+  return `${GUEST_BASE}?data=${encodeURIComponent(DATA_PATH)}&name=${encodeURIComponent(TRIP_NAME)}&dates=${encodeURIComponent('Jul 22–26, 2026')}&loc=${encodeURIComponent('Port Aransas, TX')}`;
 }
 function openShare() {
   const url = getShareUrl();
