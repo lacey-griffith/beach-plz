@@ -89,10 +89,10 @@ body {
 .day-tab.on .dt-name { color: var(--ocean-d); }
 
 /* ── MAIN BODY ── */
-.app-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+.app-body { display: flex; flex: 1; overflow: hidden; min-height: 0; max-height: calc(100vh - 110px); }
 
 /* ── SIDEBAR ── */
-.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--white); border-right: 1.5px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--white); border-right: 1.5px solid var(--border); display: flex; flex-direction: column; overflow: hidden; max-height: calc(100vh - 110px); }
 .sidebar-inner { padding: 10px; overflow: hidden; flex: 1; display: flex; flex-direction: column; min-height: 0; }
 #acList { overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px; }
 .sidebar h2 { font-size: 9.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ocean); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 2px solid var(--teal); }
