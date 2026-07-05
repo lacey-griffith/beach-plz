@@ -970,7 +970,7 @@ const PORT_A_DEFAULT = {
   location: 'Port Aransas, TX',
   address: 'Unit 212, Executive Keys Condos, Mustang Island',
   crew: ['Nicole', 'RJ', 'Tyler', 'Gracie', 'Lacey'],
-  binId: '6a401210da38895dfe08580f',
+  dataPath: 'port-a-2026.json',
   createdAt: 1700000000000,
   days: [
     {id:'wed',name:'Wed',date:'Jul 22',label:'Arrival'},
@@ -1014,9 +1014,8 @@ function generateTripDays(startStr, endStr) {
 const _activeTrip = getActiveTripConfig();
 
 // ── CONFIG ────────────────────────────────────────────────────────
-const API_KEY = '$2a$10$fB8HdKHZXxwyK6Qj087K3OdEXwetiR4n4BeQaWd9prgKSfVY2kp2u';
-let BIN_ID  = _activeTrip.binId;
-const API_BASE = 'https://api.jsonbin.io/v3';
+const PROXY_BASE = 'https://beach-plz-proxy.lacey-griffith04.workers.dev';
+let DATA_PATH = _activeTrip.dataPath;
 
 // ── CONSTANTS ─────────────────────────────────────────────────────
 let DAYS = _activeTrip.days;
@@ -1144,12 +1143,13 @@ function setSyncState(s) {
 async function saveBin() {
   setSyncState('busy');
   try {
-    const r = await fetch(`${API_BASE}/b/${BIN_ID}`, {
+    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat };
+    const putRes = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-      body: JSON.stringify({ placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     });
-    setSyncState(r.ok ? 'ok' : 'err');
+    setSyncState(putRes.ok ? 'ok' : 'err');
   } catch { setSyncState('err'); }
 }
 
@@ -1176,10 +1176,12 @@ function reconcileOwnership() {
 
 async function loadBin() {
   try {
-    const r = await fetch(`${API_BASE}/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+    const headers = {};
+    if (ui.lastEtag) headers['If-None-Match'] = ui.lastEtag;
+    const r = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`, { headers });
+    if (r.status === 304) { setSyncState('ok'); return; }
     if (!r.ok) return;
     const etag = r.headers.get('ETag');
-    if (etag && etag === ui.lastEtag) return;
     ui.lastEtag = etag;
     const { record } = await r.json();
     if (record.placed) {
@@ -1216,8 +1218,9 @@ async function loadBin() {
 
 function startPolling() {
   clearInterval(ui.pollTimer);
-  ui.pollTimer = setInterval(loadBin, 4000);
+  ui.pollTimer = setInterval(() => { if (!document.hidden) loadBin(); }, 20000);
 }
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadBin(); });
 
 // ── WHO ───────────────────────────────────────────────────────────
 function setWho(who) {
@@ -2326,19 +2329,18 @@ async function submitNewTrip() {
     const days = generateTripDays(startStr, endStr);
     const initialState = {
       placed: Object.fromEntries(days.map(d => [d.id, {}])),
-      customActs: [], hiddenBase: [], chat: []
+      customActs: [], hiddenBase: [], chat: [], condoInfo: {}
     };
-    const res = await fetch(`${API_BASE}/b`, {
+    const newPath = `trip-${Date.now()}.json`;
+    const res = await fetch(`${PROXY_BASE}/data/${newPath}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-      body: JSON.stringify(initialState)
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(initialState),
     });
-    if (!res.ok) throw new Error('JSONBin error ' + res.status);
-    const { metadata } = await res.json();
-    const newBinId = metadata.id;
+    if (!res.ok) throw new Error('Proxy error ' + res.status);
 
     const trip = { id: 'trip-' + Date.now(), name, emoji, slug, startDate: startStr, endDate: endStr,
-      location, address, crew, binId: newBinId, createdAt: Date.now(), days };
+      location, address, crew, dataPath: newPath, createdAt: Date.now(), days };
     const manifest = getTripManifest();
     manifest.push(trip);
     saveTripManifest(manifest);
