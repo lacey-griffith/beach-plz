@@ -358,6 +358,43 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .t-weed-b { animation-delay: .8s; animation-duration: 4.2s; }
 @keyframes weed-sway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 
+/* ── DINNER PLANNING ── */
+.dinner-outer { padding: 18px 16px 28px; }
+.dinner-outer-hdr { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--ocean-d); margin-bottom: 12px; }
+.dinner-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.dinner-card { background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(212,245,234,.3)); border: 1.5px solid var(--border); border-radius: 16px 20px 14px 18px / 18px 14px 20px 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.dinner-hdr { border-bottom: 2px solid var(--teal); padding-bottom: 6px; margin-bottom: 2px; }
+.dinner-day { font-weight: 800; font-size: 13px; color: var(--ocean-d); }
+.dinner-date { font-weight: 600; font-size: 10px; color: var(--muted); margin-left: 4px; }
+.dinner-plan { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.dinner-servings { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--ocean-d); }
+.serv-btn { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--teal); background: var(--white); color: var(--teal); font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.serv-btn:hover { background: var(--teal); color: #fff; }
+.serv-count { min-width: 16px; text-align: center; }
+.dinner-list { display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; }
+.dinner-empty { font-size: 10.5px; color: var(--muted); text-align: center; padding: 10px 0; font-style: italic; }
+.dinner-item { display: flex; align-items: center; gap: 5px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px; }
+.dinner-item.checked { opacity: .5; }
+.dinner-item.checked .di-name { text-decoration: line-through; }
+.di-move-group { display: flex; flex-direction: column; gap: 1px; }
+.di-move { width: 14px; height: 12px; border: none; background: transparent; color: var(--muted); font-size: 9px; cursor: pointer; line-height: 1; padding: 0; }
+.di-move:hover:not(:disabled) { color: var(--teal); }
+.di-move:disabled { opacity: .25; cursor: default; }
+.di-check { width: 14px; height: 14px; flex-shrink: 0; accent-color: var(--teal); }
+.di-name { flex: 1; min-width: 0; border: none; background: transparent; font-size: 11px; font-weight: 600; color: var(--text); font-family: inherit; padding: 2px; }
+.di-name:focus { outline: 1.5px solid var(--teal); border-radius: 4px; }
+.di-price { width: 52px; border: 1px solid var(--border); border-radius: 6px; font-size: 10.5px; padding: 2px 4px; font-family: inherit; }
+.di-del { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--sand-d); color: var(--muted); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.di-del:hover { background: var(--coral); color: #fff; }
+.dinner-add-row { display: flex; gap: 6px; }
+.dinner-add-input { flex: 1; min-width: 0; border: 1.5px dashed var(--teal); border-radius: 8px; padding: 6px 8px; font-size: 11px; font-family: inherit; background: var(--mint-l); }
+.dinner-add-btn { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--teal); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
+.dinner-add-btn:hover { background: var(--ocean); }
+.dinner-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--border); }
+.dinner-total { font-size: 11px; font-weight: 800; color: var(--ocean-d); }
+.dinner-clear-btn { font-size: 10px; font-weight: 700; color: var(--coral); background: none; border: 1.5px solid var(--coral); border-radius: 20px; padding: 4px 10px; cursor: pointer; }
+.dinner-clear-btn:hover { background: var(--coral); color: #fff; }
+
 /* ── LEGEND ── */
 .legend-row { display: flex; gap: 7px; flex-wrap: wrap; padding: 5px 14px; background: var(--sky-l); border-bottom: 1px solid var(--border); align-items: center; font-size: 9.5px; color: var(--muted); flex-shrink: 0; }
 .ld { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 2px; vertical-align: middle; }
@@ -646,6 +683,12 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
   <div class="cal-wrap">
     <div class="cal-grid" id="calGrid"></div>
   </div>
+</div>
+
+<!-- DINNER PLANNING + SHOPPING LISTS -->
+<div class="dinner-outer">
+  <h2 class="dinner-outer-hdr">🍽️ Dinner Planning</h2>
+  <div class="dinner-section" id="dinnerSection"></div>
 </div>
 
 <!-- BEACH FOOTER -->
@@ -1077,6 +1120,7 @@ let state = {
   hiddenBase: [],
   condoInfo: { address: '', doorCode: '', wifi: '', wifiPw: '', checkIn: '', checkOut: '', notes: '' },
   chat: [],
+  dinners: Object.fromEntries(DAYS.map(d => [d.id, { items: [], servings: 4 }])),
 };
 let ui = {
   curDay: 'wed',
@@ -1106,6 +1150,22 @@ function slotToTime(s) {
 function durLabel(slots) {
   const m = slots * 30;
   return m < 60 ? `${m}min` : m % 60 === 0 ? `${m/60}hr` : `${Math.floor(m/60)}hr ${m%60}min`;
+}
+
+// ── DINNER DETECTION ──────────────────────────────────────────────
+// Finds the food-type activity placed latest in the evening (5pm+) for a given day.
+function getDinnerActivity(dayId) {
+  const dinnerCutoffSlot = (17 - H_START) * 2; // 5:00pm
+  let best = null;
+  Object.entries(state.placed[dayId] || {}).forEach(([slotKey, entry]) => {
+    if (!entry || !entry.isStart) return;
+    const act = getAct(entry.actId);
+    if (!act || act.type !== 'food') return;
+    const slot = Number(slotKey);
+    if (slot < dinnerCutoffSlot) return;
+    if (!best || slot > best.slot) best = { slot, entry, act };
+  });
+  return best;
 }
 
 function isClosed(actId, dayId) {
@@ -1155,7 +1215,7 @@ function setSyncState(s) {
 async function saveBin() {
   setSyncState('busy');
   try {
-    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat };
+    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, dinners: state.dinners };
     const putRes = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1208,6 +1268,11 @@ async function loadBin() {
     if (record.customActs) state.customActs = record.customActs;
     if (record.hiddenBase) state.hiddenBase = record.hiddenBase;
     if (record.condoInfo)  state.condoInfo  = { ...state.condoInfo, ...record.condoInfo };
+    if (record.dinners) {
+      DAYS.forEach(d => {
+        state.dinners[d.id] = record.dinners[d.id] || state.dinners[d.id] || { items: [], servings: 4 };
+      });
+    }
     if (record.chat) {
       const prevLen = state.chat.length;
       state.chat = record.chat;
@@ -1933,6 +1998,122 @@ function renderAll() {
   renderDayTabs();
   renderCalendar();
   renderSidebar();
+  renderDinners();
+}
+
+// ── DINNER PLANNING + SHOPPING LIST ─────────────────────────────────
+function renderDinners() {
+  const container = document.getElementById('dinnerSection');
+  if (!container) return;
+  container.innerHTML = '';
+  DAYS.forEach(day => {
+    const dinner = state.dinners[day.id] || (state.dinners[day.id] = { items: [], servings: 4 });
+    const card = document.createElement('div');
+    card.className = 'dinner-card';
+    const found = getDinnerActivity(day.id);
+    const dinnerLabel = found
+      ? `${found.act.e} ${found.act.name} · ${slotToTime(found.slot)}`
+      : 'No dinner planned yet';
+    const total = dinner.items.reduce((sum, it) => sum + (Number(it.price) || 0), 0);
+    card.innerHTML = `
+      <div class="dinner-hdr">
+        <div class="dinner-day">${day.name} <span class="dinner-date">${day.date}</span></div>
+        <div class="dinner-plan">${dinnerLabel}</div>
+      </div>
+      <div class="dinner-servings">
+        <span>Servings</span>
+        <button class="serv-btn" data-act="dec" type="button">−</button>
+        <span class="serv-count">${dinner.servings}</span>
+        <button class="serv-btn" data-act="inc" type="button">+</button>
+      </div>
+      <div class="dinner-list" id="dinnerList-${day.id}"></div>
+      <div class="dinner-add-row">
+        <input type="text" class="dinner-add-input" placeholder="Add item…" />
+        <button class="dinner-add-btn" type="button">+</button>
+      </div>
+      <div class="dinner-footer">
+        <span class="dinner-total">Est. total: $${total.toFixed(2)}</span>
+        <button class="dinner-clear-btn" type="button">Clear dinner</button>
+      </div>
+    `;
+
+    card.querySelector('[data-act="dec"]').addEventListener('click', () => {
+      dinner.servings = Math.max(1, dinner.servings - 1);
+      renderDinners(); saveBin();
+    });
+    card.querySelector('[data-act="inc"]').addEventListener('click', () => {
+      dinner.servings = dinner.servings + 1;
+      renderDinners(); saveBin();
+    });
+
+    const addInput = card.querySelector('.dinner-add-input');
+    const addItem = () => {
+      const name = addInput.value.trim();
+      if (!name) return;
+      dinner.items.push({ id: 'di' + Date.now() + Math.random().toString(36).slice(2, 6), name, price: null, checked: false });
+      addInput.value = '';
+      renderDinners(); saveBin();
+    };
+    card.querySelector('.dinner-add-btn').addEventListener('click', addItem);
+    addInput.addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); });
+
+    card.querySelector('.dinner-clear-btn').addEventListener('click', () => {
+      if (!dinner.items.length) return;
+      if (!confirm(`Clear all items for ${day.name}'s dinner?`)) return;
+      dinner.items = [];
+      renderDinners(); saveBin();
+    });
+
+    const listEl = card.querySelector(`#dinnerList-${day.id}`);
+    if (!dinner.items.length) {
+      listEl.innerHTML = '<div class="dinner-empty">No items yet — add what you need above</div>';
+    } else {
+      dinner.items.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'dinner-item' + (item.checked ? ' checked' : '');
+        row.innerHTML = `
+          <div class="di-move-group">
+            <button class="di-move" data-dir="up" title="Move up" type="button" ${idx === 0 ? 'disabled' : ''}>↑</button>
+            <button class="di-move" data-dir="down" title="Move down" type="button" ${idx === dinner.items.length - 1 ? 'disabled' : ''}>↓</button>
+          </div>
+          <input type="checkbox" class="di-check" ${item.checked ? 'checked' : ''} />
+          <input type="text" class="di-name" value="${(item.name || '').replace(/"/g, '&quot;')}" />
+          <input type="number" class="di-price" placeholder="$" min="0" step="0.01" value="${item.price ?? ''}" />
+          <button class="di-del" title="Remove" type="button">✕</button>
+        `;
+        row.querySelector('.di-check').addEventListener('change', e => {
+          item.checked = e.target.checked;
+          row.classList.toggle('checked', item.checked);
+          saveBin();
+        });
+        row.querySelector('.di-name').addEventListener('change', e => {
+          item.name = e.target.value.trim() || item.name;
+          saveBin();
+        });
+        row.querySelector('.di-price').addEventListener('change', e => {
+          const v = parseFloat(e.target.value);
+          item.price = isNaN(v) ? null : v;
+          renderDinners(); saveBin();
+        });
+        row.querySelector('.di-del').addEventListener('click', () => {
+          dinner.items.splice(idx, 1);
+          renderDinners(); saveBin();
+        });
+        row.querySelectorAll('.di-move').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const dir = btn.dataset.dir;
+            const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+            if (swapIdx < 0 || swapIdx >= dinner.items.length) return;
+            [dinner.items[idx], dinner.items[swapIdx]] = [dinner.items[swapIdx], dinner.items[idx]];
+            renderDinners(); saveBin();
+          });
+        });
+        listEl.appendChild(row);
+      });
+    }
+
+    container.appendChild(card);
+  });
 }
 
 // ── SHEET (mobile) ────────────────────────────────────────────────
