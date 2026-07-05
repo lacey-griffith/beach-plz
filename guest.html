@@ -77,11 +77,11 @@ body{
 
 <script>
 const params = new URLSearchParams(location.search);
-const BIN_ID   = params.get('binId');
+const DATA_PATH = params.get('data');
 const TRIP_NAME= params.get('name')  || 'Trip Info';
 const DATES    = params.get('dates') || '';
 const LOC      = params.get('loc')   || '';
-const API_KEY  = '$2a$10$fB8HdKHZXxwyK6Qj087K3OdEXwetiR4n4BeQaWd9prgKSfVY2kp2u';
+const PROXY_BASE = 'https://beach-plz-proxy.lacey-griffith04.workers.dev';
 
 document.getElementById('hdrTitle').textContent = TRIP_NAME;
 document.getElementById('hdrSub').textContent   = [DATES, LOC].filter(Boolean).join(' · ');
@@ -111,12 +111,13 @@ function copyText(text, btn) {
 }
 
 async function load() {
-  if (!BIN_ID) {
+  if (!DATA_PATH) {
     document.getElementById('content').innerHTML = '<div class="error">No trip info found. Ask whoever sent you this link to regenerate it.</div>';
     return;
   }
   try {
-    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+    const r = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`);
+    if (!r.ok) throw new Error('fetch failed');
     const { record } = await r.json();
     renderAll(record);
   } catch(e) {
