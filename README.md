@@ -62,3 +62,5 @@ Nicole · RJ · Tyler · Gracie · Lacey
 ---
 
 *Built with Claude · Hosted on GitHub Pages · Synced via JSONBin*
+
+<!-- redeploy trigger -->
