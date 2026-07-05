@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>beach-plz 🌊</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700;800&display=swap');
 
@@ -364,6 +366,9 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .dinner-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
 .dinner-card { background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(212,245,234,.3)); border: 1.5px solid var(--border); border-radius: 16px 20px 14px 18px / 18px 14px 20px 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
 .dinner-hdr { border-bottom: 2px solid var(--teal); padding-bottom: 6px; margin-bottom: 2px; }
+.dinner-day-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.dinner-map-btn { font-size: 9.5px; font-weight: 700; color: var(--ocean-d); background: var(--sky-l); border: 1.5px solid var(--border); border-radius: 20px; padding: 3px 9px; cursor: pointer; white-space: nowrap; }
+.dinner-map-btn:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
 .dinner-day { font-weight: 800; font-size: 13px; color: var(--ocean-d); }
 .dinner-date { font-weight: 600; font-size: 10px; color: var(--muted); margin-left: 4px; }
 .dinner-plan { font-size: 11px; color: var(--muted); margin-top: 2px; }
@@ -394,6 +399,14 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .dinner-total { font-size: 11px; font-weight: 800; color: var(--ocean-d); }
 .dinner-clear-btn { font-size: 10px; font-weight: 700; color: var(--coral); background: none; border: 1.5px solid var(--coral); border-radius: 20px; padding: 4px 10px; cursor: pointer; }
 .dinner-clear-btn:hover { background: var(--coral); color: #fff; }
+.itinerary-modal-body { max-width: 640px; }
+.itinerary-map { width: 100%; height: 340px; border-radius: 12px; overflow: hidden; margin: 12px 0; border: 1.5px solid var(--border); background: var(--sky-l); }
+.itinerary-stops { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; }
+.itin-stop { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 5px 8px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; }
+.itin-stop .itin-num { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.itin-stop .itin-name { font-weight: 700; color: var(--text); }
+.itin-stop .itin-time { color: var(--muted); font-size: 10px; margin-left: auto; }
+.itinerary-empty { text-align: center; padding: 30px 10px; color: var(--muted); font-size: 12px; }
 
 /* ── LEGEND ── */
 .legend-row { display: flex; gap: 7px; flex-wrap: wrap; padding: 5px 14px; background: var(--sky-l); border-bottom: 1px solid var(--border); align-items: center; font-size: 9.5px; color: var(--muted); flex-shrink: 0; }
@@ -852,6 +865,18 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
   <div class="sea-glass-modal" id="detailModalBody"></div>
 </div>
 
+<!-- ITINERARY MAP MODAL -->
+<div class="modal-overlay" id="itineraryModal" style="display:none" onclick="if(event.target===this)closeItineraryMap()">
+  <div class="sea-glass-modal itinerary-modal-body">
+    <h3 id="itineraryTitle">🗺️ Daily Itinerary</h3>
+    <div id="itineraryMapEl" class="itinerary-map"></div>
+    <div id="itineraryStopsList" class="itinerary-stops"></div>
+    <div class="mbtn-row">
+      <button class="mbtn mbtn-cancel" onclick="closeItineraryMap()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- CUSTOM ACTIVITY MODAL -->
 <div class="modal-overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal-card">
@@ -870,6 +895,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
       </div>
     </div>
     <div class="mfield"><label>Note (optional)</label><input id="mNote" placeholder="Location, tip, etc." maxlength="80"/></div>
+    <div class="mfield"><label>Address (optional, for itinerary map)</label><input id="mAddr" placeholder="e.g. 323 Beach St, Port Aransas, TX" maxlength="120"/></div>
     <div class="mbtn-row">
       <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
       <button class="mbtn mbtn-add" onclick="submitCustom()">✦ Add</button>
@@ -1079,36 +1105,37 @@ const TOTAL_SLOTS = (H_END - H_START) * 2; // 30-min slots
 const SLOT_H_DESKTOP = 40, SLOT_H_MOBILE = 52;
 const REUSABLE_TYPES = new Set(['pool','food','travel','custom']);
 
+const CONDO_LOC = { addr: '800 Access Road 1-A, Port Aransas, TX 78373', lat: 27.8034767, lng: -97.078922 };
 const BASE_ACTS = [
   {id:'drive-there',e:'🚙',name:'Drive to Port A',type:'travel',dur:9,cost:0,cl:[],n:'Leave early! Allow 4.5–5 hrs with stops.'},
   {id:'drive-home',e:'🏡',name:'Drive Home',type:'travel',dur:9,cost:0,cl:[],n:'Check out 11am, home before dark.'},
-  {id:'checkin',e:'🏠',name:'Check In',type:'other',dur:2,cost:0,cl:[],n:'Unpack, claim beds. Check-in ~4pm.'},
-  {id:'grocery',e:'🛒',name:'Grocery Run',type:'other',dur:2,cost:40,cl:[],n:'Stock up before island. Huge savings for 5!'},
-  {id:'pool-am',e:'🏊',name:'Pool (Morning)',type:'pool',dur:4,cost:0,cl:[],n:'Before heat peaks. Coffee + pool = perfect.'},
-  {id:'pool-pm',e:'🏊',name:'Pool (Afternoon)',type:'pool',dur:4,cost:0,cl:[],n:'Peak pool hours. Floaties, cold drinks.'},
-  {id:'pool-eve',e:'🌅',name:'Pool at Sunset',type:'pool',dur:3,cost:0,cl:[],n:'Swim while the sky turns pink.'},
+  {id:'checkin',e:'🏠',name:'Check In',type:'other',dur:2,cost:0,cl:[],n:'Unpack, claim beds. Check-in ~4pm.', addr: CONDO_LOC.addr, lat: CONDO_LOC.lat, lng: CONDO_LOC.lng},
+  {id:'grocery',e:'🛒',name:'Grocery Run',type:'other',dur:2,cost:40,cl:[],n:'Stock up before island. Huge savings for 5!', addr:'101 E Goodnight Ave, Aransas Pass, TX 78336', lat:27.901272, lng:-97.146059},
+  {id:'pool-am',e:'🏊',name:'Pool (Morning)',type:'pool',dur:4,cost:0,cl:[],n:'Before heat peaks. Coffee + pool = perfect.', addr: CONDO_LOC.addr, lat: CONDO_LOC.lat, lng: CONDO_LOC.lng},
+  {id:'pool-pm',e:'🏊',name:'Pool (Afternoon)',type:'pool',dur:4,cost:0,cl:[],n:'Peak pool hours. Floaties, cold drinks.', addr: CONDO_LOC.addr, lat: CONDO_LOC.lat, lng: CONDO_LOC.lng},
+  {id:'pool-eve',e:'🌅',name:'Pool at Sunset',type:'pool',dur:3,cost:0,cl:[],n:'Swim while the sky turns pink.', addr: CONDO_LOC.addr, lat: CONDO_LOC.lat, lng: CONDO_LOC.lng},
   {id:'sunrise',e:'🌅',name:'Sunrise Walk',type:'beach',dur:2,cost:0,cl:[],n:'Best shelling. Dolphins offshore. Bring coffee.'},
   {id:'beach',e:'🏖️',name:'Beach Day',type:'beach',dur:6,cost:0,cl:[],n:'Sun, sand, Gulf vibes.'},
   {id:'nightwalk',e:'🌙',name:'Night Beach Walk',type:'beach',dur:2,cost:0,cl:[],n:'Watch for turtle tracks. Red light only near nests.'},
-  {id:'pier',e:'🎣',name:'Horace Caldwell Pier',type:'beach',dur:3,cost:3,cl:[],n:'$3 day pass. Pole rentals on site.'},
-  {id:'ark',e:'🐢',name:'ARK Turtle Rehab',type:'turtle',dur:2,cost:0,cl:['thu','sat','sun'],n:'PRE-REGISTER: utmsi.utexas.edu · Wed & Fri 10am only',url:'https://utmsi.utexas.edu/amos-rehabilitation-keep/'},
-  {id:'sealife',e:'🐢',name:'Texas Sealife Center',type:'turtle',dur:3,cost:9,cl:['wed'],n:'$9/person · Thu–Sat 10–4 · Sun 12–4 · ~35 min drive',url:'https://www.texassealifecenter.org/'},
-  {id:'jetty',e:'🪨',name:'South Jetty',type:'turtle',dur:2,cost:0,cl:[],n:'Turtles hang near granite rocks year-round.'},
-  {id:'utmsi',e:'🔬',name:'UT Marine Science',type:'nature',dur:2,cost:0,cl:['wed','sun'],n:'Free · Tue–Sat 10–4 · Seahorses, eels, whale jawbone.',url:'https://utmsi.utexas.edu/visit/port-aransas/'},
-  {id:'birding',e:'🐦',name:'Leonabelle Birding',type:'nature',dur:2,cost:0,cl:[],n:'Free · Loaner binoculars · Sunrise to sunset'},
-  {id:'roberts',e:'⛵',name:'Roberts Point Park',type:'nature',dur:2,cost:0,cl:[],n:'Ships, dolphins, best sunset on the island. Free.'},
-  {id:'ferry',e:'⛴️',name:'Ferry Ride',type:'nature',dur:1,cost:0,cl:[],n:'Free! Dolphins ride the wake. Build in line time.'},
-  {id:'golfcart',e:'🛺',name:'Golf Cart Rental',type:'other',dur:4,cost:25,cl:[],n:'Book Coastal Ed\'s in advance — sells out in July!'},
-  {id:'gaff',e:'🏴‍☠️',name:'The Gaff',type:'bar',dur:3,cost:20,cl:[],n:'Pirate dive bar · cheap pizza · belt sander races!'},
-  {id:'beerHut',e:'🍺',name:'Port A Beer Hut',type:'bar',dur:2,cost:20,cl:['wed','thu'],n:'CASH ONLY · Swing bar! Live music Saturdays.'},
-  {id:'stingrays',e:'🚗',name:"Stingray's Taphouse",type:'bar',dur:3,cost:25,cl:['thu','fri'],n:'Real Mustangs over the bar · 20+ taps · pizza & wings'},
-  {id:'bierhaus',e:'🍻',name:'BierHaus',type:'bar',dur:3,cost:25,cl:[],n:'Bar swings · live music · great burgers'},
-  {id:'nueces',e:'🔥',name:'Nueces Brewing + BBQ',type:'drive',dur:4,cost:35,cl:['wed','sun'],n:'~35 min drive · Award-winning BBQ + craft beer'},
-  {id:'moby',e:'🐳',name:"Moby Dick's",type:'food',dur:4,cost:30,cl:['wed','sun'],n:'Seafood · steaks · Tiki bar · Tue–Sat 11–9'},
-  {id:'burgers',e:'🍔',name:'Burgers (Condo)',type:'food',dur:2,cost:10,cl:[],n:'Grill out! Budget win for 5 people.'},
-  {id:'tacos',e:'🌮',name:'Tacos (Condo/Takeout)',type:'food',dur:2,cost:12,cl:[],n:'Condo taco bar or local takeout.'},
-  {id:'sandwiches',e:'🥖',name:'Sandwich Lunch',type:'food',dur:1,cost:5,cl:[],n:'Quick & cheap. Keeps everyone fueled.'},
-  {id:'proteinbowls',e:'🥗',name:'Protein Bowls (Condo)',type:'food',dur:2,cost:12,cl:[],n:'Rice · chicken/shrimp · veggies · macro-friendly!'},
+  {id:'pier',e:'🎣',name:'Horace Caldwell Pier',type:'beach',dur:3,cost:3,cl:[],n:'$3 day pass. Pole rentals on site.', addr:'Port Aransas Beach Rd, Port Aransas, TX 78373', lat:27.8278997, lng:-97.0530295},
+  {id:'ark',e:'🐢',name:'ARK Turtle Rehab',type:'turtle',dur:2,cost:0,cl:['thu','sat','sun'],n:'PRE-REGISTER: utmsi.utexas.edu · Wed & Fri 10am only',url:'https://utmsi.utexas.edu/amos-rehabilitation-keep/', addr:'750 Channel View Dr, Port Aransas, TX 78373', lat:27.8365303, lng:-97.0524783},
+  {id:'sealife',e:'🐢',name:'Texas Sealife Center',type:'turtle',dur:3,cost:9,cl:['wed'],n:'$9/person · Thu–Sat 10–4 · Sun 12–4 · ~35 min drive',url:'https://www.texassealifecenter.org/', addr:'14220 S Padre Island Dr, Corpus Christi, TX 78418', lat:27.6253434, lng:-97.2214337},
+  {id:'jetty',e:'🪨',name:'South Jetty',type:'turtle',dur:2,cost:0,cl:[],n:'Turtles hang near granite rocks year-round.', addr:'321 N on the Beach, Port Aransas, TX 78373', lat:27.8339645, lng:-97.0436271},
+  {id:'utmsi',e:'🔬',name:'UT Marine Science',type:'nature',dur:2,cost:0,cl:['wed','sun'],n:'Free · Tue–Sat 10–4 · Seahorses, eels, whale jawbone.',url:'https://utmsi.utexas.edu/visit/port-aransas/', addr:'750 Channel View Dr, Port Aransas, TX 78373', lat:27.8365303, lng:-97.0524783},
+  {id:'birding',e:'🐦',name:'Leonabelle Birding',type:'nature',dur:2,cost:0,cl:[],n:'Free · Loaner binoculars · Sunrise to sunset', addr:'1356 Ross Ave, Port Aransas, TX 78373', lat:27.8272791, lng:-97.0783761},
+  {id:'roberts',e:'⛵',name:'Roberts Point Park',type:'nature',dur:2,cost:0,cl:[],n:'Ships, dolphins, best sunset on the island. Free.', addr:'301 J C Barr Blvd, Port Aransas, TX 78373', lat:27.8405158, lng:-97.0654963},
+  {id:'ferry',e:'⛴️',name:'Ferry Ride',type:'nature',dur:1,cost:0,cl:[],n:'Free! Dolphins ride the wake. Build in line time.', addr:'619 W Cotter Ave, Port Aransas, TX 78373', lat:27.8396272, lng:-97.0690363},
+  {id:'golfcart',e:'🛺',name:'Golf Cart Rental',type:'other',dur:4,cost:25,cl:[],n:'Book Coastal Ed\'s in advance — sells out in July!', addr:'600 Cut-Off Rd #7, Port Aransas, TX 78373', lat:27.8326073, lng:-97.0717403},
+  {id:'gaff',e:'🏴‍☠️',name:'The Gaff',type:'bar',dur:3,cost:20,cl:[],n:'Pirate dive bar · cheap pizza · belt sander races!', addr:'323 Beach St, Port Aransas, TX 78373', lat:27.8337568, lng:-97.0587847},
+  {id:'beerHut',e:'🍺',name:'Port A Beer Hut',type:'bar',dur:2,cost:20,cl:['wed','thu'],n:'CASH ONLY · Swing bar! Live music Saturdays.', addr:'905 TX-361, Port Aransas, TX 78373', lat:27.8261331, lng:-97.0679355},
+  {id:'stingrays',e:'🚗',name:"Stingray's Taphouse",type:'bar',dur:3,cost:25,cl:['thu','fri'],n:'Real Mustangs over the bar · 20+ taps · pizza & wings', addr:'401 Beach St, Port Aransas, TX 78373', lat:27.8337638, lng:-97.0586377},
+  {id:'bierhaus',e:'🍻',name:'BierHaus',type:'bar',dur:3,cost:25,cl:[],n:'Bar swings · live music · great burgers', addr:'522 E Avenue G, Port Aransas, TX 78373', lat:27.8253479, lng:-97.0633322},
+  {id:'nueces',e:'🔥',name:'Nueces Brewing + BBQ',type:'drive',dur:4,cost:35,cl:['wed','sun'],n:'~35 min drive · Award-winning BBQ + craft beer', addr:'401 S Water St, Corpus Christi, TX 78401', lat:27.7886294, lng:-97.3953867},
+  {id:'moby',e:'🐳',name:"Moby Dick's",type:'food',dur:4,cost:30,cl:['wed','sun'],n:'Seafood · steaks · Tiki bar · Tue–Sat 11–9', addr:'517 S Alister St, Port Aransas, TX 78373', lat:27.8289026, lng:-97.0661151},
+  {id:'burgers',e:'🍔',name:'Burgers (Condo)',type:'food',dur:2,cost:10,cl:[],n:'Grill out! Budget win for 5 people.', addr: CONDO_LOC.addr, lat: CONDO_LOC.lat, lng: CONDO_LOC.lng},
+  {id:'tacos',e:'🌮',name:'Tacos (Condo/Takeout)',type:'food',dur:2,cost:12,cl:[],n:'Condo taco bar or local takeout.', addr: CONDO_LOC.addr, lat: CONDO_LOC.lat, lng: CONDO_LOC.lng},
+  {id:'sandwiches',e:'🥖',name:'Sandwich Lunch',type:'food',dur:1,cost:5,cl:[],n:'Quick & cheap. Keeps everyone fueled.', addr: CONDO_LOC.addr, lat: CONDO_LOC.lat, lng: CONDO_LOC.lng},
+  {id:'proteinbowls',e:'🥗',name:'Protein Bowls (Condo)',type:'food',dur:2,cost:12,cl:[],n:'Rice · chicken/shrimp · veggies · macro-friendly!', addr: CONDO_LOC.addr, lat: CONDO_LOC.lat, lng: CONDO_LOC.lng},
   {id:'seafood',e:'🦐',name:'Local Seafood Takeout',type:'food',dur:2,cost:20,cl:[],n:'Fried shrimp · fish tacos · boiled seafood.'},
   {id:'downtown',e:'🎨',name:'Explore Downtown Port A',type:'other',dur:2,cost:0,cl:[],n:'Art galleries · shops · souvenirs.'},
 ];
@@ -1118,7 +1145,7 @@ let state = {
   placed: Object.fromEntries(DAYS.map(d => [d.id, {}])),
   customActs: [],
   hiddenBase: [],
-  condoInfo: { address: '', doorCode: '', wifi: '', wifiPw: '', checkIn: '', checkOut: '', notes: '' },
+  condoInfo: { address: '', doorCode: '', wifi: '', wifiPw: '', checkIn: '', checkOut: '', notes: '', lat: CONDO_LOC.lat, lng: CONDO_LOC.lng },
   chat: [],
   dinners: Object.fromEntries(DAYS.map(d => [d.id, { items: [], servings: 4 }])),
 };
@@ -2017,7 +2044,10 @@ function renderDinners() {
     const total = dinner.items.reduce((sum, it) => sum + (Number(it.price) || 0), 0);
     card.innerHTML = `
       <div class="dinner-hdr">
-        <div class="dinner-day">${day.name} <span class="dinner-date">${day.date}</span></div>
+        <div class="dinner-day-row">
+          <div class="dinner-day">${day.name} <span class="dinner-date">${day.date}</span></div>
+          <button class="dinner-map-btn" type="button" title="View itinerary map">🗺️ Map</button>
+        </div>
         <div class="dinner-plan">${dinnerLabel}</div>
       </div>
       <div class="dinner-servings">
@@ -2036,6 +2066,8 @@ function renderDinners() {
         <button class="dinner-clear-btn" type="button">Clear dinner</button>
       </div>
     `;
+
+    card.querySelector('.dinner-map-btn').addEventListener('click', () => openItineraryMap(day.id));
 
     card.querySelector('[data-act="dec"]').addEventListener('click', () => {
       dinner.servings = Math.max(1, dinner.servings - 1);
@@ -2114,6 +2146,96 @@ function renderDinners() {
 
     container.appendChild(card);
   });
+}
+
+// ── GEOCODING (for custom activity addresses) ───────────────────────
+async function geocodeAddress(addr) {
+  if (!addr) return null;
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(addr)}`;
+    const r = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    if (!r.ok) return null;
+    const results = await r.json();
+    if (!results.length) return null;
+    return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+  } catch { return null; }
+}
+
+// ── ITINERARY MAP ─────────────────────────────────────────────────
+let itineraryLeafletMap = null;
+function getDayStops(dayId) {
+  const stops = [];
+  if (state.condoInfo?.lat && state.condoInfo?.lng) {
+    stops.push({ slot: -1, name: '🏠 Condo (start)', lat: state.condoInfo.lat, lng: state.condoInfo.lng, time: '' });
+  }
+  const entries = Object.entries(state.placed[dayId] || {})
+    .filter(([, entry]) => entry && entry.isStart)
+    .map(([slotKey, entry]) => ({ slot: Number(slotKey), entry }))
+    .sort((a, b) => a.slot - b.slot);
+  entries.forEach(({ slot, entry }) => {
+    const act = getAct(entry.actId);
+    if (!act || act.lat == null || act.lng == null) return;
+    stops.push({ slot, name: `${act.e} ${act.name}`, lat: act.lat, lng: act.lng, time: slotToTime(slot) });
+  });
+  return stops;
+}
+
+function openItineraryMap(dayId) {
+  const day = DAYS.find(d => d.id === dayId);
+  document.getElementById('itineraryTitle').textContent = `🗺️ ${day?.name || ''} Itinerary`;
+  document.getElementById('itineraryModal').style.display = 'flex';
+
+  const stops = getDayStops(dayId);
+  const stopsListEl = document.getElementById('itineraryStopsList');
+  const mapEl = document.getElementById('itineraryMapEl');
+
+  if (stops.length < 2) {
+    stopsListEl.innerHTML = '';
+    mapEl.innerHTML = '<div class="itinerary-empty">Not enough located stops yet for a route.<br>Add activities with known addresses to this day to see them mapped.</div>';
+    if (itineraryLeafletMap) { itineraryLeafletMap.remove(); itineraryLeafletMap = null; }
+    return;
+  }
+
+  stopsListEl.innerHTML = stops.map((s, i) => `
+    <div class="itin-stop">
+      <span class="itin-num">${i + 1}</span>
+      <span class="itin-name">${s.name}</span>
+      <span class="itin-time">${s.time}</span>
+    </div>
+  `).join('');
+
+  mapEl.innerHTML = '';
+  setTimeout(() => {
+    if (itineraryLeafletMap) { itineraryLeafletMap.remove(); itineraryLeafletMap = null; }
+    itineraryLeafletMap = L.map('itineraryMapEl');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(itineraryLeafletMap);
+
+    const bounds = [];
+    stops.forEach((s, i) => {
+      const marker = L.marker([s.lat, s.lng]).addTo(itineraryLeafletMap);
+      marker.bindPopup(`<b>${i + 1}. ${s.name}</b>${s.time ? '<br>' + s.time : ''}`);
+      bounds.push([s.lat, s.lng]);
+    });
+    itineraryLeafletMap.fitBounds(bounds, { padding: [30, 30] });
+
+    // Draw the route via OSRM (free public routing server)
+    const coordStr = stops.map(s => `${s.lng},${s.lat}`).join(';');
+    fetch(`https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data || !data.routes || !data.routes.length) return;
+        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        L.polyline(coords, { color: '#1B8276', weight: 4, opacity: 0.75 }).addTo(itineraryLeafletMap);
+      })
+      .catch(() => {}); // route is a nice-to-have; markers alone still work if this fails
+  }, 50);
+}
+
+function closeItineraryMap() {
+  document.getElementById('itineraryModal').style.display = 'none';
+  if (itineraryLeafletMap) { itineraryLeafletMap.remove(); itineraryLeafletMap = null; }
 }
 
 // ── SHEET (mobile) ────────────────────────────────────────────────
@@ -2279,13 +2401,14 @@ function closeDetailModal() {
 
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
-  ['mName','mEmoji','mCost','mNote'].forEach(id => document.getElementById(id).value = '');
+  ['mName','mEmoji','mCost','mNote','mAddr'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('mDur').value = '2';
   document.getElementById('mClosed').value = '';
 }
 function submitCustom() {
   const name = document.getElementById('mName').value.trim();
   if (!name) { toast('Name is required!', 'e'); return; }
+  const addr = document.getElementById('mAddr').value.trim();
   const act = {
     id: `custom-${Date.now()}`,
     e: document.getElementById('mEmoji').value.trim() || '📌',
@@ -2298,11 +2421,20 @@ function submitCustom() {
     createdBy: ui.currentWho,
     isCustom: true,
   };
+  if (addr) act.addr = addr;
   state.customActs.push(act);
   closeModal();
   toast(`✦ "${name}" added!`, 's');
   renderAll();
   saveBin();
+  if (addr) {
+    geocodeAddress(addr).then(coords => {
+      if (!coords) return;
+      act.lat = coords.lat;
+      act.lng = coords.lng;
+      saveBin();
+    });
+  }
 }
 function deleteCustom(id) {
   state.customActs = state.customActs.filter(a => a.id !== id);
