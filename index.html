@@ -988,9 +988,21 @@ function getTripManifest() {
 function saveTripManifest(trips) {
   localStorage.setItem(TRIPS_KEY, JSON.stringify(trips));
 }
+function migrateTripManifest(manifest) {
+  let changed = false;
+  manifest.forEach(t => {
+    if (!t.dataPath) {
+      if (t.id === 'port-a-2026') { t.dataPath = 'port-a-2026.json'; changed = true; }
+      if (t.binId) { delete t.binId; changed = true; }
+    }
+  });
+  if (changed) saveTripManifest(manifest);
+  return manifest;
+}
 function getActiveTripConfig() {
   let manifest = getTripManifest();
   if (!manifest.length) { manifest = [PORT_A_DEFAULT]; saveTripManifest(manifest); }
+  manifest = migrateTripManifest(manifest);
   const activeId = localStorage.getItem(ACTIVE_TRIP_KEY) || manifest[0].id;
   return manifest.find(t => t.id === activeId) || manifest[0];
 }
