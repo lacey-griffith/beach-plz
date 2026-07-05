@@ -121,7 +121,7 @@ body {
 .ac-del:hover { background: var(--coral); color: #fff; }
 
 /* ── CALENDAR ── */
-.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; border: 3px solid transparent; border-radius: 16px 20px 14px 22px / 18px 14px 22px 16px; transition: border-color .25s, background .25s; background: linear-gradient(160deg, rgba(255,255,255,.3), rgba(212,245,234,.18)); }
+.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 3px solid transparent; border-radius: 16px 20px 14px 22px / 18px 14px 22px 16px; transition: border-color .25s, background .25s; background: linear-gradient(160deg, rgba(255,255,255,.3), rgba(212,245,234,.18)); }
 body.active-lacey .cal-wrap { border-color: var(--lacey-c); background: linear-gradient(165deg, rgba(232,184,194,.38), rgba(255,255,255,.22) 55%, rgba(232,184,194,.22)); }
 body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear-gradient(165deg, rgba(174,232,224,.4), rgba(255,255,255,.22) 55%, rgba(174,232,224,.24)); }
 .cal-grid { display: grid; }
@@ -262,9 +262,9 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 #dragGhost { position: fixed; pointer-events: none; z-index: 9998; transition: none !important; transform: scale(1.05) rotate(-1deg); box-shadow: 0 12px 30px rgba(0,0,0,.25) !important; }
 
 /* ── CUSTOM ACTIVITY MODAL ── */
-.modal-overlay { position: fixed; inset: 0; background: rgba(27,60,70,.55); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(27,60,70,.55); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; }
 
-.sea-glass-modal { background: linear-gradient(160deg, rgba(255,255,255,.94), rgba(212,245,234,.7)); border-radius: 24px 24px 0 0; padding: 22px 20px 28px; width: 100%; max-width: 460px; max-height: 82vh; overflow-y: auto; box-shadow: 0 -8px 30px rgba(15,90,106,.25); }
+.sea-glass-modal { background: linear-gradient(160deg, rgba(255,255,255,.94), rgba(212,245,234,.7)); border-radius: 22px 26px 20px 24px / 24px 20px 26px 22px; padding: 22px 20px 28px; width: 100%; max-width: 460px; max-height: 82vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(15,90,106,.28); }
 .dm-hdr { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
 .dm-emoji { font-size: 30px; line-height: 1; }
 .dm-title { flex: 1; }
@@ -294,7 +294,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .edit-ta { resize: vertical; min-height: 70px; }
 .dm-btn.site { background: #fff; color: var(--ocean-d); border: 1.5px solid var(--ocean); }
 .dm-closed-note { background: rgba(184,84,58,.1); color: var(--coral); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; font-weight: 700; }
-.modal-card { background: var(--white); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px; padding: 20px 18px 32px; max-height: 88vh; overflow-y: auto; }
+.modal-card { background: var(--white); border-radius: 20px 24px 18px 22px / 22px 18px 24px 20px; width: 100%; max-width: 480px; padding: 20px 18px 32px; max-height: 88vh; overflow-y: auto; }
 .modal-card h3 { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--ocean-d); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
 .mfield { margin-bottom: 10px; }
 .mfield label { display: block; font-size: 10px; font-weight: 800; color: var(--ocean); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 3px; }
