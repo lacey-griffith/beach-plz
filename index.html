@@ -129,7 +129,7 @@ body {
 .ac-del:hover { border-color: var(--coral); color: var(--coral-d); background: #fffdf7; }
 
 /* ── CALENDAR ── */
-.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.985); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
+.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
 body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7), 0 0 0 2px var(--active-c); }
 .cal-grid { display: grid; }
 /* Desktop: 5 col, Mobile: 1 col — set by JS */
@@ -412,7 +412,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .dinner-outer { padding: 18px 16px 28px; position: relative; z-index: 2; }
 .dinner-outer-hdr { font-family: 'Baloo 2', sans-serif; font-size: 20px; color: var(--ocean-d); margin-bottom: 12px; }
 .dinner-section { display: flex; justify-content: center; }
-.dinner-card { background: linear-gradient(160deg, rgba(255,255,255,.4), rgba(212,245,234,.2)); border: 1.5px solid var(--border); border-radius: 16px 20px 14px 18px / 18px 14px 20px 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 420px; animation: dinnerCardIn .3s ease-out; }
+.dinner-card { background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1.5px solid var(--border); border-radius: 16px 20px 14px 18px / 18px 14px 20px 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 420px; animation: dinnerCardIn .3s ease-out; }
 @keyframes dinnerCardIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
 .dinner-hdr { border-bottom: 2px solid var(--teal); padding-bottom: 6px; margin-bottom: 2px; }
 .dinner-day-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
@@ -477,6 +477,10 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 @media (min-width: 768px) {
   .fab, .sheet-overlay, .sheet, .who-bar, .day-tabs { display: none !important; }
   .sidebar { display: flex; }
+  .app-body { max-width: 1360px; margin: 0 auto; width: 100%; }
+  .dinner-outer { max-width: 1360px; margin: 0 auto; padding: 28px 32px 40px; }
+  .dinner-card { max-width: 640px; padding: 22px 28px; gap: 14px; }
+  .dinner-outer-hdr { font-size: 24px; margin-bottom: 16px; }
 }
 @media (max-width: 767px) {
   .sidebar { display: none; }
