@@ -558,7 +558,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .trips-new-btn:active { background: rgba(255,255,255,.85); }
 .trips-toggle-btn { background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.3);
   border-radius: 999px; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 6px 12px; cursor: pointer; font-family: 'Nunito Sans', sans-serif;
-  flex-shrink: 0; }
+  flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; }
 .trips-toggle-btn:hover { background: rgba(255,255,255,.26); }
 .hdr-logo-tile { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,.16); box-shadow: inset 0 1px 0 rgba(255,255,255,.28); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .hdr-logo-tile img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,.22)); }
@@ -652,7 +652,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
       </div>
       <div id="ntStatus" class="edit-lbl" style="color:var(--coral);min-height:16px"></div>
       <div class="dm-actions" style="margin-top:12px">
-        <button class="dm-btn maps" id="ntSubmitBtn" onclick="submitNewTrip()">🌊 Create Trip</button>
+        <button class="dm-btn maps" id="ntSubmitBtn" onclick="submitNewTrip()">Create Trip</button>
         <button class="dm-btn site" onclick="closeNewTripForm()">Cancel</button>
       </div>
     </div>
@@ -695,6 +695,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 <div class="hdr">
   <div style="display:flex;align-items:center;gap:12px;min-width:0">
     <button class="trips-toggle-btn" onclick="showTripsHome()" title="All trips">Trips</button>
+    <a class="trips-toggle-btn" id="listsLink" href="lists.html" title="Packing &amp; grocery lists">Lists</a>
     <div class="hdr-logo-tile"><img src="assets/blue-star.png" alt=""></div>
     <div style="min-width:0">
       <h1 id="hdrTitle">beach-plz</h1>
@@ -2955,15 +2956,21 @@ async function submitNewTrip() {
     const days = generateTripDays(startStr, endStr);
     const initialState = {
       placed: Object.fromEntries(days.map(d => [d.id, {}])),
-      customActs: [], hiddenBase: [], chat: [], condoInfo: {}
+      customActs: [], hiddenBase: [], chat: [], condoInfo: {}, people: [],
+      dinners: Object.fromEntries(days.map(d => [d.id, { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } }])),
+      enrichment: {},
     };
     const newPath = `trip-${Date.now()}.json`;
     const res = await fetch(`${PROXY_BASE}/data/${newPath}`, {
-      method: 'POST',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(initialState),
     });
-    if (!res.ok) throw new Error('Proxy error ' + res.status);
+    if (!res.ok) {
+      let detail = '';
+      try { detail = await res.text(); } catch {}
+      throw new Error(`Proxy error ${res.status}${detail ? ': ' + detail.slice(0, 200) : ''}`);
+    }
 
     const trip = { id: 'trip-' + Date.now(), name, slug, startDate: startStr, endDate: endStr,
       location, address, crew, dataPath: newPath, createdAt: Date.now(), days };
@@ -2972,8 +2979,9 @@ async function submitNewTrip() {
     saveTripManifest(manifest);
     switchToTrip(trip.id);
   } catch (err) {
-    statusEl.textContent = 'Could not create trip — check connection and try again.';
-    btn.disabled = false; btn.textContent = '🌊 Create Trip';
+    console.error('Trip creation failed:', err);
+    statusEl.textContent = `Could not create trip (${err.message || 'check connection'}) — try again.`;
+    btn.disabled = false; btn.textContent = 'Create Trip';
   }
 }
 
@@ -2989,6 +2997,8 @@ function hydrateHeader() {
     const crew  = Array.isArray(t.crew) ? t.crew.join(' · ') : (t.crew || '');
     hdrSub.textContent = `${start}–${end}${crew ? ' · ' + crew : ''} · LIVE`;
   }
+  const listsLink = document.getElementById('listsLink');
+  if (listsLink) listsLink.href = `lists.html?trip=${encodeURIComponent(t.dataPath)}`;
   // Also update desktop sidebar trip label if present
   const deskTop = document.querySelector('.sidebar h2');
 }
