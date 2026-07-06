@@ -97,10 +97,10 @@ body {
 .day-tab.on .dt-name { color: var(--ocean-d); }
 
 /* ── MAIN BODY ── */
-.app-body { display: flex; flex: 1; overflow: hidden; min-height: 0; max-height: calc(100vh - 110px); position: relative; z-index: 2; gap: 16px; padding: 16px; }
+.app-body { display: flex; flex: 1; overflow: hidden; min-height: 0; max-height: 620px; position: relative; z-index: 2; gap: 16px; padding: 16px; }
 
 /* ── SIDEBAR ── */
-.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); display: flex; flex-direction: column; overflow: hidden; max-height: calc(100vh - 110px); }
+.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); display: flex; flex-direction: column; overflow: hidden; max-height: 620px; }
 .sidebar-inner { padding: 10px; overflow: hidden; flex: 1; display: flex; flex-direction: column; min-height: 0; }
 #acList { overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px; }
 .sidebar h2 { font-size: 9.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ocean); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 2px solid var(--teal); }
@@ -132,7 +132,7 @@ body {
 .ac-del:hover { border-color: var(--coral); color: var(--coral-d); background: #fffdf7; }
 
 /* ── CALENDAR ── */
-.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
+.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: 620px; border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
 body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7), 0 0 0 2px var(--active-c); }
 .cal-grid { display: grid; }
 /* Desktop: 5 col, Mobile: 1 col — set by JS */
@@ -491,7 +491,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 @media (max-width: 767px) {
   .sidebar { display: none; }
   .app-body { display: block; overflow: visible; }
-  .cal-wrap { height: calc(100vh - 280px); overflow-y: auto; }
+  .cal-wrap { height: calc(100vh - 360px); overflow-y: auto; }
   .drag-hint { display: none; }
 }
 /* ── LOGIN GATE ── */
@@ -788,6 +788,12 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
   <span class="drag-hint" style="font-size:11px;color:var(--muted)">Tap <strong style="color:var(--ocean)">+</strong> to add · <strong style="color:var(--coral-d)">×</strong> to remove · drag an event's edge to resize</span>
 </div>
 
+<!-- DINNER PLANNING + SHOPPING LISTS -->
+<div class="dinner-outer">
+  <h2 class="dinner-outer-hdr">Dinner Planning</h2>
+  <div class="dinner-section" id="dinnerSection"></div>
+</div>
+
 <!-- APP BODY -->
 <div class="app-body">
 
@@ -814,12 +820,6 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
   <div class="cal-wrap">
     <div class="cal-grid" id="calGrid"></div>
   </div>
-</div>
-
-<!-- DINNER PLANNING + SHOPPING LISTS -->
-<div class="dinner-outer">
-  <h2 class="dinner-outer-hdr">Dinner Planning</h2>
-  <div class="dinner-section" id="dinnerSection"></div>
 </div>
 
 <!-- FAB (mobile) -->
@@ -1001,10 +1001,9 @@ let DATA_PATH = _activeTrip.dataPath;
 
 // ── CONSTANTS ─────────────────────────────────────────────────────
 let DAYS = _activeTrip.days;
-const H_START = 7, H_END = 24;
+const H_START = 8, H_END = 23;
 const TOTAL_SLOTS = (H_END - H_START) * 2; // 30-min slots
 const SLOT_H_DESKTOP = 40, SLOT_H_MOBILE = 52;
-const REUSABLE_TYPES = new Set(['pool','food','travel','custom']);
 
 const CONDO_LOC = { addr: '800 Access Road 1-A, Port Aransas, TX 78373', lat: 27.8034767, lng: -97.078922 };
 const BASE_ACTS = [
@@ -1159,8 +1158,7 @@ function isClosed(actId, dayId) {
 }
 
 function isUsed(actId) {
-  if (REUSABLE_TYPES.has(getAct(actId)?.type)) return false;
-  return DAYS.some(d => Object.values(state.placed[d.id]).some(p => p?.isStart && p.actId === actId));
+  return false; // activities can always be added again — no more one-and-done disabling
 }
 
 function hasConflict(dayId, startSlot, span, skipActId = null) {
