@@ -400,6 +400,8 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .di-link { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--mint-l); color: var(--ocean-d); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .di-link:hover { background: var(--teal); color: #fff; }
 .di-link:disabled { opacity: .6; cursor: default; }
+.di-heb { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--sand-d); color: var(--ocean-d); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.di-heb:hover { background: var(--coral); color: #fff; }
 .di-del { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--sand-d); color: var(--muted); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .di-del:hover { background: var(--coral); color: #fff; }
 .dinner-add-row { display: flex; gap: 6px; }
@@ -884,6 +886,17 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
     <div id="itineraryStopsList" class="itinerary-stops"></div>
     <div class="mbtn-row">
       <button class="mbtn mbtn-cancel" onclick="closeItineraryMap()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- H-E-B HISTORY SEARCH MODAL -->
+<div class="modal-overlay" id="hebModal" style="display:none" onclick="if(event.target===this)closeHebModal()">
+  <div class="sea-glass-modal" style="max-width:480px">
+    <h3>🛒 Search Your H-E-B History</h3>
+    <div id="hebResultsList" class="itinerary-stops" style="max-height:320px"></div>
+    <div class="mbtn-row">
+      <button class="mbtn mbtn-cancel" onclick="closeHebModal()">Close</button>
     </div>
   </div>
 </div>
@@ -2126,6 +2139,7 @@ function renderDinners() {
           <input type="text" class="di-name" value="${(item.name || '').replace(/"/g, '&quot;')}" />
           <input type="number" class="di-price" placeholder="$" min="0" step="0.01" value="${item.price ?? ''}" />
           <button class="di-link" title="${item.sourceUrl ? 'Re-check price from saved link' : 'Paste a product link to auto-fill price'}" type="button">${item.sourceUrl ? '🔗' : '📎'}</button>
+          <button class="di-heb" title="Search your H-E-B order history" type="button">🛒</button>
           <button class="di-del" title="Remove" type="button">✕</button>
         `;
         row.querySelector('.di-link').addEventListener('click', async () => {
@@ -2146,6 +2160,7 @@ function renderDinners() {
           }
           renderDinners(); saveBin();
         });
+        row.querySelector('.di-heb').addEventListener('click', () => openHebSearch(day.id, item.id));
         row.querySelector('.di-check').addEventListener('change', e => {
           item.checked = e.target.checked;
           row.classList.toggle('checked', item.checked);
@@ -2212,6 +2227,91 @@ async function fetchUrlEnrichment(targetUrl) {
     if (!r.ok) return null;
     return await r.json();
   } catch { return null; }
+}
+
+// ── H-E-B ORDER HISTORY SEARCH ───────────────────────────────────
+let hebHistoryCache = null;
+async function loadHebHistory() {
+  if (hebHistoryCache) return hebHistoryCache;
+  try {
+    const r = await fetch('https://raw.githubusercontent.com/lacey-griffith/stocked-and-loaded/main/src/seedData.js');
+    if (!r.ok) return null;
+    const text = await r.text();
+    const match = text.match(/const SEED_DATA = (\[[\s\S]*\])\s*export default/);
+    if (!match) return null;
+    const data = JSON.parse(match[1]);
+    const flat = {};
+    data.forEach(order => {
+      const orderDate = new Date(order.date.split(',').slice(0, 2).join(','));
+      order.items.forEach(item => {
+        const existing = flat[item.productId];
+        if (!existing || orderDate > existing._date) {
+          flat[item.productId] = { ...item, _date: orderDate };
+        }
+      });
+    });
+    hebHistoryCache = Object.values(flat);
+    return hebHistoryCache;
+  } catch { return null; }
+}
+
+function searchHebHistory(query, items, limit = 5) {
+  const qTokens = new Set(query.toLowerCase().split(/\s+/).filter(Boolean));
+  const qLower = query.toLowerCase();
+  const scored = [];
+  items.forEach(it => {
+    const nameLower = it.name.toLowerCase();
+    const nameTokens = new Set(nameLower.match(/\w+/g) || []);
+    let overlap = 0;
+    qTokens.forEach(t => { if (nameTokens.has(t)) overlap++; });
+    const substringBonus = nameLower.includes(qLower) ? 2 : 0;
+    const score = overlap + substringBonus;
+    if (score > 0) scored.push({ score, item: it });
+  });
+  scored.sort((a, b) => b.score - a.score || b.item._date - a.item._date);
+  return scored.slice(0, limit).map(s => s.item);
+}
+
+async function openHebSearch(dayId, itemId) {
+  const dinner = state.dinners[dayId];
+  const item = dinner.items.find(i => i.id === itemId);
+  if (!item) return;
+  document.getElementById('hebModal').style.display = 'flex';
+  const listEl = document.getElementById('hebResultsList');
+  listEl.innerHTML = '<div class="itinerary-empty">Searching your H-E-B history…</div>';
+
+  const history = await loadHebHistory();
+  if (!history) {
+    listEl.innerHTML = '<div class="itinerary-empty">Could not load your H-E-B history right now.</div>';
+    return;
+  }
+  const results = searchHebHistory(item.name, history);
+  if (!results.length) {
+    listEl.innerHTML = '<div class="itinerary-empty">No matches found in your past H-E-B orders.</div>';
+    return;
+  }
+  listEl.innerHTML = '';
+  results.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'itin-stop';
+    row.style.cursor = 'pointer';
+    row.innerHTML = `
+      <span class="itin-name">${r.name}</span>
+      <span class="itin-time">$${r.price.toFixed(2)}</span>
+    `;
+    row.addEventListener('click', () => {
+      item.price = r.price;
+      item.sourceUrl = null;
+      closeHebModal();
+      renderDinners();
+      saveBin();
+      toast(`💵 Applied $${r.price.toFixed(2)} from your H-E-B history`, 's');
+    });
+    listEl.appendChild(row);
+  });
+}
+function closeHebModal() {
+  document.getElementById('hebModal').style.display = 'none';
 }
 
 // ── ITINERARY MAP ─────────────────────────────────────────────────
