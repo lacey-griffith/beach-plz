@@ -129,7 +129,7 @@ body {
 .ac-del:hover { border-color: var(--coral); color: var(--coral-d); background: #fffdf7; }
 
 /* ── CALENDAR ── */
-.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.94); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
+.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.985); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
 body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7), 0 0 0 2px var(--active-c); }
 .cal-grid { display: grid; }
 /* Desktop: 5 col, Mobile: 1 col — set by JS */
@@ -411,8 +411,9 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 /* ── DINNER PLANNING ── */
 .dinner-outer { padding: 18px 16px 28px; position: relative; z-index: 2; }
 .dinner-outer-hdr { font-family: 'Baloo 2', sans-serif; font-size: 20px; color: var(--ocean-d); margin-bottom: 12px; }
-.dinner-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-.dinner-card { background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(212,245,234,.3)); border: 1.5px solid var(--border); border-radius: 16px 20px 14px 18px / 18px 14px 20px 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.dinner-section { display: flex; justify-content: center; }
+.dinner-card { background: linear-gradient(160deg, rgba(255,255,255,.4), rgba(212,245,234,.2)); border: 1.5px solid var(--border); border-radius: 16px 20px 14px 18px / 18px 14px 20px 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 420px; animation: dinnerCardIn .3s ease-out; }
+@keyframes dinnerCardIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
 .dinner-hdr { border-bottom: 2px solid var(--teal); padding-bottom: 6px; margin-bottom: 2px; }
 .dinner-day-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .dinner-map-btn { font-size: 9.5px; font-weight: 700; color: var(--ocean-d); background: var(--sky-l); border: 1.5px solid var(--border); border-radius: 20px; padding: 3px 9px; cursor: pointer; white-space: nowrap; }
@@ -781,7 +782,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 
 <!-- DINNER PLANNING + SHOPPING LISTS -->
 <div class="dinner-outer">
-  <h2 class="dinner-outer-hdr">🍽️ Dinner Planning</h2>
+  <h2 class="dinner-outer-hdr">Dinner Planning</h2>
   <div class="dinner-section" id="dinnerSection"></div>
 </div>
 
@@ -2097,7 +2098,8 @@ function renderDinners() {
   const container = document.getElementById('dinnerSection');
   if (!container) return;
   container.innerHTML = '';
-  DAYS.forEach(day => {
+  const day = DAYS.find(d => d.id === ui.curDay) || DAYS[0];
+  {
     const dinner = state.dinners[day.id] || (state.dinners[day.id] = { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } });
     if (!dinner.venue) dinner.venue = { name: '', menu: '', phone: '', notes: '' };
     if (dinner.out === undefined) dinner.out = false;
@@ -2280,7 +2282,7 @@ function renderDinners() {
     }
 
     container.appendChild(card);
-  });
+  }
 }
 
 // ── GEOCODING (for custom activity addresses) ───────────────────────
