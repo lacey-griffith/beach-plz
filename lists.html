@@ -3,21 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Port A Trip Lists 🌊</title>
+<title>Port A Trip Lists</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap');
 
 :root {
-  --ocean:#1B7A8A; --teal:#4ABFB0; --mint:#D4F5EA; --coral:#E8816A;
-  --sand:#FAF3E0; --tan:#E8D5B0; --tan-d:#C4A882; --sky:#E0F4FA;
-  --text:#2C4A52; --muted:#6B9099; --border:#C5DDE3; --white:#fff;
+  --ocean: #0a7a6d; --ocean-d: #0b5f5f; --ocean-l: #0e8877;
+  --teal: #0e7a6d; --mint: #e2f3e8; --coral: #e8896a; --coral-d: #a04b31;
+  --sand: #f3ead6; --tan: #f7efdd; --tan-d: #cdbf9f; --sky: #dcf0f5;
+  --amber: #d99b3f; --amber-d: #8a5a1c; --amber-bg: #fbeed7;
+  --berry: #c96f8a; --berry-d: #964261; --berry-bg: #f8e6ec;
+  --green: #57a86f; --green-d: #2f6a48; --green-bg: #e6f2eb;
+  --blue: #56a9bd; --blue-d: #2a6b7c; --blue-bg: #dcf0f5;
+  --text: #143434; --muted: #5c6b66; --border: #ece2ca; --white: #fff;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Nunito', sans-serif;
-  background: var(--sand);
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  background-color: #3d97b3;
+  background-image:
+    linear-gradient(180deg, #2a7d9e 0%, #3d97b3 26%, #5fb2c4 52%, #86c8cf 74%, #b7dccf 100%),
+    linear-gradient(180deg, rgba(160,222,236,.5), rgba(160,222,236,0) 46%);
+  background-attachment: fixed;
   color: var(--text);
   font-size: 12px;
 }
@@ -41,20 +50,20 @@ body {
 @media(min-width:560px){.page-header{flex-direction:row;align-items:flex-end;margin-bottom:28px;}}
 
 .page-header h1 {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 26px;
-  color: var(--ocean);
+  color: var(--ocean-d);
   line-height: 1.1;
 }
 
 .page-header h1 span {
   display: block;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Nunito Sans', sans-serif;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--coral);
+  color: var(--coral-d);
   margin-bottom: 4px;
 }
 
@@ -77,21 +86,22 @@ body {
 
 /* CONDO CALLOUT */
 .condo-card {
-  background: var(--ocean);
+  background: linear-gradient(135deg, var(--ocean-d), var(--ocean), var(--ocean-l));
   color: white;
-  border-radius: 10px;
-  padding: 12px 14px;
+  border-radius: 14px;
+  padding: 14px 16px;
   margin-bottom: 18px;
   display: flex;
   gap: 10px;
   align-items: flex-start;
   flex-wrap: wrap;
+  box-shadow: 0 8px 24px rgba(16,58,70,.22);
 }
 
-.condo-card .icon { font-size: 26px; flex-shrink: 0; }
-.condo-card h3 { font-size: 12.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 3px; }
-.condo-card p { font-size: 11px; opacity: .9; line-height: 1.6; }
-.condo-card .warn { background: rgba(255,255,255,.18); border-radius: 6px; padding: 4px 10px; display: inline-block; font-size: 10.5px; font-weight: 700; margin-top: 5px; }
+.condo-card .icon { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; margin-top: 8px; }
+.condo-card h3 { font-family: 'Baloo 2', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: .02em; margin-bottom: 3px; }
+.condo-card p { font-size: 11px; opacity: .92; line-height: 1.6; }
+.condo-card .warn { background: rgba(255,255,255,.2); border-radius: 8px; padding: 4px 10px; display: inline-block; font-size: 10.5px; font-weight: 700; margin-top: 5px; }
 
 /* GRID */
 .lists-grid {
@@ -109,10 +119,12 @@ body {
 
 /* LIST CARD */
 .list-card {
-  background: var(--white);
-  border-radius: 10px;
+  background: rgba(240,250,248,.94);
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
   overflow: hidden;
-  border: 1.5px solid var(--border);
+  border: 1px solid rgba(214,236,232,.95);
+  box-shadow: 0 8px 26px rgba(16,58,70,.16);
   break-inside: avoid;
 }
 
@@ -124,21 +136,21 @@ body {
 }
 
 .list-card-header h2 {
-  font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: .1em;
-  text-transform: uppercase;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .01em;
 }
 
-.list-card-header .icon { font-size: 18px; }
+.list-card-header .icon { display: none; }
 
-/* Header accent colors */
-.hc-ocean { background: var(--ocean); color: white; }
-.hc-teal { background: var(--teal); color: white; }
-.hc-coral { background: var(--coral); color: white; }
-.hc-turtle { background: #2D8A55; color: white; }
-.hc-sky { background: var(--sky); color: var(--ocean); border-bottom: 1.5px solid var(--border); }
-.hc-tan { background: var(--tan); color: var(--text); border-bottom: 1.5px solid var(--border); }
+/* Header accent colors (category-token based, matches main planner) */
+.hc-ocean { background: linear-gradient(135deg, var(--ocean-d), var(--ocean)); color: white; }
+.hc-teal { background: var(--blue-bg); color: var(--blue-d); border-bottom: 1.5px solid var(--border); }
+.hc-coral { background: var(--coral-bg, #fbeae2); color: var(--coral-d); border-bottom: 1.5px solid var(--border); }
+.hc-turtle { background: var(--green-bg); color: var(--green-d); border-bottom: 1.5px solid var(--border); }
+.hc-sky { background: var(--sky); color: var(--ocean-d); border-bottom: 1.5px solid var(--border); }
+.hc-tan { background: var(--amber-bg); color: var(--amber-d); border-bottom: 1.5px solid var(--border); }
 
 /* SECTIONS within a card */
 .list-section {
@@ -190,25 +202,16 @@ body {
 }
 
 .check-item label strong { font-weight: 800; }
-.tip { font-size: 10px; color: var(--coral); font-weight: 700; margin: 3px 0 5px 20px; }
+.tip { font-size: 10px; color: var(--coral-d); font-weight: 700; margin: 3px 0 5px 20px; }
 
 /* OWNER BADGE */
-.owner-tag { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; cursor: pointer; border: 2px solid rgba(197,221,227,.4); background: transparent; color: var(--muted); transition: all .12s; margin-top: 1px; user-select: none; }
-.owner-tag.lacey { background: linear-gradient(135deg, #E8B8C2, #A8556A); color: #fff; border-color: #A8556A; }
-.owner-tag.nicole { background: linear-gradient(135deg, #AEE8E0, #1F7A6F); color: #fff; border-color: #1F7A6F; }
-.owner-tag:not(.lacey):not(.nicole) { opacity: .35; }
-.owner-tag:not(.lacey):not(.nicole):hover { opacity: .7; }
+.owner-tag { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 900; cursor: pointer; border: 2px solid rgba(197,221,227,.6); background: transparent; color: var(--muted); transition: all .12s; margin-top: 1px; user-select: none; }
+.owner-tag.assigned { color: #fff; border-color: transparent; }
+.owner-tag:not(.assigned) { opacity: .35; }
+.owner-tag:not(.assigned):hover { opacity: .7; }
 
-/* BEACH FOOTER */
-.footer-bar {
-  margin-top: 28px;
-  position: relative;
-  height: 56px;
-  overflow: hidden;
-}
-
-.footer-bar .sand { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--sand) 0%, var(--tan) 60%, var(--tan-d) 100%); }
-.footer-bar svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 56px; }
+/* FOOTER DIVIDER */
+.footer-bar { margin-top: 28px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, transparent, var(--ocean-l), transparent); opacity: .5; }
 
 .print-note {
   text-align: center;
@@ -220,9 +223,9 @@ body {
 
 
 .top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
-.btn-clear{padding:7px 14px;border-radius:8px;border:1.5px solid var(--coral);background:white;color:var(--coral);font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .14s}
+.btn-clear{padding:8px 16px;border-radius:999px;border:1.5px solid var(--coral);background:rgba(255,255,255,.7);color:var(--coral-d);font-family:'Nunito Sans',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .14s}
 .btn-clear:hover{background:var(--coral);color:white}
-.btn-back{padding:7px 14px;border-radius:8px;border:1.5px solid var(--teal);background:white;color:var(--teal);font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;text-decoration:none;transition:all .14s}
+.btn-back{padding:8px 16px;border-radius:999px;border:1.5px solid var(--teal);background:rgba(255,255,255,.7);color:var(--teal);font-family:'Nunito Sans',sans-serif;font-size:11px;font-weight:800;cursor:pointer;text-decoration:none;transition:all .14s}
 .btn-back:hover{background:var(--teal);color:white}
 @media (min-width:560px){
   .kitchen-grid{grid-template-columns:1fr 1fr 1fr !important}
@@ -250,13 +253,13 @@ body {
   <div class="top-actions">
     <a class="btn-back" href="/beach-plz/">← Back to Planner</a>
     <button class="btn-clear" onclick="clearAll()">↺ Clear all checks</button>
-    <span style="font-size:10px;color:var(--muted);font-style:italic">Checks save automatically to your device 🐚</span>
+    <span style="font-size:10px;color:var(--muted);font-style:italic">Checks save automatically to your device (per-device only, not synced)</span>
   </div>
   <!-- HEADER -->
   <div class="page-header">
     <h1>
       <span>Port Aransas, Texas</span>
-      Trip Lists 🌊
+      Trip Lists
     </h1>
     <div class="trip-info">
       <strong>The Crew</strong>
@@ -268,21 +271,20 @@ body {
 
   <!-- CONDO CALLOUT -->
   <div class="condo-card">
-    <div class="icon">🏠</div>
+    <div class="icon"></div>
     <div>
       <h3>Unit 212 — Executive Keys Condos, Port Aransas</h3>
       <p>3rd floor · 1,100 sq ft · King bed + Double bed + Twin bunk w/ trundle · 2 private baths · Private balcony (Gulf + courtyard views) · Pool on property · Beach 5 min walk · Full kitchen · 4.83 ⭐</p>
-      <div class="warn">⚠ No elevator in Building 2 — pack smart for that 3rd floor haul!</div>
+      <div class="warn">No elevator in Building 2 — pack smart for that 3rd floor haul!</div>
     </div>
   </div>
 
   <!-- GRID -->
   <div class="lists-grid">
 
-    <!-- 🛒 GROCERY LIST -->
+    <!-- GROCERY LIST -->
     <div class="list-card">
       <div class="list-card-header hc-ocean">
-        <span class="icon">🛒</span>
         <h2>Grocery List</h2>
       </div>
 
@@ -327,7 +329,7 @@ body {
         <div class="check-item"><input type="checkbox" id="g25"><label for="g25">Popcorn + trail mix / nuts</label></div>
         <div class="check-item"><input type="checkbox" id="g26"><label for="g26">Goldfish / crackers</label></div>
         <div class="check-item"><input type="checkbox" id="g27"><label for="g27">Grapes, watermelon <span class="note">(pre-cut if possible)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="g28"><label for="g28">Popsicles / ice cream bars 🍦</label></div>
+        <div class="check-item"><input type="checkbox" id="g28"><label for="g28">Popsicles / ice cream bars</label></div>
       </div>
 
       <div class="list-section">
@@ -359,10 +361,9 @@ body {
       </div>
     </div>
 
-    <!-- 🧴 PERSONAL PACKING -->
+    <!-- PERSONAL PACKING -->
     <div class="list-card">
       <div class="list-card-header hc-teal">
-        <span class="icon">🧴</span>
         <h2>Personal Packing</h2>
       </div>
 
@@ -383,14 +384,14 @@ body {
       <div class="list-section">
         <h3>Toiletries</h3>
         <div class="check-item"><input type="checkbox" id="p11"><label for="p11"><strong>Reef-safe sunscreen</strong> <span class="note">(bring a lot — reapply every 90 min!)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p12"><label for="p12">After-sun aloe gel 🌿</label></div>
+        <div class="check-item"><input type="checkbox" id="p12"><label for="p12">After-sun aloe gel</label></div>
         <div class="check-item"><input type="checkbox" id="p13"><label for="p13"><strong>Bug spray</strong> <span class="note">(DEET — near marshes it's real)</span></label></div>
         <div class="check-item"><input type="checkbox" id="p14"><label for="p14">Shampoo / conditioner / body wash</label></div>
         <div class="check-item"><input type="checkbox" id="p15"><label for="p15">Dry shampoo <span class="note">(humidity = hair enemy)</span></label></div>
         <div class="check-item"><input type="checkbox" id="p16"><label for="p16">Face wash + skincare</label></div>
         <div class="check-item"><input type="checkbox" id="p17"><label for="p17">Deodorant, razor, feminine products</label></div>
         <div class="check-item"><input type="checkbox" id="p18"><label for="p18">Hair ties, clips</label></div>
-        <div class="check-item"><input type="checkbox" id="p19"><label for="p19">Nail stuff <span class="note">(beach mani touch-up 💅)</span></label></div>
+        <div class="check-item"><input type="checkbox" id="p19"><label for="p19">Nail stuff <span class="note">(beach mani touch-up)</span></label></div>
       </div>
 
       <div class="list-section">
@@ -413,10 +414,9 @@ body {
       </div>
     </div>
 
-    <!-- 🏖️ BEACH GEAR -->
+    <!-- BEACH GEAR -->
     <div class="list-card">
       <div class="list-card-header hc-sky">
-        <span class="icon">🏖️</span>
         <h2>Beach &amp; Activity Gear</h2>
       </div>
 
@@ -431,17 +431,16 @@ body {
         <div class="check-item"><input type="checkbox" id="b7"><label for="b7">Beach chairs <span class="note">(check if condo has them first)</span></label></div>
         <div class="check-item"><input type="checkbox" id="b8"><label for="b8">Bluetooth speaker <span class="note">(waterproof ideally)</span></label></div>
         <div class="check-item"><input type="checkbox" id="b9"><label for="b9">Frisbee / paddleball / cards</label></div>
-        <div class="check-item"><input type="checkbox" id="b10"><label for="b10">Mesh bag for wet gear / shells 🐚</label></div>
+        <div class="check-item"><input type="checkbox" id="b10"><label for="b10">Mesh bag for wet gear / shells</label></div>
         <div class="check-item"><input type="checkbox" id="b11"><label for="b11"><strong>Red flashlight</strong> <span class="note">(night turtle watching — no white light near nests!)</span></label></div>
         <div class="check-item"><input type="checkbox" id="b12"><label for="b12"><strong>Baby powder</strong> <span class="note">(sand hack — dust on skin, sand falls right off!)</span></label></div>
         <div class="check-item"><input type="checkbox" id="b13"><label for="b13">Microfiber towels <span class="note">(shed sand way better than regular towels)</span></label></div>
       </div>
     </div>
 
-    <!-- 💊 FIRST AID + BEACH SURVIVAL -->
+    <!-- FIRST AID + BEACH SURVIVAL -->
     <div class="list-card">
       <div class="list-card-header hc-coral">
-        <span class="icon">💊</span>
         <h2>First Aid + Beach Survival</h2>
       </div>
 
@@ -460,22 +459,22 @@ body {
       </div>
 
       <div class="list-section">
-        <h3>🪼 Jellyfish Sting Kit</h3>
+        <h3>Jellyfish Sting Kit</h3>
         <div class="check-item"><input type="checkbox" id="m11"><label for="m11"><strong>Lidocaine spray</strong> <span class="note">(Solarcaine — best for immediate sting pain)</span></label></div>
         <div class="check-item"><input type="checkbox" id="m12"><label for="m12"><strong>Meat tenderizer</strong> <span class="note">(yes really — enzymes break down venom, mix with water)</span></label></div>
         <div class="check-item"><input type="checkbox" id="m13"><label for="m13">Tweezers <span class="note">(for tentacles + jetty rock splinters)</span></label></div>
         <div class="check-item"><input type="checkbox" id="m14"><label for="m14">Benadryl cream <span class="note">(itch + swelling)</span></label></div>
-        <div class="tip">⚡ Sting protocol: rinse with SEAWATER (not fresh!) → remove tentacles with card/tweezers → lidocaine spray → hydrocortisone</div>
-        <div class="tip">🚫 Do NOT pee on it. Do NOT rinse with fresh water. Do NOT rub.</div>
+        <div class="tip">Sting protocol: rinse with SEAWATER (not fresh!) → remove tentacles with card/tweezers → lidocaine spray → hydrocortisone</div>
+        <div class="tip">Do NOT pee on it. Do NOT rinse with fresh water. Do NOT rub.</div>
       </div>
 
       <div class="list-section">
-        <h3>🌊 Gulf Hazard Reminders</h3>
+        <h3>Gulf Hazard Reminders</h3>
         <div class="check-item"><input type="checkbox" id="m15"><label for="m15">Do the <strong>stingray shuffle</strong> entering the water <span class="note">(drag feet — they move out of the way)</span></label></div>
         <div class="check-item"><input type="checkbox" id="m16"><label for="m16">Watch for <strong>Portuguese Man o' War</strong> <span class="note">(blue/purple balloon — if on beach, skip the water that day)</span></label></div>
         <div class="check-item"><input type="checkbox" id="m17"><label for="m17">Reapply sunscreen every <strong>90 min</strong> + after swimming</label></div>
         <div class="check-item"><input type="checkbox" id="m18"><label for="m18">Hydrate constantly — heat exhaustion sneaks up fast at 95°F+</label></div>
-        <div class="check-item"><input type="checkbox" id="m19"><label for="m19">Turtle sighting on beach? Call <strong>1-866-887-8535</strong> 🐢</label></div>
+        <div class="check-item"><input type="checkbox" id="m19"><label for="m19">Turtle sighting on beach? Call <strong>1-866-887-8535</strong></label></div>
       </div>
     </div>
 
@@ -485,13 +484,12 @@ body {
   <div style="margin-top:18px">
     <div class="list-card">
       <div class="list-card-header hc-tan">
-        <span class="icon">🍳</span>
         <h2>Condo Kitchen Supplies to Bring</h2>
       </div>
       <div style="display:grid;grid-template-columns:1fr;padding:8px 14px 12px;gap:0" class="kitchen-grid">
         <div class="list-section kitchen-sec">
           <h3>Cooking</h3>
-          <div class="check-item"><input type="checkbox" id="k1"><label for="k1"><strong>Your own good knife</strong> <span class="note">(condo knives are always terrible 😂)</span></label></div>
+          <div class="check-item"><input type="checkbox" id="k1"><label for="k1"><strong>Your own good knife</strong> <span class="note">(condo knives are always terrible)</span></label></div>
           <div class="check-item"><input type="checkbox" id="k2"><label for="k2">Cutting board</label></div>
           <div class="check-item"><input type="checkbox" id="k3"><label for="k3">Can opener</label></div>
           <div class="check-item"><input type="checkbox" id="k4"><label for="k4">Good spatula <span class="note">(for grilling)</span></label></div>
@@ -516,31 +514,10 @@ body {
     </div>
   </div>
 
-  <!-- BEACH FOOTER -->
-  <div class="footer-bar">
-    <div class="sand"></div>
-    <svg viewBox="0 0 900 56" preserveAspectRatio="none">
-      <ellipse cx="60" cy="48" rx="42" ry="7" fill="rgba(196,168,130,.4)"/>
-      <ellipse cx="200" cy="50" rx="30" ry="5" fill="rgba(196,168,130,.3)"/>
-      <ellipse cx="400" cy="49" rx="36" ry="6" fill="rgba(196,168,130,.35)"/>
-      <ellipse cx="600" cy="50" rx="28" ry="5" fill="rgba(196,168,130,.3)"/>
-      <ellipse cx="800" cy="48" rx="38" ry="6" fill="rgba(196,168,130,.38)"/>
-      <g transform="translate(48,38)"><ellipse cx="0" cy="0" rx="10" ry="6" fill="#E8C99A" stroke="#D4A877" stroke-width=".7"/><path d="M-10,0 Q0,-4 10,0" stroke="#C49A6C" stroke-width=".5" fill="none"/><path d="M-8,2 Q0,-2 8,2" stroke="#C49A6C" stroke-width=".4" fill="none"/><line x1="-2" y1="-6" x2="-3" y2="-10" stroke="#D4A877" stroke-width=".6"/></g>
-      <g transform="translate(130,46)"><ellipse cx="0" cy="0" rx="6" ry="6" fill="#F0D9B5" stroke="#D4B896" stroke-width=".6"/><ellipse cx="0" cy="0" rx="4" ry="4" fill="none" stroke="#C4A070" stroke-width=".4"/><ellipse cx="0" cy="0" rx="2" ry="2" fill="#C4A070"/></g>
-      <g transform="translate(250,40)"><path d="M0,-8 Q8,0 2,8 Q0,9 -2,8 Q-8,0 0,-8Z" fill="#E8C99A" stroke="#C4A070" stroke-width=".6"/><path d="M0,-8 Q3,-1 2,5" stroke="#C4A070" stroke-width=".4" fill="none"/><path d="M0,-8 Q-3,-1 -2,5" stroke="#C4A070" stroke-width=".4" fill="none"/></g>
-      <g transform="translate(360,42)"><ellipse cx="0" cy="0" rx="11" ry="7" fill="#FADADD" stroke="#E4A0A8" stroke-width=".7"/><path d="M-11,0 Q0,-5 11,0" stroke="#C48090" stroke-width=".5" fill="none"/><path d="M-9,2 Q0,-3 9,2" stroke="#C48090" stroke-width=".4" fill="none"/><line x1="-2" y1="-7" x2="-3" y2="-11" stroke="#D4909A" stroke-width=".6"/></g>
-      <g transform="translate(480,46)"><ellipse cx="0" cy="0" rx="6" ry="6" fill="#C5E8F0" stroke="#88C8D8" stroke-width=".6"/><ellipse cx="0" cy="0" rx="4" ry="4" fill="none" stroke="#68A8B8" stroke-width=".4"/><ellipse cx="0" cy="0" rx="1.5" ry="1.5" fill="#88C8D8"/></g>
-      <g transform="translate(600,40)"><ellipse cx="0" cy="0" rx="10" ry="6" fill="#FFE0B2" stroke="#E4A060" stroke-width=".7"/><path d="M-10,0 Q0,-4 10,0" stroke="#D49050" stroke-width=".5" fill="none"/><line x1="1" y1="-6" x2="2" y2="-10" stroke="#D4A060" stroke-width=".5"/></g>
-      <g transform="translate(720,43)"><path d="M0,-9 Q9,1 2,9 Q0,10 -2,9 Q-9,1 0,-9Z" fill="#C8E8C0" stroke="#88C880" stroke-width=".6"/><line x1="0" y1="-9" x2="0" y2="9" stroke="#78B870" stroke-width=".4"/></g>
-      <g transform="translate(820,46)"><ellipse cx="0" cy="0" rx="7" ry="4" fill="#E0D0F0" stroke="#B090D0" stroke-width=".5"/><ellipse cx="0" cy="0" rx="4.5" ry="2.5" fill="none" stroke="#9070B0" stroke-width=".4"/><ellipse cx="0" cy="0" rx="2" ry="1.2" fill="#B090D0"/></g>
-      <path d="M10,53 Q50,51 90,53 Q130,51 170,53" stroke="rgba(196,168,130,.5)" stroke-width=".7" fill="none"/>
-      <path d="M300,53 Q350,51 400,53 Q450,51 500,53" stroke="rgba(196,168,130,.4)" stroke-width=".6" fill="none"/>
-      <path d="M650,53 Q700,51 750,53" stroke="rgba(196,168,130,.45)" stroke-width=".6" fill="none"/>
-    </svg>
-  </div>
+  <div class="footer-bar"></div>
 
   <div class="print-note no-print">
-    👆 Click any checkbox to check it off · <strong>Ctrl/Cmd + P</strong> to print
+    Click any checkbox to check it off · <strong>Ctrl/Cmd + P</strong> to print
   </div>
 
 </div>
@@ -548,6 +525,21 @@ body {
 <script>
 const STORAGE_KEY  = 'porta-lists-v1';
 const OWNERS_KEY   = 'porta-lists-owners-v1';
+const PROXY_BASE = 'https://beach-plz-proxy.lacey-griffith04.workers.dev';
+const DATA_PATH = 'port-a-2026.json';
+
+// This list is a standalone page (checks/assignments are per-device, not
+// synced), but the account list itself should still match whoever has
+// actually joined the trip planner — so read-only fetch it once on load.
+let PEOPLE = [];
+async function loadPeople() {
+  try {
+    const r = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`);
+    if (!r.ok) return;
+    const { record } = await r.json();
+    if (record.people && record.people.length) PEOPLE = record.people;
+  } catch (e) { /* fall back to unassigned-only tags if offline */ }
+}
 
 function saveChecks() {
   const state = {};
@@ -587,11 +579,28 @@ function loadOwners() {
 }
 
 function applyOwnerStyle(tag) {
-  tag.classList.remove('lacey','nicole');
-  const o = tag.dataset.owner;
-  if (o === 'lacey')  { tag.classList.add('lacey');  tag.textContent = 'L'; }
-  else if (o === 'nicole') { tag.classList.add('nicole'); tag.textContent = 'N'; }
-  else { tag.textContent = '·'; }
+  const person = PEOPLE.find(p => p.id === tag.dataset.owner);
+  if (person) {
+    tag.classList.add('assigned');
+    tag.style.background = person.color;
+    tag.style.borderColor = person.color;
+    tag.textContent = person.name.trim()[0].toUpperCase();
+    tag.title = `Assigned to ${person.name} — tap to change`;
+  } else {
+    tag.classList.remove('assigned');
+    tag.style.background = '';
+    tag.style.borderColor = '';
+    tag.textContent = '·';
+    tag.title = PEOPLE.length ? `Tap to assign: ${PEOPLE.map(p => p.name).join(', ')}` : 'Tap to assign';
+  }
+}
+
+function cycleOwner(tag) {
+  const ids = ['', ...PEOPLE.map(p => p.id)];
+  const idx = ids.indexOf(tag.dataset.owner || '');
+  tag.dataset.owner = ids[(idx + 1) % ids.length] || '';
+  applyOwnerStyle(tag);
+  saveOwners();
 }
 
 function clearAll() {
@@ -615,12 +624,9 @@ document.querySelectorAll('.check-item').forEach(item => {
   tag.dataset.id = cb.id;
   tag.dataset.owner = '';
   tag.textContent = '·';
-  tag.title = 'Tap to assign: L = Lacey, N = Nicole';
+  tag.title = 'Tap to assign';
   tag.addEventListener('click', () => {
-    const cycle = { '': 'lacey', 'lacey': 'nicole', 'nicole': '' };
-    tag.dataset.owner = cycle[tag.dataset.owner] ?? '';
-    applyOwnerStyle(tag);
-    saveOwners();
+    cycleOwner(tag);
   });
   item.appendChild(tag);
 
@@ -638,8 +644,10 @@ document.querySelectorAll('.check-item').forEach(item => {
 });
 
 loadChecks();
-loadOwners();// Load saved state on open
-loadChecks();
+(async () => {
+  await loadPeople();
+  loadOwners(); // re-applies now that PEOPLE is populated
+})();
 </script>
 
 </body>
