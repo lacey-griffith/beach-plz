@@ -21,6 +21,7 @@
   --sidebar-w: 264px;
   --lacey-c: #C9798A; --lacey-l: #E8B8C2; --lacey-d: #A8556A;
   --nicole-c: #6FCFC4; --nicole-l: #AEE8E0; --nicole-d: #1F7A6F;
+  --active-c: var(--ocean);
 }
 body {
   font-family: 'Nunito', sans-serif;
@@ -69,14 +70,15 @@ body {
 .who-row2 { display: flex; align-items: center; gap: 8px; }
 .who-lbl { font-size: 10px; font-weight: 700; color: var(--muted); }
 .who-btn { font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; cursor: pointer; border: 2px solid transparent; background: var(--white); transition: all .14s; }
-.who-btn.lacey { border-color: var(--lacey-d); color: var(--lacey-d); }
-.who-btn.lacey.on { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); color: #fff; }
-.who-btn.nicole { border-color: var(--nicole-d); color: var(--nicole-d); }
-.who-btn.nicole.on { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); color: #fff; }
+.who-btn { border-width: 2px; }
+.who-chip-row, .filter-chip-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 1px; }
+.who-chip-row::-webkit-scrollbar, .filter-chip-row::-webkit-scrollbar { display: none; }
+.who-add-btn { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; border: 2px dashed var(--tan-d); background: var(--sand); color: var(--ocean-d); cursor: pointer; flex-shrink: 0; white-space: nowrap; }
+.filter-toggle-btn { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; border: 1.5px solid var(--tan-d); background: var(--sand); color: var(--ocean-d); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 .show-both-lbl { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--ocean-d); cursor: pointer; user-select: none; padding: 5px 12px; border-radius: 20px; background: var(--sand); border: 1.5px solid var(--tan-d); }
 .show-both-lbl .shell-ico { font-size: 11px; }
 .show-both-cb { appearance: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--tan-d); background: var(--white); cursor: pointer; display: grid; place-content: center; flex-shrink: 0; }
-.show-both-cb::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--lacey-c), var(--nicole-c)); transform: scale(0); transition: transform .12s; }
+.show-both-cb::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--ocean-l), var(--teal)); transform: scale(0); transition: transform .12s; }
 .show-both-cb:checked::before { transform: scale(1); }
 .show-both-cb:checked { border-color: var(--ocean); }
 
@@ -124,8 +126,7 @@ body {
 
 /* ── CALENDAR ── */
 .cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 3px solid transparent; border-radius: 16px 20px 14px 22px / 18px 14px 22px 16px; transition: border-color .25s, background .25s; background: linear-gradient(160deg, rgba(255,255,255,.3), rgba(212,245,234,.18)); }
-body.active-lacey .cal-wrap { border-color: var(--lacey-c); background: linear-gradient(165deg, rgba(232,184,194,.38), rgba(255,255,255,.22) 55%, rgba(232,184,194,.22)); }
-body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear-gradient(165deg, rgba(174,232,224,.4), rgba(255,255,255,.22) 55%, rgba(174,232,224,.24)); }
+body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gradient(165deg, color-mix(in srgb, var(--active-c) 22%, white), rgba(255,255,255,.22) 55%, color-mix(in srgb, var(--active-c) 14%, white)); }
 .cal-grid { display: grid; }
 /* Desktop: 5 col, Mobile: 1 col — set by JS */
 .col-hdr { text-align: center; padding: 6px 3px; font-size: 10.5px; font-weight: 800; color: var(--ocean-d); background: var(--sky-l); border: 1px solid var(--border); border-bottom: 2.5px solid var(--teal); position: sticky; top: 0; z-index: 10; }
@@ -152,9 +153,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .pa-resize { position: absolute; bottom: 0; left: 0; right: 0; height: 10px; cursor: ns-resize; display: flex; align-items: center; justify-content: center; z-index: 7; opacity: 0; transition: opacity .15s; }
 .pa:hover .pa-resize { opacity: 1; }
 .pa-resize::after { content: ''; width: 24px; height: 3px; background: rgba(255,255,255,.6); border-radius: 2px; }
-.pa.owner-lacey { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); }
-.pa.owner-nicole { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); }
-.pa.owner-both { background: linear-gradient(to left, var(--nicole-c), var(--lacey-c)); }
+/* .pa owner colors are now applied inline per-person via JS (see ownerBg()) */
 
 /* ── MOBILE CARD-COLUMN CALENDAR ── */
 .cc-wrap { display: flex; gap: 10px; overflow-x: auto; padding: 10px 10px 90px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
@@ -169,9 +168,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .cc-card { display: flex; align-items: center; gap: 7px; background: linear-gradient(160deg, rgba(255,255,255,.92), rgba(255,255,255,.78)); border-radius: 16px 12px 18px 13px / 13px 17px 12px 16px; padding: 8px 20px 8px 9px; margin-bottom: 7px; box-shadow: 0 3px 9px rgba(15,90,106,.13), inset 0 1px 0 rgba(255,255,255,.6); position: relative; border: 1px solid rgba(255,255,255,.6); backdrop-filter: blur(3px); overflow: hidden; }
 .cc-card::before { content: ''; position: absolute; top: -10px; left: -10px; width: 50%; height: 60%; background: radial-gradient(ellipse, rgba(255,255,255,.45), transparent 70%); pointer-events: none; }
 .cc-rail { width: 4px; align-self: stretch; border-radius: 4px; flex-shrink: 0; }
-.cc-rail.owner-lacey { background: linear-gradient(var(--lacey-l), var(--lacey-d)); }
-.cc-rail.owner-nicole { background: linear-gradient(var(--nicole-l), var(--nicole-d)); }
-.cc-rail.owner-both { background: linear-gradient(var(--lacey-c), var(--nicole-c)); }
+/* .cc-rail owner colors are now applied inline per-person via JS (see ownerBg()) */
 .cc-time { text-align: center; flex-shrink: 0; width: 32px; }
 .cc-time .h { font-weight: 800; font-size: 11px; color: var(--ocean-d); line-height: 1.1; }
 .cc-time .m { font-size: 7px; color: var(--muted); }
@@ -181,8 +178,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .cc-who { display: flex; flex-shrink: 0; cursor: pointer; }
 .cc-who .av { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 800; color: #fff; border: 1.5px solid #fff; margin-left: -5px; }
 .cc-who .av:first-child { margin-left: 0; }
-.cc-who .av.lacey { background: var(--lacey-d); }
-.cc-who .av.nicole { background: var(--nicole-d); }
+/* .cc-who avatar colors are now applied inline per-person via JS */
 .cc-menu-btn { position: absolute; top: 4px; right: 5px; width: 18px; height: 18px; border-radius: 50%; background: rgba(15,90,106,.12); color: var(--ocean-d); font-size: 12px; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; letter-spacing: -1px; padding-bottom: 3px; }
 .cc-menu-btn:active { background: rgba(15,90,106,.22); }
 .cc-card.lifted { transform: scale(1.03); box-shadow: 0 6px 16px rgba(0,0,0,.16); z-index: 20; }
@@ -198,10 +194,11 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .jelly-cap.move { background: linear-gradient(160deg, var(--mint-l), var(--teal)); }
 .jelly-cap.share { width: 44px; height: 26px; padding: 0; gap: 1px; background: rgba(255,255,255,.5); }
 .jelly-seg { flex: 1; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: rgba(255,255,255,.9); cursor: pointer; transition: background .15s, opacity .15s; }
-.jelly-seg.lacey { border-radius: 50% 0 0 42% / 42% 0 0 42%; background: var(--lacey-l); opacity: .45; }
-.jelly-seg.lacey.on { background: var(--lacey-d); opacity: 1; }
-.jelly-seg.nicole { border-radius: 0 50% 42% 0 / 0 42% 42% 0; background: var(--nicole-l); opacity: .45; }
-.jelly-seg.nicole.on { background: var(--nicole-d); opacity: 1; }
+.jelly-cap.people { width: auto; min-width: 92px; max-width: 168px; height: auto; border-radius: 18px; background: rgba(255,255,255,.94); padding: 6px; flex-direction: column; gap: 4px; box-shadow: 0 3px 9px rgba(15,90,106,.16); }
+.jelly-people-list { display: flex; flex-direction: column; gap: 3px; max-height: 130px; overflow-y: auto; }
+.jelly-person-row { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 800; padding: 3px 6px; border-radius: 10px; cursor: pointer; opacity: .45; transition: opacity .12s, background .12s; color: var(--text); }
+.jelly-person-row.on { opacity: 1; background: var(--sky-l); }
+.jelly-person-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .jelly-cap.del { background: linear-gradient(160deg, #F4A98F, #C9613F); }
 .jelly-cap.del .jelly-x { position: relative; width: 13px; height: 13px; }
 .jelly-cap.del .jelly-x::before, .jelly-cap.del .jelly-x::after { content: ''; position: absolute; top: 50%; left: 50%; width: 100%; height: 2.4px; background: #fff; border-radius: 2px; }
@@ -209,7 +206,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .jelly-cap.del .jelly-x::after { transform: translate(-50%,-50%) rotate(-45deg); }
 .jelly-tentacles { width: 30px; height: 16px; margin-top: -3px; opacity: .55; background: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 6px); -webkit-mask: linear-gradient(to bottom, #000, transparent); mask: linear-gradient(to bottom, #000, transparent); }
 .jelly-cap.move ~ .jelly-tentacles { color: var(--teal); }
-.jelly-cap.share ~ .jelly-tentacles { color: var(--nicole-c); }
+.jelly-cap.people ~ .jelly-tentacles { color: var(--teal); }
 .jelly-cap.del ~ .jelly-tentacles { color: var(--coral); }
 .jelly-lbl { font-size: 8px; font-weight: 800; color: var(--ocean-d); margin-top: 2px; text-shadow: 0 1px 2px rgba(255,255,255,.7); }
 @keyframes jelly-drift { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-7px) rotate(3deg); } }
@@ -275,9 +272,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .dm-badges { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 14px; }
 .dm-badge { font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 14px; background: var(--sky-l); color: var(--ocean-d); }
 .dm-badge.owner { color: #fff; }
-.dm-badge.owner.lacey { background: linear-gradient(135deg, var(--lacey-l), var(--lacey-d)); }
-.dm-badge.owner.nicole { background: linear-gradient(135deg, var(--nicole-l), var(--nicole-d)); }
-.dm-badge.owner.both { background: linear-gradient(to left, var(--nicole-c), var(--lacey-c)); }
+/* .dm-badge.owner colors are now applied inline per-person via JS */
 .dm-section { margin-bottom: 14px; }
 .dm-section .lbl { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
 .dm-section .val { font-size: 13.5px; color: var(--text); line-height: 1.45; }
@@ -336,8 +331,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .chat-msg.me .chat-bubble { background: var(--teal); color: white; border-radius: 12px 12px 3px 12px; }
 .chat-msg.them .chat-bubble { background: var(--sky-l); color: var(--text); border-radius: 12px 12px 12px 3px; border: 1px solid var(--border); }
 .chat-who { font-size: 9.5px; font-weight: 800; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .05em; }
-.chat-who.lacey { color: var(--lacey-d); }
-.chat-who.nicole { color: var(--nicole-d); }
+/* .chat-who color is now applied inline per-person via JS */
 .chat-ts { font-size: 8.5px; color: var(--muted); margin-top: 2px; }
 .chat-empty { text-align: center; padding: 20px; color: var(--muted); font-size: 11px; font-style: italic; }
 .chat-input-row { display: flex; gap: 6px; padding: 8px 10px; border-top: 1px solid var(--border); flex-shrink: 0; background: var(--sand); }
@@ -465,8 +459,14 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
   padding: 14px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #fff;
   box-shadow: 0 4px 12px rgba(15,90,106,.18), inset 0 1px 0 rgba(255,255,255,.4);
 }
-.login-opt.lacey { background: linear-gradient(150deg, var(--lacey-l), var(--lacey-d)); }
-.login-opt.nicole { background: linear-gradient(150deg, var(--nicole-l), var(--nicole-d)); }
+/* .login-opt colors are now applied inline per-person via JS */
+.login-opt.add-new { background: linear-gradient(150deg, var(--sand-d), var(--tan-d)); color: var(--ocean-d); border: 2px dashed var(--tan-d); }
+.acct-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 10px; }
+.acct-swatch { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2.5px solid transparent; cursor: pointer; transition: transform .1s; }
+.acct-swatch:hover { transform: scale(1.1); }
+.acct-swatch.on { border-color: var(--ocean-d); box-shadow: 0 0 0 2px #fff inset; }
+.acct-custom-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 11px; color: var(--muted); font-weight: 700; }
+.acct-custom-row input[type=color] { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; padding: 0; background: none; }
 .login-glass { position: absolute; top: -14px; left: -14px; width: 60%; height: 70%; background: radial-gradient(ellipse, rgba(255,255,255,.4), transparent 70%); pointer-events: none; }
 .login-note { font-size: 10px; color: var(--muted); margin-bottom: 0; }
 
@@ -585,15 +585,31 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
     <div class="login-wave">🌊</div>
     <h2>Port A Planner</h2>
     <p>Who's checking in?</p>
-    <div class="login-opts">
-      <button class="login-opt lacey" onclick="completeLogin('lacey')">
-        <span class="login-glass"></span>Lacey
-      </button>
-      <button class="login-opt nicole" onclick="completeLogin('nicole')">
-        <span class="login-glass"></span>Nicole
-      </button>
-    </div>
+    <div class="login-opts" id="loginOpts"></div>
     <p class="login-note">🐚 Remembered on this device — no need to choose again.</p>
+  </div>
+</div>
+
+<!-- ACCOUNT CREATION MODAL -->
+<div class="modal-overlay" id="acctModal" style="display:none" onclick="if(event.target===this)closeAcctModal()">
+  <div class="sea-glass-modal" style="max-width:380px">
+    <div class="dm-hdr" style="margin-bottom:6px">
+      <div class="dm-emoji">🐚</div>
+      <div class="dm-title"><h3>New Account</h3></div>
+      <div class="dm-close" onclick="closeAcctModal()">✕</div>
+    </div>
+    <div class="mfield"><label>Your name</label><input id="acctName" placeholder="e.g. Tyler" maxlength="24"/></div>
+    <label style="display:block;font-size:10px;font-weight:800;color:var(--ocean);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Pick a color</label>
+    <div class="acct-swatches" id="acctSwatches"></div>
+    <div class="acct-custom-row">
+      <input type="color" id="acctCustomColor"/>
+      <span>...or pick a custom color</span>
+    </div>
+    <div id="acctStatus" class="edit-lbl" style="color:var(--coral);min-height:16px"></div>
+    <div class="mbtn-row">
+      <button class="mbtn mbtn-cancel" onclick="closeAcctModal()">Cancel</button>
+      <button class="mbtn mbtn-add" onclick="submitAccount()">🌊 Create & Join</button>
+    </div>
   </div>
 </div>
 
@@ -638,14 +654,10 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 <div class="who-bar">
   <div class="who-row1">
     <span class="who-lbl">I am:</span>
-    <button class="who-btn lacey on" id="mBtnL" onclick="setWho('lacey')">Lacey</button>
-    <button class="who-btn nicole" id="mBtnN" onclick="setWho('nicole')">Nicole</button>
+    <div class="who-chip-row" id="mWhoChips"></div>
   </div>
   <div class="who-row2">
-    <label class="show-both-lbl">
-      <input type="checkbox" class="show-both-cb" id="mShowBoth" onchange="setShowBoth(this.checked)">
-      <span class="shell-ico">🐚</span>Show Both
-    </label>
+    <button class="filter-toggle-btn" onclick="openFilterPopover(event)">👥 <span id="mFilterLbl">Everyone</span></button>
     <label class="show-both-lbl">
       <input type="checkbox" class="show-both-cb" id="mCalView" onchange="setCalView(this.checked ? 'all' : 'day')">
       <span class="shell-ico">🌊</span>All Days
@@ -659,8 +671,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 <!-- LEGEND -->
 <div class="legend-row">
   <span style="font-weight:800;color:var(--ocean)">Who:</span>
-  <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--lacey-d);margin-right:2px;vertical-align:middle"></span>Lacey</span>
-  <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--nicole-d);margin-right:2px;vertical-align:middle"></span>Nicole</span>
+  <span id="legendWho" style="display:contents"></span>
   <span style="margin:0 4px;color:var(--border)">·</span>
   <span style="font-weight:800;color:var(--ocean)">Colors:</span>
   <span><span class="ld" style="background:rgba(56,178,178,.8)"></span>Pool</span>
@@ -680,12 +691,8 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
     <div class="sidebar-inner">
       <div class="who-bar" style="margin-bottom:8px;border-bottom:none;padding:0;background:transparent">
         <span class="who-lbl">I am:</span>
-        <button class="who-btn lacey on" id="dBtnL" onclick="setWho('lacey')">Lacey</button>
-        <button class="who-btn nicole" id="dBtnN" onclick="setWho('nicole')">Nicole</button>
-        <label class="show-both-lbl">
-          <input type="checkbox" class="show-both-cb" id="dShowBoth" onchange="setShowBoth(this.checked)">
-          <span class="shell-ico">🐚</span>Show Both
-        </label>
+        <div class="who-chip-row" id="dWhoChips"></div>
+        <button class="filter-toggle-btn" onclick="openFilterPopover(event)">👥 <span id="dFilterLbl">Everyone</span></button>
       </div>
       <button class="add-btn" onclick="openModal()">✦ Add custom activity</button>
       <h2>Activities</h2>
@@ -1174,18 +1181,63 @@ let state = {
   chat: [],
   dinners: Object.fromEntries(DAYS.map(d => [d.id, { items: [], servings: 4 }])),
   enrichment: {},
+  people: [], // [{id, name, color}] — accounts are open: anyone can create one, no password
 };
 let ui = {
   curDay: 'wed',
   curFilter: 'all',
-  currentWho: localStorage.getItem('portA_who') || 'lacey',
-  showBoth: localStorage.getItem('portA_showBoth') !== 'false',
+  currentWho: localStorage.getItem('portA_who') || null,
+  visibleIds: null, // null = "everyone" until people load; then a Set of ids
   calView: localStorage.getItem('portA_calView') || 'all',
   pendingAct: null,
   lastEtag: null,
   pollTimer: null,
   chatOpen: false,
 };
+
+// ── PEOPLE / ACCOUNTS ─────────────────────────────────────────────
+const COLOR_PALETTE = ['#C9798A','#6FCFC4','#E8A33D','#7C9D5C','#8B7BC7','#4FA8C9','#D97D5A','#5FB89C','#C77DA8','#A8935C','#5C8FC7','#B85C6B'];
+function slugifyName(name) {
+  let base = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+|-+$)/g, '') || 'guest';
+  let id = base, n = 2;
+  while (state.people.some(p => p.id === id)) { id = `${base}-${n++}`; }
+  return id;
+}
+function personById(id) { return state.people.find(p => p.id === id); }
+function personName(id) { return personById(id)?.name || id || 'Someone'; }
+function personColor(id) { return personById(id)?.color || '#6E949E'; }
+function personInitial(id) { return (personName(id).trim()[0] || '?').toUpperCase(); }
+function shadeColor(hex, percent) {
+  hex = (hex || '#6E949E').replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const num = parseInt(hex, 16);
+  let r = (num >> 16) + Math.round(2.55 * percent);
+  let g = ((num >> 8) & 0xff) + Math.round(2.55 * percent);
+  let b = (num & 0xff) + Math.round(2.55 * percent);
+  r = Math.min(255, Math.max(0, r)); g = Math.min(255, Math.max(0, g)); b = Math.min(255, Math.max(0, b));
+  return '#' + (0x1000000 + r * 0x10000 + g * 0x100 + b).toString(16).slice(1);
+}
+// Background CSS for an event/avatar owned by 1+ attendees — solo gets a light→dark
+// gradient of their color, shared gets a gradient across everyone attending.
+function ownerBg(attendees) {
+  const ids = attendees && attendees.length ? attendees : [];
+  if (ids.length <= 1) {
+    const c = personColor(ids[0]);
+    return `linear-gradient(135deg, ${shadeColor(c, 35)}, ${shadeColor(c, -12)})`;
+  }
+  return `linear-gradient(to right, ${ids.map(id => personColor(id)).join(', ')})`;
+}
+function ensureVisibleIds() {
+  const allIds = state.people.map(p => p.id);
+  if (!ui.visibleIds) {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('portA_visibleIds') || 'null'); } catch {}
+    ui.visibleIds = new Set(saved && saved.length ? saved.filter(id => allIds.includes(id)) : allIds);
+  }
+  // Always keep newly-added people visible by default
+  allIds.forEach(id => { if (!ui.visibleIds.has(id) && !localStorage.getItem('portA_visibleIds')) ui.visibleIds.add(id); });
+}
+function saveVisibleIds() { localStorage.setItem('portA_visibleIds', JSON.stringify([...ui.visibleIds])); }
 
 // ── HELPERS ───────────────────────────────────────────────────────
 function allActs() { return [...BASE_ACTS.filter(a => !state.hiddenBase.includes(a.id)), ...state.customActs]; }
@@ -1268,7 +1320,7 @@ function setSyncState(s) {
 async function saveBin() {
   setSyncState('busy');
   try {
-    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, dinners: state.dinners, enrichment: state.enrichment };
+    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, dinners: state.dinners, enrichment: state.enrichment, people: state.people };
     const putRes = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1289,7 +1341,7 @@ function reconcileOwnership() {
       const entry = state.placed[d.id][slotKey];
       if (!entry || !entry.isStart || !entry.who) return;
       const att = entry.attendees;
-      const isShared = att && att.includes('lacey') && att.includes('nicole');
+      const isShared = att && att.length > 1;
       if (!isShared && (!att || att.length !== 1 || att[0] !== entry.who)) {
         state.placed[d.id][slotKey] = { ...entry, attendees: [entry.who] };
         changed = true;
@@ -1327,6 +1379,17 @@ async function loadBin() {
       });
     }
     if (record.enrichment) state.enrichment = { ...state.enrichment, ...record.enrichment };
+    if (record.people && record.people.length) {
+      state.people = record.people;
+    } else if (!state.people.length) {
+      // First-ever load with no accounts on record yet — seed the two original
+      // colors so existing calendar data (who:'lacey'/'nicole') still displays right.
+      state.people = [
+        { id: 'lacey', name: 'Lacey', color: '#C9798A' },
+        { id: 'nicole', name: 'Nicole', color: '#6FCFC4' },
+      ];
+      saveBin();
+    }
     if (record.chat) {
       const prevLen = state.chat.length;
       state.chat = record.chat;
@@ -1337,13 +1400,17 @@ async function loadBin() {
         }
       }
     }
+    ensureVisibleIds();
+    updateFilterLabels();
     renderAll();
+    renderWhoChips();
     Chat.renderMessages();
     setSyncState('ok');
     if (reconcileOwnership()) {
       renderAll();
       saveBin();
     }
+    maybeShowLoginGate();
   } catch { /* silent on poll errors */ }
 }
 
@@ -1356,19 +1423,144 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) load
 // ── WHO ───────────────────────────────────────────────────────────
 function setWho(who) {
   ui.currentWho = who;
-  localStorage.setItem('portA_who', who);
-  document.body.classList.toggle('active-lacey', who === 'lacey');
-  document.body.classList.toggle('active-nicole', who === 'nicole');
-  ['mBtnL','dBtnL'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'who-btn lacey' + (who==='lacey'?' on':''); });
-  ['mBtnN','dBtnN'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'who-btn nicole' + (who==='nicole'?' on':''); });
+  if (who) localStorage.setItem('portA_who', who); else localStorage.removeItem('portA_who');
+  document.body.classList.toggle('has-active', !!who);
+  document.body.style.setProperty('--active-c', who ? personColor(who) : 'var(--ocean)');
+  renderWhoChips();
   renderCalendar();
 }
 
-function setShowBoth(checked) {
-  ui.showBoth = checked;
-  localStorage.setItem('portA_showBoth', checked ? 'true' : 'false');
-  ['mShowBoth','dShowBoth'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = checked; });
-  renderCalendar();
+function renderWhoChips() {
+  const html = state.people.map(p => `
+    <button class="who-btn${p.id === ui.currentWho ? ' on' : ''}" data-pid="${p.id}"
+      style="${p.id === ui.currentWho ? `background:${ownerBg([p.id])};color:#fff;border-color:transparent` : `border-color:${p.color};color:${p.color}`}">
+      ${p.name}
+    </button>`).join('') + `<button class="who-add-btn" onclick="openAcctModal('add')">＋ Add</button>`;
+  ['mWhoChips','dWhoChips'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = html;
+    el.querySelectorAll('[data-pid]').forEach(btn => btn.addEventListener('click', () => setWho(btn.dataset.pid)));
+  });
+}
+
+// ── WHO'S SHOWING FILTER ───────────────────────────────────────────
+function updateFilterLabels() {
+  const total = state.people.length;
+  const shown = ui.visibleIds ? ui.visibleIds.size : total;
+  const lbl = shown >= total ? 'Everyone' : shown === 0 ? 'No one' : shown === 1 ? personName([...ui.visibleIds][0]) : `${shown} people`;
+  ['mFilterLbl','dFilterLbl'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = lbl; });
+}
+
+function openFilterPopover(evt) {
+  closeFilterPopover();
+  ensureVisibleIds();
+  const btn = evt.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.id = 'filterPopover';
+  pop.className = 'sea-glass-modal';
+  pop.style.cssText = `position:fixed; z-index:950; width:200px; max-width:90vw; padding:12px; top:${Math.min(rect.bottom + 6, window.innerHeight - 220)}px; left:${Math.min(rect.left, window.innerWidth - 216)}px;`;
+  pop.innerHTML = `
+    <div style="font-size:11px;font-weight:800;color:var(--ocean-d);margin-bottom:8px">Who's showing?</div>
+    <div style="display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto">
+      ${state.people.map(p => `
+        <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;cursor:pointer;padding:3px 4px;">
+          <input type="checkbox" data-pid="${p.id}" ${ui.visibleIds.has(p.id) ? 'checked' : ''} style="accent-color:${p.color}"/>
+          <span style="width:9px;height:9px;border-radius:50%;background:${p.color};flex-shrink:0"></span>${p.name}
+        </label>`).join('')}
+    </div>
+  `;
+  document.body.appendChild(pop);
+  const overlay = document.createElement('div');
+  overlay.className = 'jelly-overlay';
+  overlay.id = 'filterOverlay';
+  overlay.addEventListener('click', closeFilterPopover);
+  document.body.insertBefore(overlay, pop);
+  pop.querySelectorAll('[data-pid]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) ui.visibleIds.add(cb.dataset.pid); else ui.visibleIds.delete(cb.dataset.pid);
+      saveVisibleIds();
+      updateFilterLabels();
+      renderCalendar();
+    });
+  });
+}
+function closeFilterPopover() {
+  document.getElementById('filterPopover')?.remove();
+  document.getElementById('filterOverlay')?.remove();
+}
+
+// ── ACCOUNT CREATION ───────────────────────────────────────────────
+let _acctContext = 'onboard';
+function openAcctModal(context) {
+  _acctContext = context || 'onboard';
+  document.getElementById('acctName').value = '';
+  document.getElementById('acctStatus').textContent = '';
+  const usedColors = new Set(state.people.map(p => p.color.toLowerCase()));
+  const firstFree = COLOR_PALETTE.find(c => !usedColors.has(c.toLowerCase())) || COLOR_PALETTE[0];
+  const sw = document.getElementById('acctSwatches');
+  sw.innerHTML = COLOR_PALETTE.map(c => `<button type="button" class="acct-swatch${c === firstFree ? ' on' : ''}" data-color="${c}" style="background:${c}"></button>`).join('');
+  sw.dataset.selected = firstFree;
+  sw.querySelectorAll('.acct-swatch').forEach(btn => btn.addEventListener('click', () => {
+    sw.querySelectorAll('.acct-swatch').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    sw.dataset.selected = btn.dataset.color;
+    document.getElementById('acctCustomColor').value = btn.dataset.color;
+  }));
+  document.getElementById('acctCustomColor').value = firstFree;
+  document.getElementById('acctCustomColor').oninput = (e) => {
+    sw.querySelectorAll('.acct-swatch').forEach(b => b.classList.remove('on'));
+    sw.dataset.selected = e.target.value;
+  };
+  document.getElementById('acctModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('acctName').focus(), 60);
+}
+function closeAcctModal() { document.getElementById('acctModal').style.display = 'none'; }
+function submitAccount() {
+  const name = document.getElementById('acctName').value.trim();
+  const statusEl = document.getElementById('acctStatus');
+  if (!name) { statusEl.textContent = 'Enter a name to continue.'; return; }
+  const color = document.getElementById('acctSwatches').dataset.selected || COLOR_PALETTE[0];
+  const person = { id: slugifyName(name), name, color };
+  state.people.push(person);
+  saveBin();
+  closeAcctModal();
+  renderWhoChips();
+  ensureVisibleIds();
+  ui.visibleIds.add(person.id);
+  saveVisibleIds();
+  updateFilterLabels();
+  toast(`🐚 Welcome, ${name}!`, 's');
+  if (_acctContext === 'onboard') {
+    completeLogin(person.id);
+  } else {
+    setWho(person.id);
+    renderCalendar();
+  }
+}
+
+// ── LOGIN GATE ────────────────────────────────────────────────────
+function renderLoginGate() {
+  const opts = document.getElementById('loginOpts');
+  if (!opts) return;
+  opts.innerHTML = state.people.map(p => `
+    <button class="login-opt" style="background:${ownerBg([p.id])}" onclick="completeLogin('${p.id}')">
+      <span class="login-glass"></span>${p.name}
+    </button>`).join('') + `
+    <button class="login-opt add-new" onclick="openAcctModal('onboard')">
+      <span class="login-glass"></span>＋ I'm new here
+    </button>`;
+}
+function maybeShowLoginGate() {
+  if (localStorage.getItem('portA_onboarded')) return;
+  if (localStorage.getItem('portA_who')) {
+    // Returning user from before the login gate existed — don't block them.
+    localStorage.setItem('portA_onboarded', 'true');
+    return;
+  }
+  renderLoginGate();
+  document.getElementById('loginGate').style.display = 'flex';
 }
 
 function setCalView(view) {
@@ -1429,7 +1621,7 @@ function buildActCard(a, forSheet = false) {
   const closedText = closed
     ? `<div class="ac-closed">⚠ Closed ${DAYS.find(d=>d.id===ui.curDay)?.name}</div>`
     : a.cl?.length ? `<div class="ac-closed">⚠ Closed: ${a.cl.map(d=>DAYS.find(x=>x.id===d)?.name).filter(Boolean).join(', ')}</div>` : '';
-  const badge = a.isCustom ? `<span class="pill" style="background:var(--mint-l);color:var(--ocean-d)">✦ ${a.createdBy==='nicole'?'Nicole':'Lacey'}</span>` : '';
+  const badge = a.isCustom ? `<span class="pill" style="background:var(--mint-l);color:var(--ocean-d)">✦ ${personName(a.createdBy)}</span>` : '';
   div.innerHTML = `
     <div class="ac-left">
       <div class="ac-name">${a.e} ${a.name}</div>
@@ -1560,8 +1752,6 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
   overlay.addEventListener('click', closeJellyMenu);
   overlay.addEventListener('touchstart', closeJellyMenu, { passive: true });
 
-  const isShared = attendees.includes('lacey') && attendees.includes('nicole');
-
   const toggleAttendee = (person) => {
     let current = attendees.slice();
     if (current.includes(person)) {
@@ -1579,7 +1769,7 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
 
   const items = [
     { cls: 'move', icon: '🕐', lbl: 'Move', action: () => { closeJellyMenu(); openMoveTpicker(dayId, slot, entry, act); } },
-    { cls: 'share', special: 'attendees', lbl: 'Who', action: null },
+    { cls: 'people', special: 'attendees', lbl: 'Who', action: null },
     { cls: 'del', icon: '<span class="jelly-x"></span>', lbl: 'Remove', action: () => { closeJellyMenu(); removeAct(dayId, slot, entry.span); } },
   ];
 
@@ -1601,11 +1791,14 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
     const j = document.createElement('div');
     j.className = 'jelly jelly-spawn';
     if (it.special === 'attendees') {
-      const lOn = attendees.includes('lacey'), nOn = attendees.includes('nicole');
       j.innerHTML = `
-        <div class="jelly-cap share">
-          <div class="jelly-seg lacey ${lOn ? 'on' : ''}" data-p="lacey">L</div>
-          <div class="jelly-seg nicole ${nOn ? 'on' : ''}" data-p="nicole">N</div>
+        <div class="jelly-cap people">
+          <div class="jelly-people-list">
+            ${state.people.map(p => `
+              <div class="jelly-person-row${attendees.includes(p.id) ? ' on' : ''}" data-p="${p.id}">
+                <span class="jelly-person-dot" style="background:${p.color}"></span>${p.name}
+              </div>`).join('')}
+          </div>
         </div>
         <div class="jelly-tentacles"></div>
         <div class="jelly-lbl">${it.lbl}</div>
@@ -1614,7 +1807,7 @@ function showJellyMenu(card, dayId, slot, entry, act, attendees) {
       j.style.top = `${originY}px`;
       j.style.opacity = '0';
       document.body.appendChild(j);
-      j.querySelectorAll('.jelly-seg').forEach(seg => {
+      j.querySelectorAll('.jelly-person-row').forEach(seg => {
         seg.addEventListener('click', e => { e.stopPropagation(); toggleAttendee(seg.dataset.p); });
       });
     } else {
@@ -1798,22 +1991,23 @@ function renderCardCalendar(grid) {
       const a = getAct(entry.actId);
       if (!a) continue;
       const eff = getEffective(entry, a);
-      const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
-      if (!ui.showBoth && !att.includes(ui.currentWho)) continue;
+      const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || state.people[0]?.id];
+      if (ui.visibleIds && !att.some(id => ui.visibleIds.has(id))) continue;
       count++;
-      const isShared = att.includes('lacey') && att.includes('nicole');
-      const ownerClass = isShared ? 'owner-both' : (att[0] === 'nicole' ? 'owner-nicole' : 'owner-lacey');
 
       const card = document.createElement('div');
       card.className = 'cc-card';
       const timeParts = slotToTime(s).match(/^(\d+:\d+)\s*([ap]m)$/i);
+      const avatarsHtml = att.length > 1
+        ? att.map(id => `<div class="av" style="background:${personColor(id)}">${personInitial(id)}</div>`).join('')
+        : `<div class="av" style="background:${personColor(att[0])}">${personInitial(att[0])}</div>`;
       card.innerHTML = `
         <div class="cc-drag-handle" title="Drag to move"><span></span><span></span><span></span></div>
-        <div class="cc-rail ${ownerClass}"></div>
+        <div class="cc-rail" style="background:${ownerBg(att)}"></div>
         <div class="cc-time"><div class="h">${timeParts ? timeParts[1] : slotToTime(s)}</div><div class="m">${timeParts ? timeParts[2].toUpperCase() : ''}</div></div>
         <div class="cc-body"><div class="nm">${eff.e} ${eff.name}</div><div class="mt">${durLabel(entry.span)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div></div>
-        <div class="cc-who" title="Tap to cycle: Lacey → Nicole → Both">
-          ${isShared ? `<div class="av lacey">L</div><div class="av nicole">N</div>` : `<div class="av ${att[0]}">${att[0] === 'nicole' ? 'N' : 'L'}</div>`}
+        <div class="cc-who" title="Tap to change who's going">
+          ${avatarsHtml}
         </div>
         <div class="cc-menu-btn" title="Options">⋯</div>
       `;
@@ -1824,16 +2018,7 @@ function renderCardCalendar(grid) {
       }, { passive: false });
       card.querySelector('.cc-who').addEventListener('click', e => {
         e.stopPropagation();
-        const soloOwner = !isShared ? (att[0] || entry.who || 'lacey') : null;
-        let next;
-        if (isShared) next = { attendees: ['lacey'], who: 'lacey' };
-        else if (soloOwner === 'lacey') next = { attendees: ['nicole'], who: 'nicole' };
-        else next = { attendees: ['lacey', 'nicole'], who: entry.who };
-        for (let i = s; i < s + entry.span; i++) {
-          state.placed[day.id][i] = { ...state.placed[day.id][i], attendees: next.attendees, who: next.who };
-        }
-        renderCalendar();
-        saveBin();
+        showJellyMenu(card, day.id, s, entry, a, att);
       });
       card.querySelector('.cc-menu-btn').addEventListener('click', e => {
         e.stopPropagation();
@@ -1936,14 +2121,13 @@ function renderCalendar() {
 
       if (entry?.isStart) {
         const a = getAct(entry.actId);
-        const att0 = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
-        if (a && (ui.showBoth || att0.includes(ui.currentWho))) {
+        const att0 = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || state.people[0]?.id];
+        if (a && (!ui.visibleIds || att0.some(id => ui.visibleIds.has(id)))) {
           const eff = getEffective(entry, a);
-          const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
-          const isShared = att.includes('lacey') && att.includes('nicole');
-          const ownerClass = isShared ? 'owner-both' : (att[0] === 'nicole' ? 'owner-nicole' : 'owner-lacey');
+          const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || state.people[0]?.id];
           const pa = document.createElement('div');
-          pa.className = `pa ${ownerClass}`;
+          pa.className = 'pa';
+          pa.style.background = ownerBg(att);
           pa.style.height = `${entry.span * sh - 4}px`;
           pa.draggable = true;
           pa.innerHTML = `
@@ -2427,10 +2611,8 @@ function getEffective(entry, act) {
 }
 
 function openDetailModal(dayId, slot, entry, act) {
-  const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || 'lacey'];
-  const isShared = att.includes('lacey') && att.includes('nicole');
-  const ownerCls = isShared ? 'both' : (att[0] === 'nicole' ? 'nicole' : 'lacey');
-  const ownerLbl = isShared ? 'Both of us' : (att[0] === 'nicole' ? 'Nicole' : 'Lacey');
+  const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || state.people[0]?.id];
+  const ownerLbl = att.length > 1 ? att.map(personName).join(' & ') : personName(att[0]);
   const day = DAYS.find(d => d.id === dayId);
   const isClosedToday = act.cl && act.cl.includes(dayId);
   const eff = getEffective(entry, act);
@@ -2443,7 +2625,7 @@ function openDetailModal(dayId, slot, entry, act) {
       <div class="dm-close" onclick="closeDetailModal()">✕</div>
     </div>
     <div class="dm-badges">
-      <div class="dm-badge owner ${ownerCls}">${ownerLbl}</div>
+      <div class="dm-badge owner" style="background:${ownerBg(att)};color:#fff">${ownerLbl}</div>
       <div class="dm-badge">${day ? `${day.name}, ${day.date}` : ''} · ${slotToTime(slot)}</div>
       <div class="dm-badge">${durLabel(entry.span)}</div>
       <div class="dm-badge" id="dmCostBadge">${eff.cost === 0 ? 'Free' : `$${eff.cost}/person`}</div>
@@ -2709,7 +2891,7 @@ const Chat = {
       const time = ts.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const day = ts.toLocaleDateString([], { month: 'short', day: 'numeric' });
       div.innerHTML = `
-        ${!isMe ? `<div class="chat-who ${m.who}">${m.who === 'nicole' ? 'Nicole' : 'Lacey'}</div>` : ''}
+        ${!isMe ? `<div class="chat-who" style="color:${personColor(m.who)}">${personName(m.who)}</div>` : ''}
         <div class="chat-bubble">${m.text}</div>
         <div class="chat-ts">${day} · ${time}</div>
       `;
@@ -2771,14 +2953,6 @@ function completeLogin(who) {
   setWho(who);
   localStorage.setItem('portA_onboarded', 'true');
   document.getElementById('loginGate').style.display = 'none';
-}
-if (!localStorage.getItem('portA_onboarded')) {
-  if (localStorage.getItem('portA_who')) {
-    // Returning user from before the login gate existed — don't block them.
-    localStorage.setItem('portA_onboarded', 'true');
-  } else {
-    document.getElementById('loginGate').style.display = 'flex';
-  }
 }
 
 // ── TRIPS HOME SCREEN ─────────────────────────────────────────────
@@ -2904,9 +3078,10 @@ function hydrateHeader() {
 hydrateHeader();
 setSyncState('busy');
 setWho(ui.currentWho);
-['mShowBoth','dShowBoth'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = ui.showBoth; });
 document.getElementById('mCalView') && (document.getElementById('mCalView').checked = ui.calView === 'all');
 renderAll();
+renderWhoChips();
+updateFilterLabels();
 startCountdown();
 loadBin().then(() => { startPolling(); setSyncState('ok'); }).catch(() => { setSyncState('err'); renderAll(); });
 </script>
