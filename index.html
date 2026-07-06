@@ -2249,13 +2249,29 @@ function renderDinners() {
   const container = document.getElementById('dinnerSection');
   if (!container) return;
   container.innerHTML = '';
-  const daysToRender = isDesktop() ? DAYS : [DAYS.find(d => d.id === ui.curDay) || DAYS[0]];
+  const desktop = isDesktop();
+  const daysToRender = desktop ? DAYS : [DAYS.find(d => d.id === ui.curDay) || DAYS[0]];
+  // Set the grid explicitly in JS rather than leaning on a CSS media query —
+  // guarantees the layout always matches the exact same desktop/mobile decision
+  // used just above, with zero chance of the two disagreeing.
+  if (desktop) {
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = `repeat(${daysToRender.length}, minmax(0, 1fr))`;
+    container.style.gap = '16px';
+    container.style.justifyContent = '';
+  } else {
+    container.style.display = 'flex';
+    container.style.gridTemplateColumns = '';
+    container.style.gap = '';
+    container.style.justifyContent = 'center';
+  }
   daysToRender.forEach(day => {
     const dinner = state.dinners[day.id] || (state.dinners[day.id] = { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } });
     if (!dinner.venue) dinner.venue = { name: '', menu: '', phone: '', notes: '' };
     if (dinner.out === undefined) dinner.out = false;
     const card = document.createElement('div');
     card.className = 'dinner-card';
+    card.style.maxWidth = desktop ? 'none' : '420px';
     const found = getDinnerActivity(day.id);
     const dinnerLabel = found ? `${found.act.name} · ${slotToTime(found.slot)}` : '';
     const total = dinner.items.reduce((sum, it) => sum + (Number(it.price) || 0), 0);
