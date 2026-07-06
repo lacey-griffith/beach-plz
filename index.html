@@ -8,29 +8,33 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap');
 
 /* ── RESET & VARS ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
-  --ocean: #1B7A8A; --ocean-d: #0F5A6A; --ocean-l: #3DA5B8;
-  --teal: #1B8276; --mint-l: #D4F5EA;
-  --sand: #FAF3E0; --sand-d: #EDE0C4; --tan: #E8D5B0; --tan-d: #C4A882;
-  --coral: #B8543A; --sky-l: #E0F4FA; --border: #C5DDE3;
-  --text: #2C4A52; --muted: #4F7681; --white: #fff;
+  --ocean: #0a7a6d; --ocean-d: #0b5f5f; --ocean-l: #0e8877;
+  --teal: #0e7a6d; --teal-hover: #0b6a5e; --mint-l: #e2f3e8;
+  --sand: #f3ead6; --sand-d: #ece2ca; --tan: #f7efdd; --tan-d: #cdbf9f;
+  --coral: #e8896a; --coral-d: #a04b31; --sky-l: #dcf0f5; --border: #ece2ca;
+  --text: #143434; --muted: #5c6b66; --white: #fff;
+  --amber: #d99b3f; --amber-d: #8a5a1c; --amber-bg: #fbeed7;
+  --berry: #c96f8a; --berry-d: #964261; --berry-bg: #f8e6ec;
+  --slate: #8a94a6; --slate-d: #3a4453; --slate-bg: #eef0f4;
+  --green: #57a86f; --green-d: #2f6a48; --green-bg: #e6f2eb;
+  --blue: #56a9bd; --blue-d: #2a6b7c; --blue-bg: #dcf0f5;
+  --coral-bg: #fbeae2;
   --sidebar-w: 264px;
-  --lacey-c: #C9798A; --lacey-l: #E8B8C2; --lacey-d: #A8556A;
-  --nicole-c: #6FCFC4; --nicole-l: #AEE8E0; --nicole-d: #1F7A6F;
+  --lacey-c: #e8896a; --lacey-l: #f2b39c; --lacey-d: #a04b31;
+  --nicole-c: #56a9bd; --nicole-l: #a9dbe6; --nicole-d: #2a6b7c;
   --active-c: var(--ocean);
 }
 body {
-  font-family: 'Nunito', sans-serif;
-  background-color: var(--sand);
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  background-color: #3d97b3;
   background-image:
-    radial-gradient(ellipse 380px 220px at 8% 12%, rgba(196,168,130,.30), transparent 60%),
-    radial-gradient(ellipse 420px 260px at 92% 28%, rgba(237,224,196,.55), transparent 65%),
-    radial-gradient(ellipse 320px 200px at 18% 78%, rgba(232,213,176,.40), transparent 60%),
-    radial-gradient(ellipse 360px 240px at 85% 85%, rgba(196,168,130,.22), transparent 65%);
+    linear-gradient(180deg, #2a7d9e 0%, #3d97b3 26%, #5fb2c4 52%, #86c8cf 74%, #b7dccf 100%),
+    linear-gradient(180deg, rgba(160,222,236,.5), rgba(160,222,236,0) 46%);
   background-attachment: fixed;
   color: var(--text); font-size: 13px; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
 }
@@ -38,7 +42,7 @@ body {
 /* ── HEADER ── */
 .hdr { background: linear-gradient(135deg, var(--ocean-d), var(--ocean), var(--ocean-l)); color: #fff; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; position: relative; overflow: hidden; flex-shrink: 0; }
 .hdr::before { content: ''; position: absolute; top: -30px; right: -20px; width: 120px; height: 120px; background: rgba(255,255,255,.06); border-radius: 50%; pointer-events: none; }
-.hdr h1 { font-family: 'Playfair Display', serif; font-size: 19px; display: flex; align-items: center; gap: 6px; }
+.hdr h1 { font-family: 'Baloo 2', sans-serif; font-size: 19px; display: flex; align-items: center; gap: 6px; }
 .hdr .sub { font-size: 9px; opacity: .75; letter-spacing: .04em; margin-top: 2px; }
 .sync-pill { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 20px; padding: 4px 10px; }
 .sdot { width: 7px; height: 7px; border-radius: 50%; background: #7FFFD4; flex-shrink: 0; transition: background .3s; }
@@ -48,7 +52,7 @@ body {
 .slbl { font-size: 9.5px; opacity: .88; }
 .budget-pill { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 5px 12px; text-align: center; }
 .budget-pill .bl { font-size: 9px; opacity: .7; text-transform: uppercase; letter-spacing: .08em; }
-.budget-pill .ba { font-size: 18px; font-weight: 800; color: #A8FFE8; font-family: 'Playfair Display', serif; }
+.budget-pill .ba { font-size: 18px; font-weight: 800; color: #A8FFE8; font-family: 'Baloo 2', sans-serif; }
 
 /* ── WAVE ── */
 .wave-bar { height: 28px; background: var(--ocean); position: relative; overflow: hidden; flex-shrink: 0; }
@@ -59,10 +63,10 @@ body {
 .cd-label { font-size: 10px; opacity: .8; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
 .cd-units { display: flex; gap: 6px; align-items: center; }
 .cd-unit { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,.15); border-radius: 7px; padding: 4px 8px; min-width: 42px; }
-.cd-num { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 700; color: #A8FFE8; line-height: 1; }
+.cd-num { font-family: 'Baloo 2', sans-serif; font-size: 19px; font-weight: 700; color: #A8FFE8; line-height: 1; }
 .cd-sub { font-size: 8px; opacity: .75; text-transform: uppercase; letter-spacing: .06em; margin-top: 1px; }
 .cd-sep { font-size: 14px; opacity: .5; font-weight: 700; padding-bottom: 8px; }
-.cd-done { font-family: 'Playfair Display', serif; font-size: 16px; color: #A8FFE8; font-style: italic; }
+.cd-done { font-family: 'Baloo 2', sans-serif; font-size: 16px; color: #A8FFE8; font-style: italic; }
 
 /* ── WHO BAR (mobile only) ── */
 .who-bar { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; background: var(--sky-l); border-bottom: 1px solid var(--border); flex-shrink: 0; }
@@ -107,26 +111,26 @@ body {
 .ftab.on, .ftab:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
 
 /* ── ACTIVITY CARDS ── */
-.ac { background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 5px; cursor: pointer; border-left: 4px solid var(--teal); display: flex; align-items: center; gap: 8px; transition: all .13s; user-select: none; }
-.ac:hover { box-shadow: 0 2px 8px rgba(27,122,138,.13); transform: translateY(-1px); }
+.ac { background: rgba(255,253,247,.88); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(236,226,202,.9); border-radius: 13px; padding: 11px 11px 11px 13px; margin-bottom: 9px; cursor: pointer; display: flex; align-items: center; gap: 11px; transition: all .13s; user-select: none; }
+.ac:hover { border-color: var(--tan-d); box-shadow: 0 2px 8px rgba(90,70,30,.06); transform: translateY(-1px); }
 .ac.used { opacity: .32; pointer-events: none; }
-.ac.custom-card { border-left-color: var(--coral); }
+.ac.custom-card { border-left: 3px solid var(--teal); }
 .ac-left { flex: 1; min-width: 0; }
-.ac-name { font-weight: 700; font-size: 11.5px; margin-bottom: 2px; }
+.ac-name { font-weight: 700; font-size: 15px; color: #1c3a38; margin-bottom: 2px; }
 .ac-meta { display: flex; gap: 4px; flex-wrap: wrap; }
 .ac-closed { font-size: 9px; color: var(--coral); font-weight: 700; margin-top: 2px; }
-.pill { font-size: 8.5px; font-weight: 700; padding: 2px 5px; border-radius: 20px; text-transform: uppercase; white-space: nowrap; }
-.pf { background: var(--mint-l); color: #1A6B4A; }
-.pc { background: #FFF3E0; color: #C55A00; }
-.pt { background: var(--sky-l); color: var(--ocean-d); }
-.ac-add { width: 30px; height: 30px; border-radius: 50%; background: var(--teal); color: #fff; border: none; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background .12s; }
-.ac-add:hover { background: var(--ocean); }
-.ac-del { width: 24px; height: 24px; border-radius: 50%; background: var(--sand-d); color: var(--muted); border: none; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all .12s; }
-.ac-del:hover { background: var(--coral); color: #fff; }
+.pill { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 6px; letter-spacing: .3px; white-space: nowrap; }
+.pf { background: var(--green-bg); color: var(--green-d); text-transform: uppercase; }
+.pc { background: var(--amber-bg); color: var(--amber-d); }
+.pt { font-size: 12px; font-weight: 600; color: var(--muted); background: none; padding: 0; }
+.ac-add { width: 34px; height: 34px; border-radius: 999px; background: var(--teal); color: #fff; border: none; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background .12s; }
+.ac-add:hover { background: var(--teal-hover); }
+.ac-del { width: 34px; height: 34px; border-radius: 999px; background: #fffdf7; color: #b0806f; border: 1.5px solid var(--sand-d); font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all .12s; }
+.ac-del:hover { border-color: var(--coral); color: var(--coral-d); background: #fffdf7; }
 
 /* ── CALENDAR ── */
-.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 3px solid transparent; border-radius: 16px 20px 14px 22px / 18px 14px 22px 16px; transition: border-color .25s, background .25s; background: linear-gradient(160deg, rgba(255,255,255,.3), rgba(212,245,234,.18)); }
-body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gradient(165deg, color-mix(in srgb, var(--active-c) 22%, white), rgba(255,255,255,.22) 55%, color-mix(in srgb, var(--active-c) 14%, white)); }
+.cal-wrap { flex: 1; overflow-y: auto; overflow-x: auto; min-width: 0; max-height: calc(100vh - 110px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.94); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
+body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7), 0 0 0 2px var(--active-c); }
 .cal-grid { display: grid; }
 /* Desktop: 5 col, Mobile: 1 col — set by JS */
 .col-hdr { text-align: center; padding: 6px 3px; font-size: 10.5px; font-weight: 800; color: var(--ocean-d); background: var(--sky-l); border: 1px solid var(--border); border-bottom: 2.5px solid var(--teal); position: sticky; top: 0; z-index: 10; }
@@ -142,14 +146,16 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 .tslot.drag-over { background: var(--mint-l) !important; outline: 2px dashed var(--teal); }
 
 /* ── SEA GLASS ACTIVITY BLOCKS ── */
-.pa { position: absolute; left: 2px; right: 2px; top: 2px; border-radius: 9px 13px 8px 12px / 12px 8px 13px 9px; padding: 4px 8px; font-size: 10.5px; font-weight: 700; color: #fff; overflow: hidden; z-index: 5; cursor: grab; user-select: none; display: flex; flex-direction: column; gap: 1px; box-shadow: 0 2px 7px rgba(15,90,106,.18), inset 0 1px 0 rgba(255,255,255,.35); border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(1.5px); }
+.pa { position: absolute; left: 2px; right: 2px; top: 2px; border-radius: 10px; padding: 7px 9px; font-size: 10.5px; font-weight: 700; overflow: hidden; z-index: 5; cursor: grab; user-select: none; display: flex; flex-direction: column; gap: 1px; box-shadow: 0 2px 8px rgba(16,58,70,.13); border-left: 4px solid transparent; }
 .pa:active { cursor: grabbing; }
-.pa::before { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255,255,255,.32), rgba(255,255,255,.05) 55%); border-radius: inherit; pointer-events: none; }
-.pa-name { font-size: 10.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pa-dur { font-size: 9px; font-weight: 600; opacity: .85; }
-.pa-meta { font-size: 9px; font-weight: 600; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pa-menu-btn { position: absolute; top: 3px; right: 4px; width: 16px; height: 16px; border-radius: 50%; background: rgba(0,0,0,.28); color: #fff; font-size: 11px; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; letter-spacing: -1px; padding-bottom: 2px; z-index: 6; }
-.pa-menu-btn:hover { background: rgba(0,0,0,.45); }
+.pa-name { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pa-dur { font-size: 10.5px; font-weight: 600; opacity: .8; }
+.pa-meta { font-size: 10.5px; font-weight: 600; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pa-avatars { position: absolute; bottom: 5px; right: 6px; display: flex; }
+.pa-avatars .av-dot { width: 17px; height: 17px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; color: #fff; border: 1.5px solid rgba(255,255,255,.85); margin-left: -5px; }
+.pa-avatars .av-dot:first-child { margin-left: 0; }
+.pa-menu-btn { position: absolute; top: 4px; right: 5px; width: 18px; height: 18px; border-radius: 50%; background: rgba(20,52,52,.12); color: inherit; font-size: 11px; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; letter-spacing: -1px; padding-bottom: 2px; z-index: 6; }
+.pa-menu-btn:hover { background: rgba(20,52,52,.22); }
 .pa-resize { position: absolute; bottom: 0; left: 0; right: 0; height: 10px; cursor: ns-resize; display: flex; align-items: center; justify-content: center; z-index: 7; opacity: 0; transition: opacity .15s; }
 .pa:hover .pa-resize { opacity: 1; }
 .pa-resize::after { content: ''; width: 24px; height: 3px; background: rgba(255,255,255,.6); border-radius: 2px; }
@@ -212,16 +218,16 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 @keyframes jelly-drift { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-7px) rotate(3deg); } }
 
 /* Sea glass color palette */
-.ct-travel  { background: rgba(168,108,72,.75); }
-.ct-pool    { background: rgba(56,178,178,.72); }
-.ct-turtle  { background: rgba(72,160,104,.72); }
-.ct-bar     { background: rgba(200,128,88,.72); }
-.ct-food    { background: rgba(180,100,120,.72); }
-.ct-nature  { background: rgba(88,168,128,.72); }
-.ct-beach   { background: rgba(72,136,192,.72); }
-.ct-drive   { background: rgba(130,100,175,.72); }
-.ct-other   { background: rgba(110,148,158,.72); }
-.ct-custom  { background: rgba(64,188,178,.72); }
+.ct-travel  { background: var(--slate); }
+.ct-pool    { background: var(--blue); }
+.ct-turtle  { background: var(--green); }
+.ct-bar     { background: var(--berry); }
+.ct-food    { background: var(--coral); }
+.ct-nature  { background: var(--green); }
+.ct-beach   { background: var(--amber); }
+.ct-drive   { background: var(--slate); }
+.ct-other   { background: var(--slate); }
+.ct-custom  { background: var(--teal); }
 
 /* ── FAB (mobile add button) ── */
 .fab { position: fixed; bottom: 90px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: var(--teal); color: #fff; border: none; font-size: 26px; cursor: pointer; box-shadow: 0 4px 16px rgba(27,122,138,.35); z-index: 50; display: flex; align-items: center; justify-content: center; transition: all .14s; }
@@ -234,14 +240,14 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 .sheet.on { transform: translateY(0); }
 .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 0; }
 .sheet-hdr { padding: 10px 16px 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-.sheet-hdr h3 { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--ocean-d); }
+.sheet-hdr h3 { font-family: 'Baloo 2', sans-serif; font-size: 15px; color: var(--ocean-d); }
 .sh-close { width: 28px; height: 28px; border-radius: 50%; background: var(--sand-d); border: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); }
 .sheet-body { overflow-y: auto; padding: 10px 12px 24px; flex: 1; }
 
 /* ── TIME PICKER ── */
 .tpicker { position: fixed; inset: 0; background: rgba(27,60,70,.55); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
 .tpicker-card { background: var(--white); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px; padding: 20px 18px 32px; }
-.tpicker-card h4 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--ocean-d); margin-bottom: 3px; }
+.tpicker-card h4 { font-family: 'Baloo 2', sans-serif; font-size: 16px; color: var(--ocean-d); margin-bottom: 3px; }
 .tpicker-card .tp-sub { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
 .tp-day-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
 .tp-day-pill { flex-shrink: 0; padding: 6px 14px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--sand); font-size: 12px; font-weight: 800; color: var(--muted); cursor: pointer; transition: all .12s; }
@@ -265,9 +271,9 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 
 .sea-glass-modal { background: linear-gradient(160deg, rgba(255,255,255,.94), rgba(212,245,234,.7)); border-radius: 22px 26px 20px 24px / 24px 20px 26px 22px; padding: 22px 20px 28px; width: 100%; max-width: 460px; max-height: 82vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(15,90,106,.28); }
 .dm-hdr { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
-.dm-emoji { font-size: 30px; line-height: 1; }
+.dm-emoji { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
 .dm-title { flex: 1; }
-.dm-title h3 { font-family: 'Playfair Display', serif; color: var(--ocean-d); font-size: 19px; line-height: 1.2; }
+.dm-title h3 { font-family: 'Baloo 2', sans-serif; color: var(--ocean-d); font-size: 19px; line-height: 1.2; }
 .dm-close { width: 26px; height: 26px; border-radius: 50%; background: rgba(15,90,106,.1); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ocean-d); font-weight: 800; flex-shrink: 0; }
 .dm-badges { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 14px; }
 .dm-badge { font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 14px; background: var(--sky-l); color: var(--ocean-d); }
@@ -300,7 +306,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 .dm-btn.site { background: #fff; color: var(--ocean-d); border: 1.5px solid var(--ocean); }
 .dm-closed-note { background: rgba(184,84,58,.1); color: var(--coral); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; font-weight: 700; }
 .modal-card { background: var(--white); border-radius: 20px 24px 18px 22px / 22px 18px 24px 20px; width: 100%; max-width: 480px; padding: 20px 18px 32px; max-height: 88vh; overflow-y: auto; }
-.modal-card h3 { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--ocean-d); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+.modal-card h3 { font-family: 'Baloo 2', sans-serif; font-size: 17px; color: var(--ocean-d); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
 .mfield { margin-bottom: 10px; }
 .mfield label { display: block; font-size: 10px; font-weight: 800; color: var(--ocean); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 3px; }
 .mfield input, .mfield select { width: 100%; padding: 9px 11px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 13px; color: var(--text); background: var(--sand); outline: none; appearance: none; }
@@ -321,7 +327,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 .chat-panel { position: fixed; bottom: 80px; right: 20px; width: 300px; height: 380px; background: var(--white); border-radius: 16px; box-shadow: 0 8px 32px rgba(27,60,70,.22); border: 1.5px solid var(--border); z-index: 401; display: none; flex-direction: column; overflow: hidden; }
 .chat-panel.open { display: flex; }
 .chat-hdr { background: linear-gradient(135deg, var(--ocean-d), var(--teal)); color: white; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.chat-hdr h4 { font-family: 'Playfair Display', serif; font-size: 14px; }
+.chat-hdr h4 { font-family: 'Baloo 2', sans-serif; font-size: 14px; }
 .ch-close { background: rgba(255,255,255,.2); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
 .chat-messages { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; }
 .chat-msg { display: flex; flex-direction: column; max-width: 82%; }
@@ -354,17 +360,57 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 .toast-e { background: #C0392B; }
 .toast-s { background: var(--teal); }
 
-/* ── BEACH FOOTER ── */
-.beach-footer { height: 90px; position: relative; overflow: hidden; flex-shrink: 0; background: var(--tan-d); }
-.beach-footer .sand-layer { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--sand-d) 0%, var(--tan) 40%, var(--tan-d) 100%); }
-.beach-footer svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 90px; }
-.t-weed { transform-origin: bottom center; animation: weed-sway 3.6s ease-in-out infinite; }
-.t-weed-b { animation-delay: .8s; animation-duration: 4.2s; }
-@keyframes weed-sway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+/* ── AMBIENT OCEAN ANIMATION LAYER ── */
+@keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+@keyframes sway { 0%,100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes bobf { 0%,100% { transform: translateY(0) scaleX(-1); } 50% { transform: translateY(-11px) scaleX(-1); } }
+@keyframes bobStar { 0%,100% { transform: rotate(12deg) translateY(0); } 50% { transform: rotate(12deg) translateY(-6px); } }
+@keyframes paddle { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
+@keyframes voyage {
+  0%   { transform: translate(-16vw, 78vh) rotate(58deg); }
+  12%  { transform: translate(16vw, 56vh) rotate(74deg); }
+  25%  { transform: translate(48vw, 60vh) rotate(96deg); }
+  38%  { transform: translate(80vw, 42vh) rotate(66deg); }
+  48%  { transform: translate(110vw, 28vh) rotate(58deg); }
+  52%  { transform: translate(114vw, 24vh) rotate(250deg); }
+  62%  { transform: translate(70vw, 15vh) rotate(266deg); }
+  72%  { transform: translate(40vw, 26vh) rotate(254deg); }
+  82%  { transform: translate(12vw, 42vh) rotate(268deg); }
+  92%  { transform: translate(-12vw, 62vh) rotate(250deg); }
+  96%  { transform: translate(-20vw, 72vh) rotate(210deg); }
+  99%  { transform: translate(-18vw, 78vh) rotate(58deg); }
+  100% { transform: translate(-16vw, 78vh) rotate(58deg); }
+}
+@keyframes flapL { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(9deg); } }
+@keyframes flapR { 0%,100% { transform: rotate(8deg); } 50% { transform: rotate(-9deg); } }
+.ambient-layer { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.ambient-layer img { display: block; }
+.amb-turtle { position: fixed; top: 0; left: 0; z-index: 3; will-change: transform; animation: voyage 54s ease-in-out infinite; }
+.amb-turtle-body { position: relative; width: 141px; height: 130px; filter: drop-shadow(0 12px 16px rgba(20,52,52,.3)); animation: paddle 3s ease-in-out infinite; }
+.amb-turtle-body img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.amb-flip-l { transform-origin: 29.5% 27.5%; animation: flapL 1.5s ease-in-out infinite; }
+.amb-flip-r { transform-origin: 76.7% 44.7%; animation: flapR 1.5s ease-in-out infinite; }
+.amb-school { position: fixed; top: 0; left: 0; z-index: 3; opacity: .5; will-change: transform; }
+.amb-school img { height: 100px; }
+.amb-curious { position: fixed; top: 0; left: 0; z-index: 3; will-change: transform; }
+.amb-curious img { filter: drop-shadow(0 5px 9px rgba(16,58,70,.28)); }
+.amb-seahorse { position: fixed; top: 0; left: 0; z-index: 3; opacity: 0; will-change: transform; }
+.amb-seahorse img { height: 110px; filter: drop-shadow(0 6px 10px rgba(16,58,70,.3)); }
+.amb-bg-jelly { position: fixed; z-index: 2; opacity: .38; animation: bob 7s ease-in-out infinite; }
+.amb-bg-jelly img { height: 60px; }
+.amb-bg-star { position: fixed; z-index: 2; opacity: .4; animation: bobStar 6s ease-in-out infinite; }
+.amb-bg-star img { height: 34px; }
+.amb-bg-weed { position: fixed; bottom: 0; z-index: 2; opacity: .5; transform-origin: bottom center; animation: sway 4s ease-in-out infinite; }
+.amb-bg-weed img { height: 90px; }
+@media (prefers-reduced-motion: reduce) {
+  .amb-turtle, .amb-turtle-body, .amb-flip-l, .amb-flip-r, .amb-bg-jelly, .amb-bg-star, .amb-bg-weed { animation: none !important; }
+  .amb-school, .amb-curious, .amb-seahorse { display: none !important; }
+}
 
 /* ── DINNER PLANNING ── */
 .dinner-outer { padding: 18px 16px 28px; }
-.dinner-outer-hdr { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--ocean-d); margin-bottom: 12px; }
+.dinner-outer-hdr { font-family: 'Baloo 2', sans-serif; font-size: 20px; color: var(--ocean-d); margin-bottom: 12px; }
 .dinner-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
 .dinner-card { background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(212,245,234,.3)); border: 1.5px solid var(--border); border-radius: 16px 20px 14px 18px / 18px 14px 20px 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
 .dinner-hdr { border-bottom: 2px solid var(--teal); padding-bottom: 6px; margin-bottom: 2px; }
@@ -374,6 +420,13 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 .dinner-day { font-weight: 800; font-size: 13px; color: var(--ocean-d); }
 .dinner-date { font-weight: 600; font-size: 10px; color: var(--muted); margin-left: 4px; }
 .dinner-plan { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.dinner-toggle { display: flex; gap: 6px; margin-bottom: 4px; }
+.dinner-seg { flex: 1; border: none; border-radius: 8px; padding: 7px 6px; font-family: 'Nunito Sans', sans-serif; font-size: 12px; font-weight: 800; cursor: pointer; background: var(--sand-d); color: var(--muted); }
+.dinner-seg.on { background: var(--teal); color: #fff; }
+.dinner-seg:nth-child(2).on { background: var(--amber); }
+.venue-form { display: flex; flex-direction: column; gap: 10px; }
+.venue-links { display: flex; gap: 8px; }
+.venue-links .dm-btn { flex: 1; text-align: center; padding: 8px; font-size: 12px; }
 .dinner-servings { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--ocean-d); }
 .serv-btn { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--teal); background: var(--white); color: var(--teal); font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
 .serv-btn:hover { background: var(--teal); color: #fff; }
@@ -450,7 +503,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
   padding: 32px 26px; max-width: 320px; width: 100%; text-align: center;
 }
 .login-wave { font-size: 34px; margin-bottom: 6px; }
-.login-card h2 { font-family: 'Playfair Display', serif; color: var(--ocean-d); font-size: 21px; margin-bottom: 4px; }
+.login-card h2 { font-family: 'Baloo 2', sans-serif; color: var(--ocean-d); font-size: 21px; margin-bottom: 4px; }
 .login-card p { color: var(--muted); font-size: 12.5px; margin-bottom: 18px; }
 .login-opts { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
 .login-opt {
@@ -480,7 +533,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 .trips-home-inner { max-width: 480px; margin: 0 auto; padding: 40px 20px 60px; }
 .trips-hero { text-align: center; margin-bottom: 32px; }
 .trips-logo { font-size: 48px; margin-bottom: 4px; }
-.trips-title { font-family: 'Playfair Display', serif; color: var(--ocean-d); font-size: 32px; margin-bottom: 2px; }
+.trips-title { font-family: 'Baloo 2', sans-serif; color: var(--ocean-d); font-size: 32px; margin-bottom: 2px; }
 .trips-sub { color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .trips-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
 .trip-card { background: linear-gradient(160deg, rgba(255,255,255,.92), rgba(212,245,234,.6));
@@ -491,7 +544,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 .trip-card:active { transform: scale(.98); }
 .trip-card-emoji { font-size: 32px; flex-shrink: 0; }
 .trip-card-body { flex: 1; min-width: 0; }
-.trip-card-name { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--ocean-d); }
+.trip-card-name { font-family: 'Baloo 2', sans-serif; font-size: 17px; color: var(--ocean-d); }
 .trip-card-meta { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 2px; }
 .trip-card-crew { font-size: 10px; color: var(--muted); margin-top: 3px; }
 .trip-card-status { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; flex-shrink: 0; }
@@ -502,20 +555,46 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
   background: rgba(255,255,255,.55); color: var(--ocean-d); font-family: 'Nunito'; font-weight: 800;
   font-size: 15px; cursor: pointer; transition: background .12s; }
 .trips-new-btn:active { background: rgba(255,255,255,.85); }
-.trips-toggle-btn { background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.35);
-  border-radius: 10px; color: #fff; font-size: 16px; padding: 4px 8px; cursor: pointer;
+.trips-toggle-btn { background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.3);
+  border-radius: 999px; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 6px 12px; cursor: pointer; font-family: 'Nunito Sans', sans-serif;
   flex-shrink: 0; }
+.trips-toggle-btn:hover { background: rgba(255,255,255,.26); }
+.hdr-logo-tile { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,.16); box-shadow: inset 0 1px 0 rgba(255,255,255,.28); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hdr-logo-tile img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,.22)); }
 
 </style>
 
 </head>
 <body>
 
+<!-- AMBIENT OCEAN LAYER (decorative, non-interactive) -->
+<div class="ambient-layer" aria-hidden="true">
+  <div class="amb-bg-jelly" style="left:6%;top:14%;animation-delay:.4s"><img src="assets/pink-jelly.png" alt=""></div>
+  <div class="amb-bg-jelly" style="right:8%;top:22%;animation-delay:2s"><img src="assets/orange-jelly.png" alt=""></div>
+  <div class="amb-bg-jelly" style="left:14%;bottom:18%;animation-delay:3.4s"><img src="assets/green-jelly.png" alt=""></div>
+  <div class="amb-bg-star" style="left:4%;bottom:8%"><img src="assets/orange-star.png" alt=""></div>
+  <div class="amb-bg-star" style="right:5%;bottom:10%;animation-delay:1.6s"><img src="assets/blue-star.png" alt=""></div>
+  <div class="amb-bg-weed" style="left:2%"><img src="assets/seaweed.png" alt=""></div>
+  <div class="amb-bg-weed" style="right:3%;animation-delay:.8s"><img src="assets/kelp-green.png" alt=""></div>
+  <div class="amb-curious" id="ambCuriousA"><img src="assets/fish-gold.png" alt="" style="height:56px"></div>
+  <div class="amb-curious" id="ambCuriousB"><img src="assets/fish-blue.png" alt="" style="height:50px"></div>
+  <div class="amb-school" id="ambSchool"><img src="assets/fish-school.png" alt=""></div>
+  <div class="amb-seahorse" id="ambSeahorse"><img src="assets/seahorse-blue.png" alt=""></div>
+  <div class="amb-turtle" id="ambTurtle">
+    <div class="amb-turtle-body">
+      <img src="assets/turtle-blue-crop.png" alt="">
+      <img src="assets/turtle-flipL.png" alt="" class="amb-flip-l">
+      <img src="assets/turtle-flipR.png" alt="" class="amb-flip-r">
+    </div>
+  </div>
+</div>
+
+
 <!-- TRIPS HOME SCREEN -->
 <div id="tripsHome" class="trips-home" style="display:none">
   <div class="trips-home-inner">
     <div class="trips-hero">
-      <div class="trips-logo">🌊</div>
+      <div class="trips-logo"><img src="assets/blue-star.png" alt="" style="width:56px;height:56px;object-fit:contain"></div>
       <h1 class="trips-title">beach-plz</h1>
       <p class="trips-sub">your trip planner</p>
     </div>
@@ -528,16 +607,11 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 <div class="modal-overlay" id="newTripModal" style="display:none" onclick="if(event.target===this)closeNewTripForm()">
   <div class="sea-glass-modal" style="max-width:460px;border-radius:20px">
     <div class="dm-hdr" style="margin-bottom:16px">
-      <div class="dm-emoji">🗺️</div>
       <div class="dm-title"><h3>New Trip</h3></div>
       <div class="dm-close" onclick="closeNewTripForm()">✕</div>
     </div>
     <div class="edit-form">
       <div class="edit-row">
-        <div class="edit-field" style="flex:0 0 60px">
-          <label class="edit-lbl">Emoji</label>
-          <input class="edit-inp center" id="ntEmoji" maxlength="4" value="🏖️">
-        </div>
         <div class="edit-field">
           <label class="edit-lbl">Trip name</label>
           <input class="edit-inp" id="ntName" placeholder="e.g. Galveston 2027">
@@ -594,7 +668,6 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 <div class="modal-overlay" id="acctModal" style="display:none" onclick="if(event.target===this)closeAcctModal()">
   <div class="sea-glass-modal" style="max-width:380px">
     <div class="dm-hdr" style="margin-bottom:6px">
-      <div class="dm-emoji">🐚</div>
       <div class="dm-title"><h3>New Account</h3></div>
       <div class="dm-close" onclick="closeAcctModal()">✕</div>
     </div>
@@ -615,10 +688,11 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 
 <!-- HEADER -->
 <div class="hdr">
-  <div style="display:flex;align-items:center;gap:8px;min-width:0">
-    <button class="trips-toggle-btn" onclick="showTripsHome()" title="All trips">🗺️</button>
+  <div style="display:flex;align-items:center;gap:12px;min-width:0">
+    <button class="trips-toggle-btn" onclick="showTripsHome()" title="All trips">Trips</button>
+    <div class="hdr-logo-tile"><img src="assets/blue-star.png" alt=""></div>
     <div style="min-width:0">
-      <h1 id="hdrTitle">🌊 beach-plz</h1>
+      <h1 id="hdrTitle">beach-plz</h1>
       <div class="sub" id="hdrSub">Loading trip...</div>
     </div>
   </div>
@@ -638,7 +712,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 
 <!-- COUNTDOWN -->
 <div class="countdown-bar">
-  <span class="cd-label">⏳ Port A in</span>
+  <span class="cd-label">Port A in</span>
   <div class="cd-units" id="cdUnits">
     <div class="cd-unit"><span class="cd-num" id="cdDays">--</span><span class="cd-sub">days</span></div>
     <span class="cd-sep">:</span>
@@ -657,10 +731,10 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
     <div class="who-chip-row" id="mWhoChips"></div>
   </div>
   <div class="who-row2">
-    <button class="filter-toggle-btn" onclick="openFilterPopover(event)">👥 <span id="mFilterLbl">Everyone</span></button>
+    <button class="filter-toggle-btn" onclick="openFilterPopover(event)">Show: <span id="mFilterLbl">Everyone</span></button>
     <label class="show-both-lbl">
       <input type="checkbox" class="show-both-cb" id="mCalView" onchange="setCalView(this.checked ? 'all' : 'day')">
-      <span class="shell-ico">🌊</span>All Days
+      All Days
     </label>
   </div>
 </div>
@@ -670,17 +744,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 
 <!-- LEGEND -->
 <div class="legend-row">
-  <span style="font-weight:800;color:var(--ocean)">Who:</span>
-  <span id="legendWho" style="display:contents"></span>
-  <span style="margin:0 4px;color:var(--border)">·</span>
-  <span style="font-weight:800;color:var(--ocean)">Colors:</span>
-  <span><span class="ld" style="background:rgba(56,178,178,.8)"></span>Pool</span>
-  <span><span class="ld" style="background:rgba(72,160,104,.8)"></span>Nature</span>
-  <span><span class="ld" style="background:rgba(200,128,88,.8)"></span>Bar</span>
-  <span><span class="ld" style="background:rgba(72,136,192,.8)"></span>Beach</span>
-  <span><span class="ld" style="background:rgba(88,168,128,.8)"></span>Free</span>
-  <span><span class="ld" style="background:rgba(64,188,178,.8)"></span>Custom</span>
-  <span class="drag-hint" style="margin-left:auto;font-size:9px;color:var(--muted)">＋ to add · ✕ to remove · drag bottom edge to resize</span>
+  <span class="drag-hint" style="font-size:11px;color:var(--muted)">Tap <strong style="color:var(--ocean)">+</strong> to add · <strong style="color:var(--coral-d)">×</strong> to remove · drag an event's edge to resize</span>
 </div>
 
 <!-- APP BODY -->
@@ -692,21 +756,14 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
       <div class="who-bar" style="margin-bottom:8px;border-bottom:none;padding:0;background:transparent">
         <span class="who-lbl">I am:</span>
         <div class="who-chip-row" id="dWhoChips"></div>
-        <button class="filter-toggle-btn" onclick="openFilterPopover(event)">👥 <span id="dFilterLbl">Everyone</span></button>
+        <button class="filter-toggle-btn" onclick="openFilterPopover(event)">Show: <span id="dFilterLbl">Everyone</span></button>
       </div>
-      <button class="add-btn" onclick="openModal()">✦ Add custom activity</button>
+      <button class="add-btn" onclick="openModal()">＋ Add custom activity</button>
       <h2>Activities</h2>
       <div class="ftabs" id="ftabs">
         <div class="ftab on" data-f="all">All</div>
-        <div class="ftab" data-f="custom">✦</div>
-        <div class="ftab" data-f="travel">🚙</div>
-        <div class="ftab" data-f="pool">🏊</div>
-        <div class="ftab" data-f="turtle">🐢</div>
-        <div class="ftab" data-f="bar">🍺</div>
-        <div class="ftab" data-f="food">🍕</div>
-        <div class="ftab" data-f="nature">🌿</div>
-        <div class="ftab" data-f="beach">🏖️</div>
-        <div class="ftab" data-f="hidden" title="Removed activities">🚮</div>
+        <div class="ftab" data-f="custom">Custom</div>
+        <div class="ftab" data-f="hidden" title="Removed activities">Hidden</div>
       </div>
       <div id="acList"></div>
     </div>
@@ -724,134 +781,6 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
   <div class="dinner-section" id="dinnerSection"></div>
 </div>
 
-<!-- BEACH FOOTER -->
-<div class="beach-footer">
-  <div class="sand-layer"></div>
-  <svg viewBox="0 0 1200 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- sand bumps -->
-    <ellipse cx="100" cy="82" rx="60" ry="8" fill="rgba(196,168,130,.35)"/>
-    <ellipse cx="320" cy="85" rx="45" ry="6" fill="rgba(196,168,130,.28)"/>
-    <ellipse cx="580" cy="83" rx="55" ry="7" fill="rgba(196,168,130,.32)"/>
-    <ellipse cx="820" cy="85" rx="42" ry="6" fill="rgba(196,168,130,.28)"/>
-    <ellipse cx="1060" cy="82" rx="58" ry="7" fill="rgba(196,168,130,.33)"/>
-    <!-- sand ripples -->
-    <path d="M20,88 Q70,85 120,88 Q170,85 220,88" stroke="rgba(180,150,110,.45)" stroke-width="1" fill="none"/>
-    <path d="M400,87 Q460,84 520,87 Q580,84 640,87" stroke="rgba(180,150,110,.38)" stroke-width="1" fill="none"/>
-    <path d="M750,88 Q820,85 890,88" stroke="rgba(180,150,110,.42)" stroke-width="1" fill="none"/>
-    <path d="M1000,87 Q1060,84 1120,87 Q1160,84 1200,87" stroke="rgba(180,150,110,.38)" stroke-width="1" fill="none"/>
-    <!-- SHELL 1: conch-style, warm cream -->
-    <g transform="translate(95,62)">
-      <ellipse cx="0" cy="0" rx="14" ry="9" fill="#EDD5A8" stroke="#C8A870" stroke-width="1"/>
-      <path d="M-14,0 Q-5,-7 0,-8 Q5,-7 14,0" stroke="#C8A870" stroke-width=".8" fill="none"/>
-      <path d="M-12,2 Q0,-5 12,2" stroke="#C8A870" stroke-width=".7" fill="none"/>
-      <path d="M-9,5 Q0,-2 9,5" stroke="#C8A870" stroke-width=".6" fill="none"/>
-      <path d="M-5,8 Q0,2 5,8" stroke="#C8A870" stroke-width=".5" fill="none"/>
-      <line x1="-2" y1="-9" x2="-4" y2="-15" stroke="#C8A870" stroke-width=".9"/>
-      <circle cx="-4" cy="-16" r="1.5" fill="#C8A870"/>
-    </g>
-    <!-- SHELL 2: sand dollar, blue-white -->
-    <g transform="translate(240,66)">
-      <circle cx="0" cy="0" r="11" fill="#E8F0F5" stroke="#9EC0D0" stroke-width="1"/>
-      <circle cx="0" cy="0" r="7.5" fill="none" stroke="#9EC0D0" stroke-width=".7"/>
-      <circle cx="0" cy="0" r="3.5" fill="none" stroke="#9EC0D0" stroke-width=".6"/>
-      <!-- petal marks -->
-      <ellipse cx="0" cy="-5.5" rx="1.8" ry="3" fill="#9EC0D0" opacity=".6" transform="rotate(0)"/>
-      <ellipse cx="0" cy="-5.5" rx="1.8" ry="3" fill="#9EC0D0" opacity=".6" transform="rotate(72)"/>
-      <ellipse cx="0" cy="-5.5" rx="1.8" ry="3" fill="#9EC0D0" opacity=".6" transform="rotate(144)"/>
-      <ellipse cx="0" cy="-5.5" rx="1.8" ry="3" fill="#9EC0D0" opacity=".6" transform="rotate(216)"/>
-      <ellipse cx="0" cy="-5.5" rx="1.8" ry="3" fill="#9EC0D0" opacity=".6" transform="rotate(288)"/>
-    </g>
-    <!-- SHELL 3: clam, pink -->
-    <g transform="translate(400,60)">
-      <ellipse cx="0" cy="0" rx="12" ry="9" fill="#F5CDD5" stroke="#D899A8" stroke-width="1"/>
-      <path d="M-12,0 Q-8,-9 0,-10 Q8,-9 12,0" stroke="#D899A8" stroke-width=".8" fill="#EDB5C2" opacity=".5"/>
-      <path d="M0,-10 L0,4" stroke="#C88898" stroke-width=".7"/>
-      <path d="M-10,-2 Q0,-6 10,-2" stroke="#C88898" stroke-width=".6" fill="none"/>
-      <path d="M-8,2 Q0,-2 8,2" stroke="#C88898" stroke-width=".5" fill="none"/>
-      <path d="M-5,5.5 Q0,2 5,5.5" stroke="#C88898" stroke-width=".4" fill="none"/>
-      <line x1="-3" y1="-10" x2="-4" y2="-15" stroke="#D899A8" stroke-width=".8"/>
-    </g>
-    <!-- SHELL 4: spiral/turritella, tan -->
-    <g transform="translate(565,63)">
-      <ellipse cx="0" cy="0" rx="5" ry="12" fill="#E8D5A8" stroke="#C4A870" stroke-width="1" transform="rotate(-10)"/>
-      <ellipse cx=".5" cy="-2" rx="4" ry="9" fill="none" stroke="#C4A870" stroke-width=".7" transform="rotate(-10)"/>
-      <ellipse cx="1" cy="-4" rx="3" ry="6" fill="none" stroke="#C4A870" stroke-width=".6" transform="rotate(-10)"/>
-      <ellipse cx="1.5" cy="-6" rx="2" ry="3.5" fill="none" stroke="#C4A870" stroke-width=".5" transform="rotate(-10)"/>
-    </g>
-    <!-- SHELL 5: scallop, sea-glass teal -->
-    <g transform="translate(710,62)">
-      <path d="M-13,4 Q-13,-8 0,-12 Q13,-8 13,4 Q6,8 0,9 Q-6,8 -13,4Z" fill="#A8DDD5" stroke="#70B8B0" stroke-width="1"/>
-      <line x1="0" y1="-12" x2="0" y2="9" stroke="#70B8B0" stroke-width=".7"/>
-      <line x1="-9" y1="-8" x2="-6" y2="8" stroke="#70B8B0" stroke-width=".6"/>
-      <line x1="9" y1="-8" x2="6" y2="8" stroke="#70B8B0" stroke-width=".6"/>
-      <line x1="-12" y1="-2" x2="-10" y2="7" stroke="#70B8B0" stroke-width=".5"/>
-      <line x1="12" y1="-2" x2="10" y2="7" stroke="#70B8B0" stroke-width=".5"/>
-      <ellipse cx="0" cy="5" rx="8" ry="3" fill="#70B8B0" opacity=".3"/>
-    </g>
-    <!-- SHELL 6: moon snail, lavender -->
-    <g transform="translate(870,65)">
-      <circle cx="0" cy="0" r="11" fill="#D5C8E8" stroke="#A898C8" stroke-width="1"/>
-      <circle cx="0" cy="0" r="7" fill="#C5B8D8" stroke="#A898C8" stroke-width=".7"/>
-      <circle cx="0" cy="0" r="4" fill="#B8A8C8" stroke="#A898C8" stroke-width=".6"/>
-      <circle cx="0" cy="0" r="2" fill="#A898C8"/>
-      <circle cx="0" cy="0" r=".8" fill="white" opacity=".7"/>
-    </g>
-    <!-- SHELL 7: conch 2, orange-tan -->
-    <g transform="translate(1040,61)">
-      <ellipse cx="0" cy="0" rx="13" ry="8" fill="#EEC898" stroke="#C89858" stroke-width="1"/>
-      <path d="M-13,0 Q-4,-8 0,-9 Q4,-8 13,0" stroke="#C89858" stroke-width=".8" fill="none"/>
-      <path d="M-11,2.5 Q0,-5.5 11,2.5" stroke="#C89858" stroke-width=".7" fill="none"/>
-      <path d="M-8,5.5 Q0,-2 8,5.5" stroke="#C89858" stroke-width=".6" fill="none"/>
-      <path d="M-4,8 Q0,2 4,8" stroke="#C89858" stroke-width=".5" fill="none"/>
-      <line x1="-1" y1="-9" x2="-2" y2="-15" stroke="#C89858" stroke-width=".9"/>
-      <circle cx="-2" cy="-16" r="1.5" fill="#C89858"/>
-    </g>
-    <!-- SHELL 8: small whelk, cream -->
-    <g transform="translate(1160,67)">
-      <ellipse cx="0" cy="0" rx="7" ry="10" fill="#F0E0C0" stroke="#C8A878" stroke-width=".8" transform="rotate(15)"/>
-      <ellipse cx=".5" cy="-2" rx="5.5" ry="7.5" fill="none" stroke="#C8A878" stroke-width=".6" transform="rotate(15)"/>
-      <ellipse cx="1" cy="-4" rx="4" ry="5" fill="none" stroke="#C8A878" stroke-width=".5" transform="rotate(15)"/>
-      <ellipse cx="1.5" cy="-5.5" rx="2.5" ry="3" fill="none" stroke="#C8A878" stroke-width=".4" transform="rotate(15)"/>
-    </g>
-    <!-- ALGAE / SEAWEED clusters, swaying -->
-    <g transform="translate(30,90)"><g class="t-weed">
-      <path d="M-3,0 Q-9,-18 -2,-28 Q4,-36 -1,-46" stroke="#3A7A52" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <path d="M3,0 Q9,-14 4,-24 Q-1,-32 5,-40" stroke="#4F9A62" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <path d="M0,0 Q3,-10 -2,-18" stroke="#2E6A45" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    </g></g>
-    <g transform="translate(490,90)"><g class="t-weed t-weed-b">
-      <path d="M-2,0 Q-8,-16 -1,-26 Q5,-34 0,-42" stroke="#357A50" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-      <path d="M4,0 Q10,-12 5,-22" stroke="#52A068" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    </g></g>
-    <!-- REEF cluster: rock + coral polyps -->
-    <g transform="translate(545,80)">
-      <ellipse cx="0" cy="8" rx="26" ry="9" fill="#8A7A68" stroke="#5E5042" stroke-width="1"/>
-      <ellipse cx="-14" cy="3" rx="9" ry="9" fill="#7A6C5A" stroke="#5E5042" stroke-width=".8"/>
-      <ellipse cx="12" cy="2" rx="10" ry="10" fill="#8A7A68" stroke="#5E5042" stroke-width=".8"/>
-      <circle cx="-16" cy="-3" r="3.4" fill="#E8826A" opacity=".85"/>
-      <circle cx="-9" cy="-5" r="2.6" fill="#F2A088" opacity=".85"/>
-      <circle cx="10" cy="-6" r="3.6" fill="#E8826A" opacity=".85"/>
-      <circle cx="17" cy="-3" r="2.4" fill="#F2A088" opacity=".85"/>
-      <circle cx="2" cy="-2" r="2.2" fill="#E8826A" opacity=".7"/>
-    </g>
-    <g transform="translate(685,90)"><g class="t-weed">
-      <path d="M0,0 Q-6,-14 0,-22 Q5,-30 1,-38" stroke="#3A7A52" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <path d="M5,0 Q11,-10 6,-18" stroke="#4F9A62" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    </g></g>
-    <!-- REEF cluster 2: smaller -->
-    <g transform="translate(955,82)">
-      <ellipse cx="0" cy="6" rx="18" ry="7" fill="#8A7A68" stroke="#5E5042" stroke-width="1"/>
-      <circle cx="-7" cy="-2" r="2.8" fill="#F2A088" opacity=".85"/>
-      <circle cx="5" cy="-4" r="3.2" fill="#E8826A" opacity=".85"/>
-      <circle cx="0" cy="0" r="2" fill="#F2A088" opacity=".7"/>
-    </g>
-    <g transform="translate(1115,90)"><g class="t-weed t-weed-b">
-      <path d="M-2,0 Q-8,-16 -1,-26 Q5,-34 0,-42" stroke="#357A50" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-      <path d="M4,0 Q10,-12 5,-22" stroke="#52A068" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    </g></g>
-  </svg>
-</div>
-
 <!-- FAB (mobile) -->
 <button class="fab" id="fab" onclick="openSheet()">＋</button>
 
@@ -860,11 +789,11 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 <div class="sheet" id="sheet">
   <div class="sheet-handle"></div>
   <div class="sheet-hdr">
-    <h3>🐚 Add to <span id="sheetDayName">Wed</span></h3>
+    <h3>Add to <span id="sheetDayName">Wed</span></h3>
     <button class="sh-close" onclick="closeSheet()">✕</button>
   </div>
   <div class="sheet-body">
-    <button class="add-btn" onclick="closeSheet();openModal()">✦ Add custom activity</button>
+    <button class="add-btn" onclick="closeSheet();openModal()">＋ Add custom activity</button>
     <div id="sheetAcList"></div>
   </div>
 </div>
@@ -888,7 +817,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 <!-- ITINERARY MAP MODAL -->
 <div class="modal-overlay" id="itineraryModal" style="display:none" onclick="if(event.target===this)closeItineraryMap()">
   <div class="sea-glass-modal itinerary-modal-body">
-    <h3 id="itineraryTitle">🗺️ Daily Itinerary</h3>
+    <h3 id="itineraryTitle">Daily Itinerary</h3>
     <div id="itineraryMapEl" class="itinerary-map"></div>
     <div id="itineraryStopsList" class="itinerary-stops"></div>
     <div class="mbtn-row">
@@ -900,7 +829,7 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 <!-- H-E-B HISTORY SEARCH MODAL -->
 <div class="modal-overlay" id="hebModal" style="display:none" onclick="if(event.target===this)closeHebModal()">
   <div class="sea-glass-modal" style="max-width:480px">
-    <h3>🛒 Search Your H-E-B History</h3>
+    <h3>Search Your H-E-B History</h3>
     <div id="hebResultsList" class="itinerary-stops" style="max-height:320px"></div>
     <div class="mbtn-row">
       <button class="mbtn mbtn-cancel" onclick="closeHebModal()">Close</button>
@@ -911,16 +840,15 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 <!-- CUSTOM ACTIVITY MODAL -->
 <div class="modal-overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal-card">
-    <h3>🐚 Add Custom Activity</h3>
+    <h3>Add Custom Activity</h3>
     <div class="mfield"><label>Name *</label><input id="mName" placeholder="e.g. Coffee at sunrise" maxlength="50"/></div>
     <div class="mrow">
-      <div class="mfield"><label>Emoji</label><input id="mEmoji" placeholder="☕" maxlength="2" style="font-size:20px;text-align:center"/></div>
       <div class="mfield"><label>Duration</label>
         <select id="mDur"><option value="1">30 min</option><option value="2" selected>1 hour</option><option value="3">1.5 hrs</option><option value="4">2 hours</option><option value="6">3 hours</option><option value="8">4 hours</option><option value="10">5 hours</option></select>
       </div>
+      <div class="mfield"><label>Cost / person</label><input id="mCost" type="number" placeholder="0" min="0" max="999"/></div>
     </div>
     <div class="mrow">
-      <div class="mfield"><label>Cost / person</label><input id="mCost" type="number" placeholder="0" min="0" max="999"/></div>
       <div class="mfield"><label>Closed day</label>
         <select id="mClosed"><option value="">Open all days</option><option value="wed">Wed</option><option value="thu">Thu</option><option value="fri">Fri</option><option value="sat">Sat</option><option value="sun">Sun</option></select>
       </div>
@@ -936,12 +864,12 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
 </div>
 
 <!-- CHAT FAB -->
-<button class="chat-fab" id="chatFab" title="🏈 NFL Chat">🐚</button>
+<button class="chat-fab" id="chatFab" title="NFL Chat">Chat</button>
 
 <!-- CHAT PANEL -->
 <div class="chat-panel" id="chatPanel">
   <div class="chat-hdr">
-    <h4>🏈 NFL Chat</h4>
+    <h4>NFL Chat</h4>
     <button class="ch-close" onclick="Chat.toggle()">✕</button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
@@ -952,106 +880,6 @@ body.has-active .cal-wrap { border-color: var(--active-c); background: linear-gr
   </div>
 </div>
 
-  <div id="t-wrap">
-    <svg id="t-svg" viewBox="0 0 240 170" width="240" height="170" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 6px 18px rgba(0,80,60,.5))">
-  <!-- Sea turtle v3 — side-swimming, Olive Ridley proportions, bold ref-style outlines -->
-  <!-- Shell is wide+flat (2:1 ratio), head is prominent, flippers sweep dramatically -->
-
-  <!-- TAIL -->
-  <path d="M186,84 Q206,74 215,65 Q210,60 200,68 Q197,59 190,72Z"
-        fill="#527A28" stroke="#1B2608" stroke-width="2.6" stroke-linejoin="round"/>
-
-  <!-- FAR BACK FLIPPER -->
-  <path d="M164,92 Q176,112 180,130 Q173,134 168,124 Q162,130 161,118 Q153,122 157,106Z"
-        fill="#CCBA78" stroke="#1B2608" stroke-width="2.5" stroke-linejoin="round"/>
-
-  <!-- FAR FRONT FLIPPER (angled up and back, smaller perspective) -->
-  <path d="M84,66 Q72,42 66,26 Q74,20 80,33 Q87,22 88,40 Q98,28 94,50Z"
-        fill="#CCBA78" stroke="#1B2608" stroke-width="2.6" stroke-linejoin="round"/>
-  <path d="M74,36 Q80,46 86,56" stroke="#1B2608" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
-  <path d="M68,33 Q74,43 80,53" stroke="#1B2608" stroke-width="1.4" fill="none" opacity=".38" stroke-linecap="round"/>
-
-  <!-- PLASTRON (belly) — wide flat band under shell -->
-  <ellipse cx="122" cy="110" rx="65" ry="17" fill="#F6EECC" stroke="#1B2608" stroke-width="2.6"/>
-  <path d="M68,110 Q122,124 178,110" stroke="#D4C484" stroke-width="1.4" fill="none" opacity=".7"/>
-
-  <!-- SHELL — elongated, wide lens shape (ratio ~1.8:1) -->
-  <path d="M72,58 Q80,30 122,24 Q164,28 178,58 Q188,80 180,108 Q168,126 122,128 Q76,126 64,108 Q58,80 72,58Z"
-        fill="#638E30" stroke="#1B2608" stroke-width="3.4" stroke-linejoin="round"/>
-
-  <!-- Shell scute vertical dividers -->
-  <line x1="97" y1="26" x2="92" y2="126" stroke="#1B2608" stroke-width="2.2" opacity=".82"/>
-  <line x1="122" y1="24" x2="122" y2="128" stroke="#1B2608" stroke-width="2.2" opacity=".82"/>
-  <line x1="147" y1="26" x2="152" y2="126" stroke="#1B2608" stroke-width="2.2" opacity=".82"/>
-  <!-- Shell scute horizontal rows -->
-  <path d="M76,58 Q122,48 174,58" stroke="#1B2608" stroke-width="2" fill="none" opacity=".78"/>
-  <path d="M68,90 Q122,104 178,90" stroke="#1B2608" stroke-width="2" fill="none" opacity=".78"/>
-
-  <!-- Plate colour variation — alternating lighter/darker panels -->
-  <path d="M97,26 Q122,24 122,24 L122,58 Q110,53 95,58Z" fill="#76A43A" opacity=".92"/>
-  <path d="M122,24 Q147,26 147,26 L152,58 Q136,53 122,58Z" fill="#547822" opacity=".92"/>
-  <path d="M95,58 Q110,53 122,58 L122,90 Q108,86 93,90Z" fill="#6E9C34" opacity=".92"/>
-  <path d="M122,58 Q136,53 152,58 L154,90 Q138,86 122,90Z" fill="#4E7018" opacity=".92"/>
-  <path d="M93,90 Q108,86 122,90 L122,124 Q106,120 88,122Z" fill="#67983A" opacity=".88"/>
-  <path d="M122,90 Q138,86 154,90 L158,122 Q140,120 122,124Z" fill="#4C6C1A" opacity=".88"/>
-
-  <!-- Shell final bold outline on top -->
-  <path d="M72,58 Q80,30 122,24 Q164,28 178,58 Q188,80 180,108 Q168,126 122,128 Q76,126 64,108 Q58,80 72,58Z"
-        fill="none" stroke="#1B2608" stroke-width="3.4" stroke-linejoin="round"/>
-
-  <!-- Marginal scallop hints -->
-  <g fill="none" stroke="#1B2608" stroke-width="1.6" opacity=".45">
-    <path d="M78,48 q3,5 -1,8"/><path d="M86,34 q4,4 0,8"/>
-    <path d="M158,34 q-4,4 0,8"/><path d="M166,48 q-3,5 1,8"/>
-    <path d="M170,102 q-3,5 1,7"/><path d="M160,116 q-3,4 1,7"/>
-    <path d="M82,116 q3,4 -1,7"/><path d="M70,102 q3,5 -1,7"/>
-  </g>
-
-  <!-- Shell sheen -->
-  <ellipse cx="100" cy="54" rx="24" ry="13" fill="rgba(255,255,255,.20)" stroke="none"/>
-
-  <!-- NECK — visible, bridges head to shell -->
-  <path d="M68,98 Q54,90 44,84 Q42,94 50,101 Q42,104 47,113 Q56,108 70,108Z"
-        fill="#EAE09E" stroke="#1B2608" stroke-width="2.8" stroke-linejoin="round"/>
-
-  <!-- HEAD — big, round, expressive; takes up left third of canvas -->
-  <ellipse cx="28" cy="96" rx="26" ry="24" fill="#EAE09E" stroke="#1B2608" stroke-width="3.4"/>
-  <!-- Top-of-head darker banding -->
-  <path d="M12,78 Q28,72 44,78 Q48,88 42,92 Q32,80 14,82Z" fill="#CABC72" stroke="none"/>
-  <!-- Snout -->
-  <path d="M6,93 Q1,96 3,103 Q9,107 17,100Z" fill="#EAE09E" stroke="#1B2608" stroke-width="2.8" stroke-linejoin="round"/>
-  <!-- Mouth smile -->
-  <path d="M4,101 Q14,108 26,103" stroke="#1B2608" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  <!-- Nostril -->
-  <ellipse cx="8" cy="91" rx="2.4" ry="1.6" fill="#1B2608"/>
-
-  <!-- EYE — large, round, bold; the money shot -->
-  <circle cx="20" cy="84" r="10" fill="#1B2608"/>
-  <circle cx="20" cy="84" r="7.8" fill="#243010"/>
-  <circle cx="20" cy="84" r="4.5" fill="#0E1606"/>
-  <!-- Main shine spot -->
-  <circle cx="23.5" cy="80.5" r="3.2" fill="white"/>
-  <!-- Secondary glint -->
-  <circle cx="16" cy="87.5" r="1.5" fill="rgba(255,255,255,.55)"/>
-  <!-- Outline ring -->
-  <circle cx="20" cy="84" r="10" fill="none" stroke="#1B2608" stroke-width="2.2"/>
-  <!-- Brow ridge — gives character -->
-  <path d="M10,72 Q20,67 30,71" stroke="#1B2608" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-
-  <!-- NEAR FRONT FLIPPER — long, dramatic sweep downward -->
-  <path d="M74,108 Q46,132 26,144 Q18,136 29,128 Q20,121 32,118 Q24,108 38,109 Q44,97 66,102Z"
-        fill="#EAE09E" stroke="#1B2608" stroke-width="3.2" stroke-linejoin="round"/>
-  <!-- Flipper cross-band lines -->
-  <path d="M60,107 Q44,120 30,133" stroke="#1B2608" stroke-width="1.9" fill="none" opacity=".5" stroke-linecap="round"/>
-  <path d="M52,114 Q38,125 26,137" stroke="#1B2608" stroke-width="1.7" fill="none" opacity=".38" stroke-linecap="round"/>
-  <path d="M44,120 Q32,130 22,140" stroke="#1B2608" stroke-width="1.5" fill="none" opacity=".28" stroke-linecap="round"/>
-
-  <!-- NEAR BACK FLIPPER — smaller, tucked toward tail -->
-  <path d="M168,104 Q178,122 180,138 Q174,141 169,131 Q163,137 162,125 Q154,129 158,115Z"
-        fill="#EAE09E" stroke="#1B2608" stroke-width="2.8" stroke-linejoin="round"/>
-</svg>
-  </div>
-</div>
 
 <!-- TOAST -->
 <div class="toast-c" id="toastContainer"></div>
@@ -1179,7 +1007,7 @@ let state = {
   hiddenBase: [],
   condoInfo: { address: '', doorCode: '', wifi: '', wifiPw: '', checkIn: '', checkOut: '', notes: '', lat: CONDO_LOC.lat, lng: CONDO_LOC.lng },
   chat: [],
-  dinners: Object.fromEntries(DAYS.map(d => [d.id, { items: [], servings: 4 }])),
+  dinners: Object.fromEntries(DAYS.map(d => [d.id, { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } }])),
   enrichment: {},
   people: [], // [{id, name, color}] — accounts are open: anyone can create one, no password
 };
@@ -1227,6 +1055,20 @@ function ownerBg(attendees) {
   }
   return `linear-gradient(to right, ${ids.map(id => personColor(id)).join(', ')})`;
 }
+// Category → design-token colors for calendar event blocks (bg/border/text/meta)
+const CATEGORY_STYLE = {
+  travel: { bg: 'var(--slate-bg)', border: 'var(--slate)', text: 'var(--slate-d)' },
+  drive:  { bg: 'var(--slate-bg)', border: 'var(--slate)', text: 'var(--slate-d)' },
+  other:  { bg: 'var(--slate-bg)', border: 'var(--slate)', text: 'var(--slate-d)' },
+  pool:   { bg: 'var(--blue-bg)',  border: 'var(--blue)',  text: 'var(--blue-d)' },
+  turtle: { bg: 'var(--green-bg)', border: 'var(--green)', text: 'var(--green-d)' },
+  nature: { bg: 'var(--green-bg)', border: 'var(--green)', text: 'var(--green-d)' },
+  bar:    { bg: 'var(--berry-bg)', border: 'var(--berry)', text: 'var(--berry-d)' },
+  food:   { bg: 'var(--coral-bg)', border: 'var(--coral)', text: 'var(--coral-d)' },
+  beach:  { bg: 'var(--amber-bg)', border: 'var(--amber)', text: 'var(--amber-d)' },
+  custom: { bg: 'var(--mint-l)',   border: 'var(--teal)',  text: 'var(--ocean-d)' },
+};
+function categoryStyle(type) { return CATEGORY_STYLE[type] || CATEGORY_STYLE.other; }
 function ensureVisibleIds() {
   const allIds = state.people.map(p => p.id);
   if (!ui.visibleIds) {
@@ -1375,7 +1217,7 @@ async function loadBin() {
     if (record.condoInfo)  state.condoInfo  = { ...state.condoInfo, ...record.condoInfo };
     if (record.dinners) {
       DAYS.forEach(d => {
-        state.dinners[d.id] = record.dinners[d.id] || state.dinners[d.id] || { items: [], servings: 4 };
+        state.dinners[d.id] = record.dinners[d.id] || state.dinners[d.id] || { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } };
       });
     }
     if (record.enrichment) state.enrichment = { ...state.enrichment, ...record.enrichment };
@@ -1531,7 +1373,7 @@ function submitAccount() {
   ui.visibleIds.add(person.id);
   saveVisibleIds();
   updateFilterLabels();
-  toast(`🐚 Welcome, ${name}!`, 's');
+  toast(`Welcome, ${name}!`, 's');
   if (_acctContext === 'onboard') {
     completeLogin(person.id);
   } else {
@@ -1577,7 +1419,7 @@ function startCountdown() {
     const diff = target - Date.now();
     const units = document.getElementById('cdUnits');
     if (!units) return;
-    if (diff <= 0) { units.innerHTML = '<span class="cd-done">🌊 WE\'RE HERE!! 🐚</span>'; return; }
+    if (diff <= 0) { units.innerHTML = '<span class="cd-done">WE\'RE HERE!!</span>'; return; }
     const dd = Math.floor(diff/864e5), hh = Math.floor(diff%864e5/36e5);
     const mm = Math.floor(diff%36e5/6e4), ss = Math.floor(diff%6e4/1e3);
     ['cdDays','cdHrs','cdMins','cdSecs'].forEach((id,i) => {
@@ -1621,10 +1463,10 @@ function buildActCard(a, forSheet = false) {
   const closedText = closed
     ? `<div class="ac-closed">⚠ Closed ${DAYS.find(d=>d.id===ui.curDay)?.name}</div>`
     : a.cl?.length ? `<div class="ac-closed">⚠ Closed: ${a.cl.map(d=>DAYS.find(x=>x.id===d)?.name).filter(Boolean).join(', ')}</div>` : '';
-  const badge = a.isCustom ? `<span class="pill" style="background:var(--mint-l);color:var(--ocean-d)">✦ ${personName(a.createdBy)}</span>` : '';
+  const badge = a.isCustom ? `<span class="pill" style="background:var(--mint-l);color:var(--ocean-d)">${personName(a.createdBy)}</span>` : '';
   div.innerHTML = `
     <div class="ac-left">
-      <div class="ac-name">${a.e} ${a.name}</div>
+      <div class="ac-name">${a.name}</div>
       <div class="ac-meta">${cp}<span class="pill pt">~${a.dur*30}min</span>${badge}</div>
       ${closedText}
     </div>
@@ -1651,7 +1493,7 @@ function renderSidebar() {
       const div = document.createElement('div');
       div.className = 'ac';
       div.innerHTML = `
-        <div class="ac-left"><div class="ac-name">${a.e} ${a.name}</div></div>
+        <div class="ac-left"><div class="ac-name">${a.name}</div></div>
         <button class="ac-add" title="Restore to list">↺</button>
       `;
       div.querySelector('.ac-add').addEventListener('click', e => { e.stopPropagation(); restoreBaseAct(a.id); });
@@ -1676,7 +1518,7 @@ function pickActivity(actId) {
   if (!a) return;
   closeSheet();
   // Show time picker
-  document.getElementById('tpTitle').textContent = `${a.e} ${a.name}`;
+  document.getElementById('tpTitle').textContent = `${a.name}`;
   document.getElementById('tpSub').textContent = `Pick a start time on ${DAYS.find(d=>d.id===ui.curDay)?.name} · ~${durLabel(a.dur)}`;
   const grid = document.getElementById('tpGrid');
   grid.innerHTML = '';
@@ -1705,7 +1547,7 @@ function placeAct(dayId, slot, actId) {
   for (let i = slot; i < slot + a.dur; i++) {
     state.placed[dayId][i] = { actId, isStart: i === slot, span: a.dur, who: ui.currentWho, attendees: [ui.currentWho] };
   }
-  toast(`${a.e} ${a.name} added!`, 's', 1600);
+  toast(`${a.name} added!`, 's', 1600);
   renderAll();
   saveBin();
 }
@@ -1847,7 +1689,7 @@ function closeJellyMenu() {
 function openMoveTpicker(fromDayId, fromSlot, entry, act, preSelectDayId = null) {
   const targetDayId = preSelectDayId || fromDayId;
   const eff = getEffective(entry, act);
-  document.getElementById('tpTitle').textContent = `Move ${eff.e} ${eff.name}`;
+  document.getElementById('tpTitle').textContent = `Move ${eff.name}`;
   document.getElementById('tpSub').textContent = `Pick a day + time · ~${durLabel(entry.span)}`;
 
   // Day pills
@@ -2005,7 +1847,7 @@ function renderCardCalendar(grid) {
         <div class="cc-drag-handle" title="Drag to move"><span></span><span></span><span></span></div>
         <div class="cc-rail" style="background:${ownerBg(att)}"></div>
         <div class="cc-time"><div class="h">${timeParts ? timeParts[1] : slotToTime(s)}</div><div class="m">${timeParts ? timeParts[2].toUpperCase() : ''}</div></div>
-        <div class="cc-body"><div class="nm">${eff.e} ${eff.name}</div><div class="mt">${durLabel(entry.span)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div></div>
+        <div class="cc-body"><div class="nm">${eff.name}</div><div class="mt">${durLabel(entry.span)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div></div>
         <div class="cc-who" title="Tap to change who's going">
           ${avatarsHtml}
         </div>
@@ -2030,7 +1872,7 @@ function renderCardCalendar(grid) {
     if (count === 0) {
       const empty = document.createElement('div');
       empty.className = 'cc-empty';
-      empty.textContent = '🐚 Nothing planned yet';
+      empty.textContent = 'Nothing planned yet';
       body.appendChild(empty);
     }
     col.appendChild(body);
@@ -2093,9 +1935,12 @@ function renderCalendar() {
     const corner = document.createElement('div');
     corner.style.cssText = 'background:var(--sky-l);border:1px solid var(--border);border-bottom:2.5px solid var(--teal);position:sticky;top:0;z-index:11;';
     grid.appendChild(corner);
-    activeDays.forEach(day => {
+    activeDays.forEach((day, i) => {
       const h = document.createElement('div');
       h.className = 'col-hdr';
+      const isArrival = i === 0, isCheckout = i === activeDays.length - 1;
+      if (isArrival) { h.style.background = 'var(--green-bg)'; h.style.color = 'var(--green-d)'; }
+      if (isCheckout) { h.style.background = 'var(--coral-bg)'; h.style.color = 'var(--coral-d)'; }
       const dc = dayCost(day.id);
       h.innerHTML = `<div class="dn">${day.name}</div><div class="dd">${day.date} · ${day.label}</div>${dc > 0 ? `<div class="dc">$${dc}/p</div>` : ''}`;
       grid.appendChild(h);
@@ -2125,16 +1970,20 @@ function renderCalendar() {
         if (a && (!ui.visibleIds || att0.some(id => ui.visibleIds.has(id)))) {
           const eff = getEffective(entry, a);
           const att = entry.attendees && entry.attendees.length ? entry.attendees : [entry.who || state.people[0]?.id];
+          const cat = categoryStyle(a.type);
           const pa = document.createElement('div');
           pa.className = 'pa';
-          pa.style.background = ownerBg(att);
+          pa.style.background = cat.bg;
+          pa.style.borderLeftColor = cat.border;
+          pa.style.color = cat.text;
           pa.style.height = `${entry.span * sh - 4}px`;
           pa.draggable = true;
           pa.innerHTML = `
-            <div class="pa-name">${eff.e} ${eff.name}</div>
-            <div class="pa-dur">⏱ ${durLabel(entry.span)}</div>
+            <div class="pa-name">${eff.name}</div>
+            <div class="pa-dur">${durLabel(entry.span)}</div>
             <div class="pa-meta">${slotToTime(s)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div>
             <div class="pa-menu-btn" title="Options">⋯</div>
+            <div class="pa-avatars">${att.map(id => `<span class="av-dot" style="background:${personColor(id)}">${personInitial(id)}</span>`).join('')}</div>
             <div class="pa-resize" title="Drag to resize"></div>
           `;
 
@@ -2245,22 +2094,74 @@ function renderDinners() {
   if (!container) return;
   container.innerHTML = '';
   DAYS.forEach(day => {
-    const dinner = state.dinners[day.id] || (state.dinners[day.id] = { items: [], servings: 4 });
+    const dinner = state.dinners[day.id] || (state.dinners[day.id] = { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } });
+    if (!dinner.venue) dinner.venue = { name: '', menu: '', phone: '', notes: '' };
+    if (dinner.out === undefined) dinner.out = false;
     const card = document.createElement('div');
     card.className = 'dinner-card';
     const found = getDinnerActivity(day.id);
-    const dinnerLabel = found
-      ? `${found.act.e} ${found.act.name} · ${slotToTime(found.slot)}`
-      : 'No dinner planned yet';
+    const dinnerLabel = found ? `${found.act.name} · ${slotToTime(found.slot)}` : '';
     const total = dinner.items.reduce((sum, it) => sum + (Number(it.price) || 0), 0);
     card.innerHTML = `
       <div class="dinner-hdr">
         <div class="dinner-day-row">
           <div class="dinner-day">${day.name} <span class="dinner-date">${day.date}</span></div>
-          <button class="dinner-map-btn" type="button" title="View itinerary map">🗺️ Map</button>
+          <button class="dinner-map-btn" type="button" title="View itinerary map">Map</button>
         </div>
-        <div class="dinner-plan">${dinnerLabel}</div>
+        ${dinnerLabel ? `<div class="dinner-plan">On the calendar: ${dinnerLabel}</div>` : ''}
       </div>
+      <div class="dinner-toggle" role="group" aria-label="${day.name} dinner mode">
+        <button type="button" class="dinner-seg${!dinner.out ? ' on' : ''}" data-mode="in" aria-pressed="${!dinner.out}">Cooking in</button>
+        <button type="button" class="dinner-seg${dinner.out ? ' on' : ''}" data-mode="out" aria-pressed="${dinner.out}">Going out</button>
+      </div>
+      <div class="dinner-body" id="dinnerBody-${day.id}"></div>
+    `;
+
+    card.querySelector('.dinner-map-btn').addEventListener('click', () => openItineraryMap(day.id));
+    card.querySelectorAll('.dinner-seg').forEach(btn => {
+      btn.addEventListener('click', () => {
+        dinner.out = btn.dataset.mode === 'out';
+        renderDinners(); saveBin();
+      });
+    });
+
+    const bodyEl = card.querySelector(`#dinnerBody-${day.id}`);
+
+    if (dinner.out) {
+      // ── GOING OUT: persistent, manually-entered venue info (no calendar auto-pull) ──
+      bodyEl.innerHTML = `
+        <div class="venue-form">
+          <div class="mfield"><label>Venue name</label><input type="text" class="venue-name" placeholder="e.g. The Gaff" value="${(dinner.venue.name || '').replace(/"/g, '&quot;')}"/></div>
+          <div class="mrow">
+            <div class="mfield"><label>Menu link (optional)</label><input type="url" class="venue-menu" placeholder="https://…" value="${(dinner.venue.menu || '').replace(/"/g, '&quot;')}"/></div>
+            <div class="mfield"><label>Phone (optional)</label><input type="tel" class="venue-phone" placeholder="(361) 555-0100" value="${(dinner.venue.phone || '').replace(/"/g, '&quot;')}"/></div>
+          </div>
+          <div class="mfield"><label>Notes (hours, parking, wait time, reservation info, etc.)</label>
+            <textarea class="venue-notes edit-ta" rows="3" placeholder="Anything worth remembering for the night...">${dinner.venue.notes || ''}</textarea>
+          </div>
+          <div class="venue-links">
+            ${dinner.venue.menu ? `<a class="dm-btn maps" href="${dinner.venue.menu}" target="_blank" rel="noopener">View menu</a>` : ''}
+            ${dinner.venue.phone ? `<a class="dm-btn site" href="tel:${dinner.venue.phone.replace(/[^0-9+]/g, '')}">Call</a>` : ''}
+          </div>
+        </div>
+      `;
+      const saveVenue = () => {
+        dinner.venue.name = bodyEl.querySelector('.venue-name').value.trim();
+        dinner.venue.menu = bodyEl.querySelector('.venue-menu').value.trim();
+        dinner.venue.phone = bodyEl.querySelector('.venue-phone').value.trim();
+        dinner.venue.notes = bodyEl.querySelector('.venue-notes').value;
+        saveBin();
+      };
+      bodyEl.querySelector('.venue-name').addEventListener('change', () => { saveVenue(); renderDinners(); });
+      bodyEl.querySelector('.venue-menu').addEventListener('change', () => { saveVenue(); renderDinners(); });
+      bodyEl.querySelector('.venue-phone').addEventListener('change', () => { saveVenue(); renderDinners(); });
+      bodyEl.querySelector('.venue-notes').addEventListener('change', saveVenue);
+      container.appendChild(card);
+      return; // done rendering this card
+    }
+
+    // ── COOKING IN: servings + shopping list (unchanged behavior) ──
+    bodyEl.innerHTML = `
       <div class="dinner-servings">
         <span>Servings</span>
         <button class="serv-btn" data-act="dec" type="button">−</button>
@@ -2278,18 +2179,16 @@ function renderDinners() {
       </div>
     `;
 
-    card.querySelector('.dinner-map-btn').addEventListener('click', () => openItineraryMap(day.id));
-
-    card.querySelector('[data-act="dec"]').addEventListener('click', () => {
+    bodyEl.querySelector('[data-act="dec"]').addEventListener('click', () => {
       dinner.servings = Math.max(1, dinner.servings - 1);
       renderDinners(); saveBin();
     });
-    card.querySelector('[data-act="inc"]').addEventListener('click', () => {
+    bodyEl.querySelector('[data-act="inc"]').addEventListener('click', () => {
       dinner.servings = dinner.servings + 1;
       renderDinners(); saveBin();
     });
 
-    const addInput = card.querySelector('.dinner-add-input');
+    const addInput = bodyEl.querySelector('.dinner-add-input');
     const addItem = () => {
       const name = addInput.value.trim();
       if (!name) return;
@@ -2297,17 +2196,17 @@ function renderDinners() {
       addInput.value = '';
       renderDinners(); saveBin();
     };
-    card.querySelector('.dinner-add-btn').addEventListener('click', addItem);
+    bodyEl.querySelector('.dinner-add-btn').addEventListener('click', addItem);
     addInput.addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); });
 
-    card.querySelector('.dinner-clear-btn').addEventListener('click', () => {
+    bodyEl.querySelector('.dinner-clear-btn').addEventListener('click', () => {
       if (!dinner.items.length) return;
       if (!confirm(`Clear all items for ${day.name}'s dinner?`)) return;
       dinner.items = [];
       renderDinners(); saveBin();
     });
 
-    const listEl = card.querySelector(`#dinnerList-${day.id}`);
+    const listEl = bodyEl.querySelector(`#dinnerList-${day.id}`);
     if (!dinner.items.length) {
       listEl.innerHTML = '<div class="dinner-empty">No items yet — add what you need above</div>';
     } else {
@@ -2322,8 +2221,8 @@ function renderDinners() {
           <input type="checkbox" class="di-check" ${item.checked ? 'checked' : ''} />
           <input type="text" class="di-name" value="${(item.name || '').replace(/"/g, '&quot;')}" />
           <input type="number" class="di-price" placeholder="$" min="0" step="0.01" value="${item.price ?? ''}" />
-          <button class="di-link" title="${item.sourceUrl ? 'Re-check price from saved link' : 'Paste a product link to auto-fill price'}" type="button">${item.sourceUrl ? '🔗' : '📎'}</button>
-          <button class="di-heb" title="Search your H-E-B order history" type="button">🛒</button>
+          <button class="di-link" title="${item.sourceUrl ? 'Re-check price from saved link' : 'Paste a product link to auto-fill price'}" type="button">${item.sourceUrl ? 'Link' : 'Add link'}</button>
+          <button class="di-heb" title="Search your H-E-B order history" type="button">H</button>
           <button class="di-del" title="Remove" type="button">✕</button>
         `;
         row.querySelector('.di-link').addEventListener('click', async () => {
@@ -2332,13 +2231,13 @@ function renderDinners() {
           if (!url) return;
           item.sourceUrl = url.trim();
           const btn = row.querySelector('.di-link');
-          btn.textContent = '⏳';
+          btn.textContent = '...';
           btn.disabled = true;
           const data = await fetchUrlEnrichment(item.sourceUrl);
           btn.disabled = false;
           if (data && data.price != null) {
             item.price = data.price;
-            toast(`💵 Price found: $${data.price.toFixed(2)}`, 's');
+            toast(`Price found: $${data.price.toFixed(2)}`, 's');
           } else {
             toast('Couldn\'t find a price on that page — you can still enter it manually.', 'w', 3500);
           }
@@ -2519,7 +2418,7 @@ function getDayStops(dayId) {
 
 function openItineraryMap(dayId) {
   const day = DAYS.find(d => d.id === dayId);
-  document.getElementById('itineraryTitle').textContent = `🗺️ ${day?.name || ''} Itinerary`;
+  document.getElementById('itineraryTitle').textContent = `${day?.name || ''} Itinerary`;
   document.getElementById('itineraryModal').style.display = 'flex';
 
   const stops = getDayStops(dayId);
@@ -2620,7 +2519,7 @@ function openDetailModal(dayId, slot, entry, act) {
 
   let html = `
     <div class="dm-hdr">
-      <div class="dm-emoji" id="dmEmoji">${eff.e}</div>
+      <div class="dm-emoji" id="dmEmoji" style="background:${categoryStyle(act.type).border}"></div>
       <div class="dm-title"><h3 id="dmName">${eff.name}</h3></div>
       <div class="dm-close" onclick="closeDetailModal()">✕</div>
     </div>
@@ -2647,7 +2546,7 @@ function openDetailModal(dayId, slot, entry, act) {
 
   html += `
     <div class="dm-actions">
-      <a class="dm-btn maps" href="${mapsUrl}" target="_blank" rel="noopener">🗺️ Directions</a>
+      <a class="dm-btn maps" href="${mapsUrl}" target="_blank" rel="noopener">Directions</a>
       ${eff.url ? `<a class="dm-btn site" href="${eff.url}" target="_blank" rel="noopener">🔗 Website</a>` : ''}
       <button class="dm-btn edit-btn" onclick="openEditMode('${dayId}',${slot})">✏️ Edit</button>
     </div>
@@ -2717,11 +2616,7 @@ function openEditMode(dayId, slot) {
     </div>
     <div class="edit-form">
       <div class="edit-row">
-        <div class="edit-field half">
-          <label class="edit-lbl">Emoji</label>
-          <input class="edit-inp center" id="editEmoji" maxlength="4" value="${eff.e}">
-        </div>
-        <div class="edit-field half">
+        <div class="edit-field">
           <label class="edit-lbl">Cost / person ($)</label>
           <input class="edit-inp" id="editCost" type="number" min="0" value="${eff.cost}">
         </div>
@@ -2750,13 +2645,12 @@ function saveEdit(dayId, slot) {
   const entry = state.placed[dayId][slot];
   if (!entry) return;
   const act = getAct(entry.actId);
-  const emoji = document.getElementById('editEmoji').value.trim() || act.e;
   const name  = document.getElementById('editName').value.trim() || act.name;
   const cost  = Math.max(0, parseInt(document.getElementById('editCost').value) || 0);
   const n     = document.getElementById('editNotes').value.trim();
   const url   = document.getElementById('editUrl').value.trim();
 
-  const override = { e: emoji, name, cost, n, url };
+  const override = { name, cost, n, url };
   // Stamp all span slots with updated entry
   for (let i = slot; i < slot + entry.span; i++) {
     if (state.placed[dayId][i]) state.placed[dayId][i] = { ...state.placed[dayId][i], override };
@@ -2789,7 +2683,7 @@ function closeDetailModal() {
 
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
-  ['mName','mEmoji','mCost','mNote','mAddr','mUrl'].forEach(id => document.getElementById(id).value = '');
+  ['mName','mCost','mNote','mAddr','mUrl'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('mDur').value = '2';
   document.getElementById('mClosed').value = '';
 }
@@ -2800,7 +2694,7 @@ function submitCustom() {
   const siteUrl = document.getElementById('mUrl').value.trim();
   const act = {
     id: `custom-${Date.now()}`,
-    e: document.getElementById('mEmoji').value.trim() || '📌',
+    e: '',
     name,
     type: 'custom',
     dur: parseInt(document.getElementById('mDur').value) || 2,
@@ -2814,7 +2708,7 @@ function submitCustom() {
   if (siteUrl) act.url = siteUrl;
   state.customActs.push(act);
   closeModal();
-  toast(`✦ "${name}" added!`, 's');
+  toast(`"${name}" added!`, 's');
   renderAll();
   saveBin();
   if (addr) {
@@ -2879,7 +2773,7 @@ const Chat = {
     if (!el) return;
     const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
     if (!state.chat.length) {
-      el.innerHTML = '<div class="chat-empty">No messages yet — say hi! 🏈</div>';
+      el.innerHTML = '<div class="chat-empty">No messages yet — say hi!</div>';
       return;
     }
     el.innerHTML = '';
@@ -2975,11 +2869,11 @@ function renderTripsHome() {
     const card = document.createElement('div');
     card.className = 'trip-card';
     card.innerHTML = `
-      <div class="trip-card-emoji">${trip.emoji || '🌊'}</div>
+      <div class="trip-card-emoji"><img src="assets/blue-star.png" alt="" style="width:32px;height:32px;object-fit:contain"></div>
       <div class="trip-card-body">
         <div class="trip-card-name">${trip.name}</div>
         <div class="trip-card-meta">${trip.startDate ? new Date(trip.startDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''} · ${trip.location || ''}</div>
-        ${crew ? `<div class="trip-card-crew">👥 ${crew}</div>` : ''}
+        ${crew ? `<div class="trip-card-crew">Crew: ${crew}</div>` : ''}
       </div>
       <span class="trip-card-status ${status.cls}">${status.label}</span>
     `;
@@ -3013,7 +2907,6 @@ function closeNewTripForm() {
 }
 
 async function submitNewTrip() {
-  const emoji    = document.getElementById('ntEmoji').value.trim() || '🏖️';
   const name     = document.getElementById('ntName').value.trim();
   const startStr = document.getElementById('ntStart').value;
   const endStr   = document.getElementById('ntEnd').value;
@@ -3046,7 +2939,7 @@ async function submitNewTrip() {
     });
     if (!res.ok) throw new Error('Proxy error ' + res.status);
 
-    const trip = { id: 'trip-' + Date.now(), name, emoji, slug, startDate: startStr, endDate: endStr,
+    const trip = { id: 'trip-' + Date.now(), name, slug, startDate: startStr, endDate: endStr,
       location, address, crew, dataPath: newPath, createdAt: Date.now(), days };
     const manifest = getTripManifest();
     manifest.push(trip);
@@ -3063,7 +2956,7 @@ function hydrateHeader() {
   if (!t) return;
   const hdrTitle = document.getElementById('hdrTitle');
   const hdrSub   = document.getElementById('hdrSub');
-  if (hdrTitle) hdrTitle.textContent = `${t.emoji || '🌊'} ${t.name}`;
+  if (hdrTitle) hdrTitle.textContent = t.name;
   if (hdrSub) {
     const start = t.startDate ? new Date(t.startDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
     const end   = t.endDate   ? new Date(t.endDate  +'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
@@ -3074,6 +2967,97 @@ function hydrateHeader() {
   const deskTop = document.querySelector('.sidebar h2');
 }
 
+// ── AMBIENT OCEAN ANIMATION (fish school, curious fish, seahorse) ──
+// Turtle voyage + flippers run on pure CSS (see @keyframes voyage/flapL/flapR).
+// These three are RAF-driven roamers, ported 1:1 from the design prototype.
+const Ambient = {
+  start() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (typeof requestAnimationFrame !== 'function') return;
+    this.schoolEl = document.getElementById('ambSchool');
+    this.curiousAEl = document.getElementById('ambCuriousA');
+    this.curiousBEl = document.getElementById('ambCuriousB');
+    this.seahorseEl = document.getElementById('ambSeahorse');
+    if (!this.schoolEl) return;
+    const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    const vw = window.innerWidth, vh = window.innerHeight;
+    this.school = { x: vw * 0.5, y: vh * 0.4, tx: vw * 0.5, ty: vh * 0.4, vx: 0, face: 1, nextAt: now + 1200 };
+    this.cA = { x: vw * 0.22, y: vh * 0.5, tx: vw * 0.22, ty: vh * 0.5, face: 1, phase: 0, paused: false, nextAt: now + 400 };
+    this.cB = { x: vw * 0.74, y: vh * 0.34, tx: vw * 0.74, ty: vh * 0.34, face: 1, phase: 2, paused: false, nextAt: now + 1600 };
+    this.sh = { active: false, startAt: now + 2500, dir: 1, prog: 0, activatedAt: 0 };
+    this.lastT = now;
+    const loop = (t) => {
+      const dt = Math.min(0.05, (t - this.lastT) / 1000); this.lastT = t;
+      this.stepSchool(t, dt);
+      this.stepCurious(this.cA, this.curiousAEl, t, dt);
+      this.stepCurious(this.cB, this.curiousBEl, t, dt);
+      this.stepSeahorse(t, dt);
+      this._raf = requestAnimationFrame(loop);
+    };
+    this._raf = requestAnimationFrame(loop);
+  },
+  stepSchool(t, dt) {
+    const el = this.schoolEl; if (!el) return;
+    const s = this.school, vw = window.innerWidth, vh = window.innerHeight;
+    if (t >= s.nextAt) {
+      const m = 170;
+      s.tx = m + Math.random() * (vw - 2 * m);
+      s.ty = vh * (0.26 + Math.random() * 0.34);
+      s.nextAt = t + 2600 + Math.random() * 5200;
+    }
+    const dx = s.tx - s.x;
+    const desired = Math.max(-1, Math.min(1, dx / 260)) * 105;
+    s.vx += (desired - s.vx) * Math.min(1, dt * 1.8);
+    s.x += s.vx * dt;
+    s.y += (s.ty - s.y) * Math.min(1, dt * 1.4);
+    if (s.vx < -3) s.face = 1; else if (s.vx > 3) s.face = -1;
+    const bobY = Math.sin(t / 720) * 7;
+    el.style.transform = 'translate(' + s.x + 'px,' + (s.y + bobY) + 'px) scaleX(' + s.face + ')';
+  },
+  stepCurious(s, el, t, dt) {
+    if (!el) return;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    if (t >= s.nextAt) {
+      if (s.paused) {
+        s.paused = false;
+        s.tx = 70 + Math.random() * (vw - 140);
+        s.ty = vh * (0.14 + Math.random() * 0.68);
+        s.nextAt = t + 5000 + Math.random() * 5000;
+      } else {
+        s.paused = true;
+        s.nextAt = t + 700 + Math.random() * 1500;
+      }
+    }
+    const dx = s.tx - s.x, dy = s.ty - s.y, dist = Math.hypot(dx, dy);
+    if (dist < 14 && !s.paused) { s.paused = true; s.nextAt = Math.min(s.nextAt, t + 600 + Math.random() * 1300); }
+    const speed = s.paused ? 7 : 78;
+    if (dist > 0.5) {
+      s.x += (dx / dist) * speed * dt;
+      s.y += (dy / dist) * speed * dt;
+      if (Math.abs(dx) > 5) s.face = dx < 0 ? 1 : -1;
+    }
+    const wob = Math.sin(t / 320 + s.phase) * 4;
+    el.style.transform = 'translate(' + s.x + 'px,' + (s.y + wob) + 'px) scaleX(' + s.face + ')';
+  },
+  stepSeahorse(t, dt) {
+    const el = this.seahorseEl; if (!el) return;
+    const s = this.sh, vw = window.innerWidth, vh = window.innerHeight;
+    if (!s.active && t >= s.startAt) { s.active = true; s.prog = 0; s.activatedAt = t; }
+    if (!s.active) { el.style.opacity = '0'; return; }
+    s.prog += dt / 25;
+    if (s.prog >= 1) { s.active = false; s.startAt = s.activatedAt + 60000; s.dir *= -1; el.style.opacity = '0'; return; }
+    el.style.opacity = '0.62';
+    const startX = s.dir > 0 ? -150 : vw + 150;
+    const endX = s.dir > 0 ? vw + 150 : -150;
+    const x = startX + (endX - startX) * s.prog;
+    const y = vh * 0.64 + Math.sin(s.prog * Math.PI * 5) * 34;
+    const rock = Math.sin(s.prog * Math.PI * 11) * 6;
+    const face = s.dir > 0 ? -1 : 1;
+    el.style.transform = 'translate(' + x + 'px,' + y + 'px) scaleX(' + face + ') rotate(' + rock + 'deg)';
+  },
+  stop() { if (this._raf) cancelAnimationFrame(this._raf); },
+};
+
 // ── INIT ──────────────────────────────────────────────────────────
 hydrateHeader();
 setSyncState('busy');
@@ -3083,6 +3067,7 @@ renderAll();
 renderWhoChips();
 updateFilterLabels();
 startCountdown();
+try { Ambient.start(); } catch (e) { console.warn('Ambient animation failed to start:', e); }
 loadBin().then(() => { startPolling(); setSyncState('ok'); }).catch(() => { setSyncState('err'); renderAll(); });
 </script>
 </body>
