@@ -285,6 +285,11 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .dm-btn { flex: 1; text-align: center; padding: 11px; border-radius: 14px; font-weight: 800; font-size: 13px; text-decoration: none; cursor: pointer; }
 .dm-btn.maps { background: var(--teal); color: #fff; }
 .dm-btn.edit-btn { background: var(--sand-d); color: var(--ocean-d); border: 1.5px solid var(--tan-d); }
+.enrich-btn { width: 100%; background: var(--mint-l); color: var(--ocean-d); border: 1.5px dashed var(--teal); border-radius: 12px; padding: 10px; font-weight: 700; font-size: 12.5px; }
+.enrich-btn:disabled { opacity: .6; }
+.enrich-box { display: flex; flex-direction: column; gap: 6px; background: var(--mint-l); border-radius: 10px; padding: 8px 10px; }
+.enrich-row { font-size: 12px; color: var(--text); }
+.enrich-row a { color: var(--ocean-d); font-weight: 700; }
 .edit-form { display: flex; flex-direction: column; gap: 12px; }
 .edit-row { display: flex; gap: 10px; }
 .edit-field { display: flex; flex-direction: column; gap: 4px; flex: 1; }
@@ -896,6 +901,7 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
     </div>
     <div class="mfield"><label>Note (optional)</label><input id="mNote" placeholder="Location, tip, etc." maxlength="80"/></div>
     <div class="mfield"><label>Address (optional, for itinerary map)</label><input id="mAddr" placeholder="e.g. 323 Beach St, Port Aransas, TX" maxlength="120"/></div>
+    <div class="mfield"><label>Website (optional)</label><input id="mUrl" placeholder="https://…" maxlength="200"/></div>
     <div class="mbtn-row">
       <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
       <button class="mbtn mbtn-add" onclick="submitCustom()">✦ Add</button>
@@ -1148,6 +1154,7 @@ let state = {
   condoInfo: { address: '', doorCode: '', wifi: '', wifiPw: '', checkIn: '', checkOut: '', notes: '', lat: CONDO_LOC.lat, lng: CONDO_LOC.lng },
   chat: [],
   dinners: Object.fromEntries(DAYS.map(d => [d.id, { items: [], servings: 4 }])),
+  enrichment: {},
 };
 let ui = {
   curDay: 'wed',
@@ -1242,7 +1249,7 @@ function setSyncState(s) {
 async function saveBin() {
   setSyncState('busy');
   try {
-    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, dinners: state.dinners };
+    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, dinners: state.dinners, enrichment: state.enrichment };
     const putRes = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1300,6 +1307,7 @@ async function loadBin() {
         state.dinners[d.id] = record.dinners[d.id] || state.dinners[d.id] || { items: [], servings: 4 };
       });
     }
+    if (record.enrichment) state.enrichment = { ...state.enrichment, ...record.enrichment };
     if (record.chat) {
       const prevLen = state.chat.length;
       state.chat = record.chat;
@@ -2161,6 +2169,26 @@ async function geocodeAddress(addr) {
   } catch { return null; }
 }
 
+async function getDriveMinutesFromCondo(lat, lng) {
+  if (!state.condoInfo?.lat || !state.condoInfo?.lng || lat == null || lng == null) return null;
+  try {
+    const coordStr = `${state.condoInfo.lng},${state.condoInfo.lat};${lng},${lat}`;
+    const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=false`);
+    if (!r.ok) return null;
+    const data = await r.json();
+    if (!data.routes || !data.routes.length) return null;
+    return Math.round(data.routes[0].duration / 60);
+  } catch { return null; }
+}
+
+async function fetchUrlEnrichment(targetUrl) {
+  try {
+    const r = await fetch(`${PROXY_BASE}/enrich?url=${encodeURIComponent(targetUrl)}`);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
 // ── ITINERARY MAP ─────────────────────────────────────────────────
 let itineraryLeafletMap = null;
 function getDayStops(dayId) {
@@ -2299,6 +2327,16 @@ function openDetailModal(dayId, slot, entry, act) {
   if (isClosedToday) html += `<div class="dm-closed-note">⚠️ Heads up — this is normally closed on ${day ? day.name : 'this day'}.</div>`;
   if (eff.n) html += `<div class="dm-section"><div class="lbl">Notes</div><div class="val" id="dmNotes">${eff.n}</div></div>`;
   if (act.loc) html += `<div class="dm-section"><div class="lbl">Location</div><div class="val">${act.loc}</div></div>`;
+  if (act.addr) html += `<div class="dm-section"><div class="lbl">Address</div><div class="val">${act.addr}</div></div>`;
+
+  const cached = state.enrichment[entry.actId];
+  html += `<div class="dm-section" id="dmEnrichSection">`;
+  if (cached) {
+    html += renderEnrichmentHTML(cached);
+  } else if (act.lat != null || eff.url) {
+    html += `<button class="dm-btn enrich-btn" id="dmEnrichBtn" type="button">🔎 Get menu, hours & drive time</button>`;
+  }
+  html += `</div>`;
 
   html += `
     <div class="dm-actions">
@@ -2313,6 +2351,43 @@ function openDetailModal(dayId, slot, entry, act) {
   document.getElementById('detailModal').dataset.dayId = dayId;
   document.getElementById('detailModal').dataset.slot = slot;
   document.getElementById('detailModal').dataset.actId = entry.actId;
+
+  const enrichBtn = document.getElementById('dmEnrichBtn');
+  if (enrichBtn) {
+    enrichBtn.addEventListener('click', () => runEnrichment(entry.actId, act, eff));
+  }
+}
+
+function renderEnrichmentHTML(data) {
+  let html = '<div class="lbl">Trip Details</div><div class="enrich-box">';
+  if (data.driveMinutes != null) html += `<div class="enrich-row">🚗 ~${data.driveMinutes} min drive from condo</div>`;
+  if (data.menuUrl) html += `<div class="enrich-row">📋 <a href="${data.menuUrl}" target="_blank" rel="noopener">View menu</a></div>`;
+  if (data.hours) html += `<div class="enrich-row">🕒 Hours found on site — check the website link above for current hours</div>`;
+  if (data.driveMinutes == null && !data.menuUrl && !data.hours) html += `<div class="enrich-row" style="color:var(--muted)">No extra details found for this one.</div>`;
+  html += '</div>';
+  return html;
+}
+
+async function runEnrichment(actId, act, eff) {
+  const btn = document.getElementById('dmEnrichBtn');
+  if (btn) { btn.textContent = 'Looking that up…'; btn.disabled = true; }
+
+  const [urlData, driveMinutes] = await Promise.all([
+    eff.url ? fetchUrlEnrichment(eff.url) : Promise.resolve(null),
+    getDriveMinutesFromCondo(act.lat, act.lng),
+  ]);
+
+  const result = {
+    menuUrl: urlData?.menuUrl || null,
+    hours: urlData?.hours || null,
+    driveMinutes,
+    fetchedAt: Date.now(),
+  };
+  state.enrichment[actId] = result;
+  saveBin();
+
+  const section = document.getElementById('dmEnrichSection');
+  if (section) section.innerHTML = renderEnrichmentHTML(result);
 }
 
 function openEditMode(dayId, slot) {
@@ -2401,7 +2476,7 @@ function closeDetailModal() {
 
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
-  ['mName','mEmoji','mCost','mNote','mAddr'].forEach(id => document.getElementById(id).value = '');
+  ['mName','mEmoji','mCost','mNote','mAddr','mUrl'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('mDur').value = '2';
   document.getElementById('mClosed').value = '';
 }
@@ -2409,6 +2484,7 @@ function submitCustom() {
   const name = document.getElementById('mName').value.trim();
   if (!name) { toast('Name is required!', 'e'); return; }
   const addr = document.getElementById('mAddr').value.trim();
+  const siteUrl = document.getElementById('mUrl').value.trim();
   const act = {
     id: `custom-${Date.now()}`,
     e: document.getElementById('mEmoji').value.trim() || '📌',
@@ -2422,6 +2498,7 @@ function submitCustom() {
     isCustom: true,
   };
   if (addr) act.addr = addr;
+  if (siteUrl) act.url = siteUrl;
   state.customActs.push(act);
   closeModal();
   toast(`✦ "${name}" added!`, 's');
