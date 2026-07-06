@@ -205,6 +205,15 @@ body {
 .tip { font-size: 10px; color: var(--coral-d); font-weight: 700; margin: 3px 0 5px 20px; }
 
 /* OWNER BADGE */
+.personal-tabs { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 14px 6px; }
+.personal-tab { font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 999px; border: 1.5px solid var(--border); background: rgba(255,255,255,.6); color: var(--muted); cursor: pointer; transition: all .12s; }
+.personal-tab.on { color: #fff; border-color: transparent; }
+.personal-empty { padding: 10px 14px; font-size: 11px; color: var(--muted); font-style: italic; }
+.personal-add-row { display: flex; gap: 8px; padding: 10px 14px 14px; }
+.personal-add-row input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--border); font-family: 'Nunito Sans', sans-serif; font-size: 12px; }
+.personal-add-row button { width: 34px; border-radius: 8px; border: none; background: var(--teal); color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; }
+.check-item .item-del { flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; border: none; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; opacity: .5; }
+.check-item .item-del:hover { opacity: 1; color: var(--coral-d); }
 .owner-tag { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 900; cursor: pointer; border: 2px solid rgba(197,221,227,.6); background: transparent; color: var(--muted); transition: all .12s; margin-top: 1px; user-select: none; }
 .owner-tag.assigned { color: #fff; border-color: transparent; }
 .owner-tag:not(.assigned) { opacity: .35; }
@@ -361,56 +370,16 @@ body {
       </div>
     </div>
 
-    <!-- PERSONAL PACKING -->
+    <!-- PERSONAL PACKING (per-person — each account has their own list) -->
     <div class="list-card">
       <div class="list-card-header hc-teal">
         <h2>Personal Packing</h2>
       </div>
-
-      <div class="list-section">
-        <h3>Clothes <span style="font-size:9px;font-weight:600;color:var(--muted)">(4 nights — pack light, 3rd floor no elevator!)</span></h3>
-        <div class="check-item"><input type="checkbox" id="p1"><label for="p1">Swimsuits <span class="note">(2–3 — they don't dry fast in humidity)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p2"><label for="p2">Cover-ups <span class="note">(2)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p3"><label for="p3">Casual shorts + tops <span class="note">(3–4 outfits)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p4"><label for="p4">One nicer outfit <span class="note">(for Moby Dick's / dinner out)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p5"><label for="p5">Pajamas</label></div>
-        <div class="check-item"><input type="checkbox" id="p6"><label for="p6">Underwear <span class="note">(×6)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p7"><label for="p7">Sandals / flip flops</label></div>
-        <div class="check-item"><input type="checkbox" id="p8"><label for="p8">One pair sneakers / walking shoes</label></div>
-        <div class="check-item"><input type="checkbox" id="p9"><label for="p9"><strong>Water shoes</strong> <span class="note">(jetty rocks — non-negotiable!)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p10"><label for="p10">Light cardigan / hoodie <span class="note">(restaurant AC is arctic)</span></label></div>
-      </div>
-
-      <div class="list-section">
-        <h3>Toiletries</h3>
-        <div class="check-item"><input type="checkbox" id="p11"><label for="p11"><strong>Reef-safe sunscreen</strong> <span class="note">(bring a lot — reapply every 90 min!)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p12"><label for="p12">After-sun aloe gel</label></div>
-        <div class="check-item"><input type="checkbox" id="p13"><label for="p13"><strong>Bug spray</strong> <span class="note">(DEET — near marshes it's real)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p14"><label for="p14">Shampoo / conditioner / body wash</label></div>
-        <div class="check-item"><input type="checkbox" id="p15"><label for="p15">Dry shampoo <span class="note">(humidity = hair enemy)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p16"><label for="p16">Face wash + skincare</label></div>
-        <div class="check-item"><input type="checkbox" id="p17"><label for="p17">Deodorant, razor, feminine products</label></div>
-        <div class="check-item"><input type="checkbox" id="p18"><label for="p18">Hair ties, clips</label></div>
-        <div class="check-item"><input type="checkbox" id="p19"><label for="p19">Nail stuff <span class="note">(beach mani touch-up)</span></label></div>
-      </div>
-
-      <div class="list-section">
-        <h3>Tech</h3>
-        <div class="check-item"><input type="checkbox" id="p20"><label for="p20">Phone charger + backup battery pack</label></div>
-        <div class="check-item"><input type="checkbox" id="p21"><label for="p21"><strong>Waterproof phone pouch / dry bag</strong></label></div>
-        <div class="check-item"><input type="checkbox" id="p22"><label for="p22">Earbuds</label></div>
-        <div class="check-item"><input type="checkbox" id="p23"><label for="p23">Camera / GoPro</label></div>
-        <div class="check-item"><input type="checkbox" id="p24"><label for="p24">Portable speaker</label></div>
-      </div>
-
-      <div class="list-section">
-        <h3>Misc Personal</h3>
-        <div class="check-item"><input type="checkbox" id="p25"><label for="p25">Sunglasses + backup pair</label></div>
-        <div class="check-item"><input type="checkbox" id="p26"><label for="p26">Sun hat</label></div>
-        <div class="check-item"><input type="checkbox" id="p27"><label for="p27">Small crossbody bag for going out</label></div>
-        <div class="check-item"><input type="checkbox" id="p28"><label for="p28"><strong>Cash</strong> <span class="note">(Beer Hut is cash only!)</span></label></div>
-        <div class="check-item"><input type="checkbox" id="p29"><label for="p29">ID + cards in waterproof case</label></div>
-        <div class="check-item"><input type="checkbox" id="p30"><label for="p30">Any personal prescriptions</label></div>
+      <div class="personal-tabs" id="personalTabs"></div>
+      <div id="personalItems"></div>
+      <div class="personal-add-row">
+        <input type="text" id="personalAddInput" placeholder="Add an item…" />
+        <button type="button" id="personalAddBtn">+</button>
       </div>
     </div>
 
@@ -526,19 +495,140 @@ body {
 const STORAGE_KEY  = 'porta-lists-v1';
 const OWNERS_KEY   = 'porta-lists-owners-v1';
 const PROXY_BASE = 'https://beach-plz-proxy.lacey-griffith04.workers.dev';
-const DATA_PATH = 'port-a-2026.json';
+const TRIP_DATA_PATH = new URLSearchParams(location.search).get('trip') || 'port-a-2026.json';
 
-// This list is a standalone page (checks/assignments are per-device, not
-// synced), but the account list itself should still match whoever has
-// actually joined the trip planner — so read-only fetch it once on load.
+// Lacey's original pre-filled list — kept exactly as-is. Everyone else starts
+// blank and builds their own with the add-item box below.
+const LACEY_DEFAULT_ITEMS = [
+  {section:'Clothes', html:'Swimsuits <span class="note">(2–3 — they don\'t dry fast in humidity)</span>'},
+  {section:'Clothes', html:'Cover-ups <span class="note">(2)</span>'},
+  {section:'Clothes', html:'Casual shorts + tops <span class="note">(3–4 outfits)</span>'},
+  {section:'Clothes', html:"One nicer outfit <span class=\"note\">(for Moby Dick's / dinner out)</span>"},
+  {section:'Clothes', html:'Pajamas'},
+  {section:'Clothes', html:'Underwear <span class="note">(×6)</span>'},
+  {section:'Clothes', html:'Sandals / flip flops'},
+  {section:'Clothes', html:'One pair sneakers / walking shoes'},
+  {section:'Clothes', html:'<strong>Water shoes</strong> <span class="note">(jetty rocks — non-negotiable!)</span>'},
+  {section:'Clothes', html:'Light cardigan / hoodie <span class="note">(restaurant AC is arctic)</span>'},
+  {section:'Toiletries', html:'<strong>Reef-safe sunscreen</strong> <span class="note">(bring a lot — reapply every 90 min!)</span>'},
+  {section:'Toiletries', html:'After-sun aloe gel'},
+  {section:'Toiletries', html:"<strong>Bug spray</strong> <span class=\"note\">(DEET — near marshes it's real)</span>"},
+  {section:'Toiletries', html:'Shampoo / conditioner / body wash'},
+  {section:'Toiletries', html:'Dry shampoo <span class="note">(humidity = hair enemy)</span>'},
+  {section:'Toiletries', html:'Face wash + skincare'},
+  {section:'Toiletries', html:'Deodorant, razor, feminine products'},
+  {section:'Toiletries', html:'Hair ties, clips'},
+  {section:'Toiletries', html:'Nail stuff <span class="note">(beach mani touch-up)</span>'},
+  {section:'Tech', html:'Phone charger + backup battery pack'},
+  {section:'Tech', html:'<strong>Waterproof phone pouch / dry bag</strong>'},
+  {section:'Tech', html:'Earbuds'},
+  {section:'Tech', html:'Camera / GoPro'},
+  {section:'Tech', html:'Portable speaker'},
+  {section:'Misc Personal', html:'Sunglasses + backup pair'},
+  {section:'Misc Personal', html:'Sun hat'},
+  {section:'Misc Personal', html:'Small crossbody bag for going out'},
+  {section:'Misc Personal', html:'<strong>Cash</strong> <span class="note">(Beer Hut is cash only!)</span>'},
+  {section:'Misc Personal', html:'ID + cards in waterproof case'},
+  {section:'Misc Personal', html:'Any personal prescriptions'},
+].map((it, i) => ({ id: 'lacey-seed-' + i, section: it.section, html: it.html, checked: false }));
+
 let PEOPLE = [];
-async function loadPeople() {
+let PERSONAL_LISTS = {}; // { [personId]: [{id, section, html, checked}] }
+let CURRENT_PERSON = localStorage.getItem('portA_who') || null;
+let _fullRecord = null; // cached full trip record, so saves don't clobber other fields
+
+async function loadTripData() {
   try {
-    const r = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`);
+    const r = await fetch(`${PROXY_BASE}/data/${TRIP_DATA_PATH}`);
     if (!r.ok) return;
     const { record } = await r.json();
+    _fullRecord = record || {};
     if (record.people && record.people.length) PEOPLE = record.people;
-  } catch (e) { /* fall back to unassigned-only tags if offline */ }
+    PERSONAL_LISTS = record.personalLists || {};
+    if (!PERSONAL_LISTS.lacey) PERSONAL_LISTS.lacey = LACEY_DEFAULT_ITEMS;
+    if (!CURRENT_PERSON) CURRENT_PERSON = PEOPLE[0]?.id || 'lacey';
+  } catch (e) { /* offline — personal list becomes read-only for this session */ }
+}
+
+async function savePersonalLists() {
+  if (!_fullRecord) return; // never successfully loaded — don't risk overwriting
+  try {
+    const payload = { ..._fullRecord, personalLists: PERSONAL_LISTS };
+    await fetch(`${PROXY_BASE}/data/${TRIP_DATA_PATH}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch (e) { /* silent — will retry on next change */ }
+}
+
+function personName(id) { return PEOPLE.find(p => p.id === id)?.name || (id === 'lacey' ? 'Lacey' : id); }
+function personColor(id) { return PEOPLE.find(p => p.id === id)?.color || '#6E949E'; }
+
+function renderPersonalTabs() {
+  const el = document.getElementById('personalTabs');
+  // Lacey always shows even before the account system reports her (back-compat with the seeded list)
+  const ids = PEOPLE.length ? PEOPLE.map(p => p.id) : ['lacey'];
+  el.innerHTML = ids.map(id => `
+    <button type="button" class="personal-tab${id === CURRENT_PERSON ? ' on' : ''}"
+      data-pid="${id}" style="${id === CURRENT_PERSON ? `background:${personColor(id)};border-color:${personColor(id)}` : ''}">
+      ${personName(id)}
+    </button>`).join('');
+  el.querySelectorAll('[data-pid]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      CURRENT_PERSON = btn.dataset.pid;
+      localStorage.setItem('portA_who', CURRENT_PERSON);
+      renderPersonalTabs();
+      renderPersonalItems();
+    });
+  });
+}
+
+function renderPersonalItems() {
+  const el = document.getElementById('personalItems');
+  const items = PERSONAL_LISTS[CURRENT_PERSON] || [];
+  if (!items.length) {
+    el.innerHTML = `<div class="personal-empty">No items yet — add what ${personName(CURRENT_PERSON)} needs below.</div>`;
+    return;
+  }
+  const bySection = {};
+  items.forEach(it => { (bySection[it.section || 'Added Items'] ||= []).push(it); });
+  el.innerHTML = Object.entries(bySection).map(([section, its]) => `
+    <div class="list-section">
+      <h3>${section}</h3>
+      ${its.map(it => `
+        <div class="check-item" data-id="${it.id}">
+          <input type="checkbox" ${it.checked ? 'checked' : ''}>
+          <label style="${it.checked ? 'opacity:.45;text-decoration:line-through' : ''}">${it.html}</label>
+          <button type="button" class="item-del" title="Remove">✕</button>
+        </div>`).join('')}
+    </div>`).join('');
+  el.querySelectorAll('.check-item').forEach(row => {
+    const id = row.dataset.id;
+    row.querySelector('input').addEventListener('change', e => {
+      const item = items.find(i => i.id === id);
+      if (item) item.checked = e.target.checked;
+      row.querySelector('label').style.opacity = e.target.checked ? '.45' : '1';
+      row.querySelector('label').style.textDecoration = e.target.checked ? 'line-through' : 'none';
+      savePersonalLists();
+    });
+    row.querySelector('.item-del').addEventListener('click', () => {
+      PERSONAL_LISTS[CURRENT_PERSON] = items.filter(i => i.id !== id);
+      renderPersonalItems();
+      savePersonalLists();
+    });
+  });
+}
+
+function addPersonalItem() {
+  const input = document.getElementById('personalAddInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!PERSONAL_LISTS[CURRENT_PERSON]) PERSONAL_LISTS[CURRENT_PERSON] = [];
+  PERSONAL_LISTS[CURRENT_PERSON].push({ id: 'p' + Date.now() + Math.random().toString(36).slice(2,6), section: null, html: text, checked: false });
+  input.value = '';
+  renderPersonalItems();
+  savePersonalLists();
 }
 
 function saveChecks() {
@@ -645,9 +735,16 @@ document.querySelectorAll('.check-item').forEach(item => {
 
 loadChecks();
 (async () => {
-  await loadPeople();
+  await loadTripData();
   loadOwners(); // re-applies now that PEOPLE is populated
+  renderPersonalTabs();
+  renderPersonalItems();
 })();
+
+document.getElementById('personalAddBtn').addEventListener('click', addPersonalItem);
+document.getElementById('personalAddInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addPersonalItem();
+});
 </script>
 
 </body>
