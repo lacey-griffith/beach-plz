@@ -290,6 +290,9 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .enrich-box { display: flex; flex-direction: column; gap: 6px; background: var(--mint-l); border-radius: 10px; padding: 8px 10px; }
 .enrich-row { font-size: 12px; color: var(--text); }
 .enrich-row a { color: var(--ocean-d); font-weight: 700; }
+.enrich-tip { border-top: 1px solid rgba(27,130,118,.2); padding-top: 5px; }
+.enrich-tip b { color: var(--ocean-d); }
+.enrich-snippet { color: var(--muted); font-size: 11px; font-style: italic; }
 .edit-form { display: flex; flex-direction: column; gap: 12px; }
 .edit-row { display: flex; gap: 10px; }
 .edit-field { display: flex; flex-direction: column; gap: 4px; flex: 1; }
@@ -2363,7 +2366,12 @@ function renderEnrichmentHTML(data) {
   if (data.driveMinutes != null) html += `<div class="enrich-row">🚗 ~${data.driveMinutes} min drive from condo</div>`;
   if (data.menuUrl) html += `<div class="enrich-row">📋 <a href="${data.menuUrl}" target="_blank" rel="noopener">View menu</a></div>`;
   if (data.hours) html += `<div class="enrich-row">🕒 Hours found on site — check the website link above for current hours</div>`;
-  if (data.driveMinutes == null && !data.menuUrl && !data.hours) html += `<div class="enrich-row" style="color:var(--muted)">No extra details found for this one.</div>`;
+  if (data.tips && data.tips.length) {
+    data.tips.forEach(tip => {
+      html += `<div class="enrich-row enrich-tip"><b>${tip.label}:</b> <span class="enrich-snippet">${tip.snippet}</span></div>`;
+    });
+  }
+  if (data.driveMinutes == null && !data.menuUrl && !data.hours && (!data.tips || !data.tips.length)) html += `<div class="enrich-row" style="color:var(--muted)">No extra details found for this one.</div>`;
   html += '</div>';
   return html;
 }
@@ -2380,6 +2388,7 @@ async function runEnrichment(actId, act, eff) {
   const result = {
     menuUrl: urlData?.menuUrl || null,
     hours: urlData?.hours || null,
+    tips: urlData?.tips || [],
     driveMinutes,
     fetchedAt: Date.now(),
   };
