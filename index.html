@@ -386,13 +386,13 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 @keyframes flapR { 0%,100% { transform: rotate(8deg); } 50% { transform: rotate(-9deg); } }
 .ambient-layer { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
 .ambient-layer img { display: block; }
-.amb-turtle { position: fixed; top: 0; left: 0; z-index: 3; will-change: transform; animation: voyage 54s ease-in-out infinite; }
+.amb-turtle { position: fixed; top: 0; left: 0; z-index: 3; will-change: transform; }
 .amb-turtle-body { position: relative; width: 141px; height: 130px; filter: drop-shadow(0 12px 16px rgba(20,52,52,.3)); animation: paddle 3s ease-in-out infinite; }
 .amb-turtle-body img { position: absolute; inset: 0; width: 100%; height: 100%; }
 .amb-flip-l { transform-origin: 29.5% 27.5%; animation: flapL 1.5s ease-in-out infinite; }
 .amb-flip-r { transform-origin: 76.7% 44.7%; animation: flapR 1.5s ease-in-out infinite; }
-.amb-school { position: fixed; top: 0; left: 0; z-index: 3; opacity: .5; will-change: transform; }
-.amb-school img { height: 100px; }
+.amb-school-fish { position: fixed; top: 0; left: 0; z-index: 3; opacity: .68; will-change: transform; filter: drop-shadow(0 4px 8px rgba(16,58,70,.22)); }
+.amb-school-fish img { display: block; }
 .amb-curious { position: fixed; top: 0; left: 0; z-index: 3; will-change: transform; }
 .amb-curious img { filter: drop-shadow(0 5px 9px rgba(16,58,70,.28)); }
 .amb-seahorse { position: fixed; top: 0; left: 0; z-index: 3; opacity: 0; will-change: transform; }
@@ -405,7 +405,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .amb-bg-weed img { height: 90px; }
 @media (prefers-reduced-motion: reduce) {
   .amb-turtle, .amb-turtle-body, .amb-flip-l, .amb-flip-r, .amb-bg-jelly, .amb-bg-star, .amb-bg-weed { animation: none !important; }
-  .amb-school, .amb-curious, .amb-seahorse { display: none !important; }
+  .amb-school-fish, .amb-curious, .amb-seahorse { display: none !important; }
 }
 
 /* ── DINNER PLANNING ── */
@@ -578,7 +578,11 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
   <div class="amb-bg-weed" style="right:3%;animation-delay:.8s"><img src="assets/kelp-green.png" alt=""></div>
   <div class="amb-curious" id="ambCuriousA"><img src="assets/fish-gold.png" alt="" style="height:56px"></div>
   <div class="amb-curious" id="ambCuriousB"><img src="assets/fish-blue.png" alt="" style="height:50px"></div>
-  <div class="amb-school" id="ambSchool"><img src="assets/fish-school.png" alt=""></div>
+  <div class="amb-school-fish" id="ambSchool0"><img src="assets/fish-gold.png" alt="" style="height:34px"></div>
+  <div class="amb-school-fish" id="ambSchool1"><img src="assets/fish-blue.png" alt="" style="height:26px"></div>
+  <div class="amb-school-fish" id="ambSchool2"><img src="assets/fish-gold.png" alt="" style="height:22px"></div>
+  <div class="amb-school-fish" id="ambSchool3"><img src="assets/fish-blue.png" alt="" style="height:19px"></div>
+  <div class="amb-school-fish" id="ambSchool4"><img src="assets/fish-gold.png" alt="" style="height:17px"></div>
   <div class="amb-seahorse" id="ambSeahorse"><img src="assets/seahorse-blue.png" alt=""></div>
   <div class="amb-turtle" id="ambTurtle">
     <div class="amb-turtle-body">
@@ -2967,20 +2971,40 @@ function hydrateHeader() {
   const deskTop = document.querySelector('.sidebar h2');
 }
 
-// ── AMBIENT OCEAN ANIMATION (fish school, curious fish, seahorse) ──
-// Turtle voyage + flippers run on pure CSS (see @keyframes voyage/flapL/flapR).
-// These three are RAF-driven roamers, ported 1:1 from the design prototype.
+// ── AMBIENT OCEAN ANIMATION (turtle, fish school, curious fish, seahorse) ──
+// All RAF-driven so heading/facing always match actual direction of travel —
+// avoids the "swimming backwards" look you get from fixed CSS keyframe rotations.
+const TURTLE_PATH = [
+  { x: -0.16, y: 0.78 }, { x: 0.16, y: 0.56 }, { x: 0.48, y: 0.60 }, { x: 0.80, y: 0.42 },
+  { x: 1.10, y: 0.28 }, { x: 1.14, y: 0.24 }, { x: 0.70, y: 0.15 }, { x: 0.40, y: 0.26 },
+  { x: 0.12, y: 0.42 }, { x: -0.12, y: 0.62 }, { x: -0.20, y: 0.72 }, { x: -0.18, y: 0.78 }, { x: -0.16, y: 0.78 },
+];
+const TURTLE_KEYS = [0, .12, .25, .38, .48, .52, .62, .72, .82, .92, .96, .99, 1];
+const TURTLE_DUR = 54000; // ms, one full loop
+// turtle-blue-crop.png is a top-down illustration whose head points up-and-right
+// at rest (~75° above the positive x-axis); rotation is offset by this so the
+// head always points the direction the turtle is actually travelling.
+const TURTLE_HEAD_OFFSET = 75;
+const SCHOOL_MEMBERS = [
+  { dx: 0,   dy: 0,   phase: 0.0 },
+  { dx: -30, dy: 12,  phase: 1.1 },
+  { dx: 26,  dy: -9,  phase: 2.3 },
+  { dx: -16, dy: -19, phase: 3.6 },
+  { dx: 11,  dy: 20,  phase: 0.6 },
+];
 const Ambient = {
   start() {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (typeof requestAnimationFrame !== 'function') return;
-    this.schoolEl = document.getElementById('ambSchool');
+    this.turtleEl = document.getElementById('ambTurtle');
+    this.schoolEls = SCHOOL_MEMBERS.map((_, i) => document.getElementById('ambSchool' + i));
     this.curiousAEl = document.getElementById('ambCuriousA');
     this.curiousBEl = document.getElementById('ambCuriousB');
     this.seahorseEl = document.getElementById('ambSeahorse');
-    if (!this.schoolEl) return;
+    if (!this.turtleEl) return;
     const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
     const vw = window.innerWidth, vh = window.innerHeight;
+    this.turtleStart = now;
     this.school = { x: vw * 0.5, y: vh * 0.4, tx: vw * 0.5, ty: vh * 0.4, vx: 0, face: 1, nextAt: now + 1200 };
     this.cA = { x: vw * 0.22, y: vh * 0.5, tx: vw * 0.22, ty: vh * 0.5, face: 1, phase: 0, paused: false, nextAt: now + 400 };
     this.cB = { x: vw * 0.74, y: vh * 0.34, tx: vw * 0.74, ty: vh * 0.34, face: 1, phase: 2, paused: false, nextAt: now + 1600 };
@@ -2988,6 +3012,7 @@ const Ambient = {
     this.lastT = now;
     const loop = (t) => {
       const dt = Math.min(0.05, (t - this.lastT) / 1000); this.lastT = t;
+      this.stepTurtle(t);
       this.stepSchool(t, dt);
       this.stepCurious(this.cA, this.curiousAEl, t, dt);
       this.stepCurious(this.cB, this.curiousBEl, t, dt);
@@ -2996,8 +3021,23 @@ const Ambient = {
     };
     this._raf = requestAnimationFrame(loop);
   },
+  stepTurtle(t) {
+    const el = this.turtleEl; if (!el) return;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const prog = ((t - this.turtleStart) % TURTLE_DUR) / TURTLE_DUR;
+    let i = 0;
+    while (i < TURTLE_KEYS.length - 2 && prog > TURTLE_KEYS[i + 1]) i++;
+    const k0 = TURTLE_KEYS[i], k1 = TURTLE_KEYS[i + 1];
+    const segT = (prog - k0) / ((k1 - k0) || 1);
+    const p0 = TURTLE_PATH[i], p1 = TURTLE_PATH[i + 1];
+    const x = (p0.x + (p1.x - p0.x) * segT) * vw;
+    const y = (p0.y + (p1.y - p0.y) * segT) * vh;
+    const dx = (p1.x - p0.x) * vw, dy = (p1.y - p0.y) * vh;
+    const travelAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+    const rotation = travelAngle + TURTLE_HEAD_OFFSET;
+    el.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotation + 'deg)';
+  },
   stepSchool(t, dt) {
-    const el = this.schoolEl; if (!el) return;
     const s = this.school, vw = window.innerWidth, vh = window.innerHeight;
     if (t >= s.nextAt) {
       const m = 170;
@@ -3012,7 +3052,14 @@ const Ambient = {
     s.y += (s.ty - s.y) * Math.min(1, dt * 1.4);
     if (s.vx < -3) s.face = 1; else if (s.vx > 3) s.face = -1;
     const bobY = Math.sin(t / 720) * 7;
-    el.style.transform = 'translate(' + s.x + 'px,' + (s.y + bobY) + 'px) scaleX(' + s.face + ')';
+    // Each member keeps a fixed offset from the group (loose formation) plus its
+    // own bob phase, so the school reads as several fish swimming together
+    // rather than one flat image sliding across the screen.
+    SCHOOL_MEMBERS.forEach((m, i) => {
+      const el = this.schoolEls[i]; if (!el) return;
+      const wob = Math.sin(t / 500 + m.phase) * 4;
+      el.style.transform = 'translate(' + (s.x + m.dx) + 'px,' + (s.y + m.dy + bobY + wob) + 'px) scaleX(' + s.face + ')';
+    });
   },
   stepCurious(s, el, t, dt) {
     if (!el) return;
