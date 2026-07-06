@@ -418,21 +418,22 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .condo-card {
   background: linear-gradient(135deg, var(--ocean-d), var(--ocean), var(--ocean-l));
   color: white;
-  border-radius: 14px;
-  padding: 14px 16px;
+  border-radius: 20px;
+  padding: 26px 28px;
   margin: 16px 16px 0;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  box-shadow: 0 8px 24px rgba(16,58,70,.22);
+  box-shadow: 0 14px 40px rgba(16,58,70,.28);
   position: relative;
   z-index: 2;
 }
-.condo-card .icon { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; margin-top: 8px; }
-.condo-card h3 { font-family: 'Baloo 2', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: .02em; margin-bottom: 3px; }
-.condo-card p { font-size: 11px; opacity: .92; line-height: 1.6; }
-.condo-card .warn { background: rgba(255,255,255,.2); border-radius: 8px; padding: 4px 10px; display: inline-block; font-size: 10.5px; font-weight: 700; margin-top: 5px; }
+.condo-card h3 { font-family: 'Baloo 2', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: .01em; margin-bottom: 4px; }
+.condo-card .condo-addr { font-size: 14px; opacity: .92; margin-bottom: 18px; }
+.condo-card .condo-addr a { color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,.5); }
+.condo-wifi-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+.condo-wifi-field { flex: 1; min-width: 180px; }
+.condo-wifi-field label { display: block; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .8; margin-bottom: 6px; }
+.condo-wifi-field input { width: 100%; padding: 10px 12px; border-radius: 10px; border: none; background: rgba(255,255,255,.16); color: #fff; font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 700; }
+.condo-wifi-field input::placeholder { color: rgba(255,255,255,.55); font-weight: 500; }
+.condo-wifi-field input:focus { outline: 2px solid rgba(255,255,255,.6); background: rgba(255,255,255,.24); }
 @media (min-width: 768px) {
   .condo-card { max-width: 1360px; margin: 16px auto 0; }
 }
@@ -812,11 +813,17 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 
 <!-- CONDO CALLOUT -->
 <div class="condo-card">
-  <div class="icon"></div>
-  <div>
-    <h3>Unit 212 — Executive Keys Condos, Port Aransas</h3>
-    <p>3rd floor · 1,100 sq ft · King bed + Double bed + Twin bunk w/ trundle · 2 private baths · Private balcony (Gulf + courtyard views) · Pool on property · Beach 5 min walk · Full kitchen · 4.83 rating</p>
-    <div class="warn">No elevator in Building 2 — pack smart for that 3rd floor haul!</div>
+  <h3>Unit 212 — Executive Keys Condos</h3>
+  <div class="condo-addr"><a href="https://www.google.com/maps/search/?api=1&query=800+Access+Road+1-A+Port+Aransas+TX+78373" target="_blank" rel="noopener">800 Access Road 1-A, Port Aransas, TX 78373</a></div>
+  <div class="condo-wifi-grid">
+    <div class="condo-wifi-field">
+      <label>WiFi Network</label>
+      <input type="text" id="condoWifi" placeholder="Network name">
+    </div>
+    <div class="condo-wifi-field">
+      <label>WiFi Password</label>
+      <input type="text" id="condoWifiPw" placeholder="Password">
+    </div>
   </div>
 </div>
 
@@ -2272,6 +2279,19 @@ function renderAll() {
   renderCalendar();
   renderSidebar();
   renderDinners();
+  renderCondoCard();
+}
+
+function renderCondoCard() {
+  const wifiEl = document.getElementById('condoWifi');
+  const wifiPwEl = document.getElementById('condoWifiPw');
+  if (!wifiEl || !wifiPwEl) return;
+  if (document.activeElement !== wifiEl) wifiEl.value = state.condoInfo.wifi || '';
+  if (document.activeElement !== wifiPwEl) wifiPwEl.value = state.condoInfo.wifiPw || '';
+}
+function saveCondoField(field, value) {
+  state.condoInfo[field] = value;
+  saveBin();
 }
 
 // ── DINNER PLANNING + SHOPPING LIST ─────────────────────────────────
@@ -3320,6 +3340,8 @@ hydrateHeader();
 setSyncState('busy');
 setWho(ui.currentWho);
 document.getElementById('mCalView') && (document.getElementById('mCalView').checked = ui.calView === 'all');
+document.getElementById('condoWifi').addEventListener('change', e => saveCondoField('wifi', e.target.value));
+document.getElementById('condoWifiPw').addEventListener('change', e => saveCondoField('wifiPw', e.target.value));
 renderAll();
 renderWhoChips();
 updateFilterLabels();
