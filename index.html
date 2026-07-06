@@ -397,6 +397,9 @@ body.active-nicole .cal-wrap { border-color: var(--nicole-c); background: linear
 .di-name { flex: 1; min-width: 0; border: none; background: transparent; font-size: 11px; font-weight: 600; color: var(--text); font-family: inherit; padding: 2px; }
 .di-name:focus { outline: 1.5px solid var(--teal); border-radius: 4px; }
 .di-price { width: 52px; border: 1px solid var(--border); border-radius: 6px; font-size: 10.5px; padding: 2px 4px; font-family: inherit; }
+.di-link { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--mint-l); color: var(--ocean-d); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.di-link:hover { background: var(--teal); color: #fff; }
+.di-link:disabled { opacity: .6; cursor: default; }
 .di-del { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--sand-d); color: var(--muted); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .di-del:hover { background: var(--coral); color: #fff; }
 .dinner-add-row { display: flex; gap: 6px; }
@@ -2122,8 +2125,27 @@ function renderDinners() {
           <input type="checkbox" class="di-check" ${item.checked ? 'checked' : ''} />
           <input type="text" class="di-name" value="${(item.name || '').replace(/"/g, '&quot;')}" />
           <input type="number" class="di-price" placeholder="$" min="0" step="0.01" value="${item.price ?? ''}" />
+          <button class="di-link" title="${item.sourceUrl ? 'Re-check price from saved link' : 'Paste a product link to auto-fill price'}" type="button">${item.sourceUrl ? '🔗' : '📎'}</button>
           <button class="di-del" title="Remove" type="button">✕</button>
         `;
+        row.querySelector('.di-link').addEventListener('click', async () => {
+          const existing = item.sourceUrl || '';
+          const url = prompt('Paste the HEB (or other store) product link:', existing);
+          if (!url) return;
+          item.sourceUrl = url.trim();
+          const btn = row.querySelector('.di-link');
+          btn.textContent = '⏳';
+          btn.disabled = true;
+          const data = await fetchUrlEnrichment(item.sourceUrl);
+          btn.disabled = false;
+          if (data && data.price != null) {
+            item.price = data.price;
+            toast(`💵 Price found: $${data.price.toFixed(2)}`, 's');
+          } else {
+            toast('Couldn\'t find a price on that page — you can still enter it manually.', 'w', 3500);
+          }
+          renderDinners(); saveBin();
+        });
         row.querySelector('.di-check').addEventListener('change', e => {
           item.checked = e.target.checked;
           row.classList.toggle('checked', item.checked);
