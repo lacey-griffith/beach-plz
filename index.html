@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>beach-plz 🌊</title>
+<title>beach-plz</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
@@ -113,6 +113,9 @@ body {
 /* ── ACTIVITY CARDS ── */
 .ac { background: rgba(255,253,247,.88); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(236,226,202,.9); border-radius: 13px; padding: 11px 11px 11px 13px; margin-bottom: 9px; cursor: pointer; display: flex; align-items: center; gap: 11px; transition: all .13s; user-select: none; }
 .ac:hover { border-color: var(--tan-d); box-shadow: 0 2px 8px rgba(90,70,30,.06); transform: translateY(-1px); }
+.ac[draggable="true"] { cursor: grab; }
+.ac.ac-dragging { opacity: .35; }
+.ac-drag-ghost { position: fixed; z-index: 300; pointer-events: none; opacity: .92; box-shadow: 0 8px 22px rgba(16,58,70,.3); transform: rotate(-2deg); }
 .ac.used { opacity: .32; pointer-events: none; }
 .ac.custom-card { border-left: 3px solid var(--teal); }
 .ac-left { flex: 1; min-width: 0; }
@@ -538,6 +541,8 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
     radial-gradient(ellipse 360px 220px at 20% 80%, rgba(232,213,176,.42), transparent 60%);
 }
 .trips-home-inner { max-width: 480px; margin: 0 auto; padding: 40px 20px 60px; }
+.trips-close-btn { position: fixed; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(20,52,52,.1); color: var(--ocean-d); font-size: 16px; cursor: pointer; z-index: 2001; display: flex; align-items: center; justify-content: center; }
+.trips-close-btn:hover { background: rgba(20,52,52,.18); }
 .trips-hero { text-align: center; margin-bottom: 32px; }
 .trips-logo { font-size: 48px; margin-bottom: 4px; }
 .trips-title { font-family: 'Baloo 2', sans-serif; color: var(--ocean-d); font-size: 32px; margin-bottom: 2px; }
@@ -603,6 +608,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 
 <!-- TRIPS HOME SCREEN -->
 <div id="tripsHome" class="trips-home" style="display:none">
+  <button class="trips-close-btn" onclick="hideTripsHome()" title="Back to current trip">✕</button>
   <div class="trips-home-inner">
     <div class="trips-hero">
       <div class="trips-logo"><img src="assets/blue-star.png" alt="" style="width:56px;height:56px;object-fit:contain"></div>
@@ -667,11 +673,11 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 
 <div id="loginGate" class="login-gate" style="display:none">
   <div class="login-card">
-    <div class="login-wave">🌊</div>
+    <div class="login-wave"></div>
     <h2>Port A Planner</h2>
     <p>Who's checking in?</p>
     <div class="login-opts" id="loginOpts"></div>
-    <p class="login-note">🐚 Remembered on this device — no need to choose again.</p>
+    <p class="login-note">Remembered on this device — no need to choose again.</p>
   </div>
 </div>
 
@@ -692,7 +698,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
     <div id="acctStatus" class="edit-lbl" style="color:var(--coral);min-height:16px"></div>
     <div class="mbtn-row">
       <button class="mbtn mbtn-cancel" onclick="closeAcctModal()">Cancel</button>
-      <button class="mbtn mbtn-add" onclick="submitAccount()">🌊 Create & Join</button>
+      <button class="mbtn mbtn-add" onclick="submitAccount()">Create & Join</button>
     </div>
   </div>
 </div>
@@ -870,7 +876,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
     <div class="mfield"><label>Website (optional)</label><input id="mUrl" placeholder="https://…" maxlength="200"/></div>
     <div class="mbtn-row">
       <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="mbtn mbtn-add" onclick="submitCustom()">✦ Add</button>
+      <button class="mbtn mbtn-add" onclick="submitCustom()">Add</button>
     </div>
   </div>
 </div>
@@ -1140,6 +1146,13 @@ function hasConflict(dayId, startSlot, span, skipActId = null) {
     if (entry && entry.actId !== skipActId) return true;
   }
   return false;
+}
+
+function nextAvailableSlot(dayId, dur) {
+  for (let s = 0; s + dur <= TOTAL_SLOTS; s++) {
+    if (!hasConflict(dayId, s, dur)) return s;
+  }
+  return null;
 }
 
 function totalCost() {
@@ -1502,11 +1515,22 @@ function buildActCard(a, forSheet = false) {
       <div class="ac-meta">${cp}<span class="pill pt">~${a.dur*30}min</span>${badge}</div>
       ${closedText}
     </div>
-    ${!used && !closed ? `<button class="ac-add" data-aid="${a.id}">＋</button>` : ''}
+    ${!used && !closed ? `<button class="ac-add" data-aid="${a.id}" title="Add — or drag onto the calendar">＋</button>` : ''}
     <button class="ac-del" data-del="${a.id}" title="${a.isCustom ? 'Delete' : 'Remove from list'}">✕</button>
   `;
   if (!used && !closed) {
     div.querySelector('.ac-add').addEventListener('click', e => { e.stopPropagation(); pickActivity(a.id); });
+    // Desktop: native drag-and-drop straight onto a calendar slot.
+    div.draggable = true;
+    div.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'copy';
+      e.dataTransfer.setData('application/json', JSON.stringify({ newActId: a.id }));
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => div.classList.add('ac-dragging'));
+      else div.classList.add('ac-dragging');
+    });
+    div.addEventListener('dragend', () => div.classList.remove('ac-dragging'));
+    // Mobile/touch: drag the card itself onto the visible calendar below the sheet.
+    div.addEventListener('touchstart', e => startSidebarDrag(e, a.id, div), { passive: true });
   }
   div.querySelector('[data-del]')?.addEventListener('click', e => {
     e.stopPropagation();
@@ -1761,6 +1785,82 @@ function renderMoveSlots(fromDayId, fromSlot, entry, targetDayId) {
     }
     grid.appendChild(btn);
   }
+}
+
+// ── TOUCH DRAG-AND-DROP: SIDEBAR/SHEET ACTIVITY -> CALENDAR ───────
+// Uses a short hold-delay before engaging drag mode so a normal vertical
+// scroll through the activity list isn't hijacked as a drag attempt.
+function startSidebarDrag(e, actId, sourceEl) {
+  if (e.touches.length !== 1) return;
+  const touch = e.touches[0];
+  const startX = touch.clientX, startY = touch.clientY;
+  let dragging = false, cancelled = false, ghost = null;
+  const rect = sourceEl.getBoundingClientRect();
+  const sheet = document.getElementById('sheet');
+  const isSheetOpen = sheet.classList.contains('on');
+
+  const holdTimer = setTimeout(() => {
+    if (cancelled) return;
+    dragging = true;
+    ghost = sourceEl.cloneNode(true);
+    ghost.className = 'ac-drag-ghost';
+    ghost.style.left = rect.left + 'px';
+    ghost.style.top = rect.top + 'px';
+    ghost.style.width = rect.width + 'px';
+    document.body.appendChild(ghost);
+    sourceEl.classList.add('ac-dragging');
+    if (isSheetOpen) sheet.style.transform = 'translateY(70%)';
+    if (navigator.vibrate) navigator.vibrate(12);
+  }, 160);
+
+  const onMove = (ev) => {
+    const t = ev.touches[0];
+    if (!dragging) {
+      // Real scroll intent (moved before the hold-delay elapsed) — bail out clean.
+      if (Math.hypot(t.clientX - startX, t.clientY - startY) > 10) { cancelled = true; clearTimeout(holdTimer); cleanup(); }
+      return;
+    }
+    ev.preventDefault();
+    ghost.style.left = (t.clientX - rect.width / 2) + 'px';
+    ghost.style.top = (t.clientY - 28) + 'px';
+    ghost.style.pointerEvents = 'none';
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    const col = under?.closest('.cc-col');
+    document.querySelectorAll('.cc-col').forEach(c => c.classList.remove('drag-over'));
+    if (col) col.classList.add('drag-over');
+  };
+
+  const onEnd = (ev) => {
+    clearTimeout(holdTimer);
+    cleanup();
+    if (!dragging) return;
+    sourceEl.classList.remove('ac-dragging');
+    if (isSheetOpen) sheet.style.transform = '';
+    document.querySelectorAll('.cc-col').forEach(c => c.classList.remove('drag-over'));
+    if (ghost) ghost.remove();
+    const t = ev.changedTouches[0];
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    const col = under?.closest('.cc-col');
+    const targetDayId = col?.dataset.dayId;
+    if (targetDayId) {
+      const a = getAct(actId);
+      if (!a) return;
+      const slot = nextAvailableSlot(targetDayId, a.dur);
+      if (slot === null) { toast(`No open slot on ${DAYS.find(d=>d.id===targetDayId)?.name} — try another day.`, 'w', 3000); return; }
+      closeSheet();
+      placeAct(targetDayId, slot, actId);
+    }
+  };
+
+  function cleanup() {
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+    document.removeEventListener('touchcancel', onEnd);
+  }
+
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+  document.addEventListener('touchcancel', onEnd);
 }
 
 // ── TOUCH DRAG-AND-DROP BETWEEN COLUMNS ───────────────────────────
@@ -2100,6 +2200,7 @@ function renderCalendar() {
         cell.classList.remove('drag-over');
         try {
           const d = JSON.parse(e.dataTransfer.getData('application/json'));
+          if (d.newActId) { placeAct(day.id, s, d.newActId); return; }
           moveAct(d.fromDay, d.fromSlot, day.id, s - (d.grabOffset || 0), d.actId, d.span, d.who, d.attendees);
         } catch {}
       });
@@ -2421,7 +2522,7 @@ async function openHebSearch(dayId, itemId) {
       closeHebModal();
       renderDinners();
       saveBin();
-      toast(`💵 Applied $${r.price.toFixed(2)} from your H-E-B history`, 's');
+      toast(`Applied $${r.price.toFixed(2)} from your H-E-B history`, 's');
     });
     listEl.appendChild(row);
   });
@@ -2435,7 +2536,7 @@ let itineraryLeafletMap = null;
 function getDayStops(dayId) {
   const stops = [];
   if (state.condoInfo?.lat && state.condoInfo?.lng) {
-    stops.push({ slot: -1, name: '🏠 Condo (start)', lat: state.condoInfo.lat, lng: state.condoInfo.lng, time: '' });
+    stops.push({ slot: -1, name: 'Condo (start)', lat: state.condoInfo.lat, lng: state.condoInfo.lng, time: '' });
   }
   const entries = Object.entries(state.placed[dayId] || {})
     .filter(([, entry]) => entry && entry.isStart)
@@ -2573,15 +2674,15 @@ function openDetailModal(dayId, slot, entry, act) {
   if (cached) {
     html += renderEnrichmentHTML(cached);
   } else if (act.lat != null || eff.url) {
-    html += `<button class="dm-btn enrich-btn" id="dmEnrichBtn" type="button">🔎 Get menu, hours & drive time</button>`;
+    html += `<button class="dm-btn enrich-btn" id="dmEnrichBtn" type="button">Get menu, hours & drive time</button>`;
   }
   html += `</div>`;
 
   html += `
     <div class="dm-actions">
       <a class="dm-btn maps" href="${mapsUrl}" target="_blank" rel="noopener">Directions</a>
-      ${eff.url ? `<a class="dm-btn site" href="${eff.url}" target="_blank" rel="noopener">🔗 Website</a>` : ''}
-      <button class="dm-btn edit-btn" onclick="openEditMode('${dayId}',${slot})">✏️ Edit</button>
+      ${eff.url ? `<a class="dm-btn site" href="${eff.url}" target="_blank" rel="noopener">Website</a>` : ''}
+      <button class="dm-btn edit-btn" onclick="openEditMode('${dayId}',${slot})">Edit</button>
     </div>
   `;
   document.getElementById('detailModalBody').innerHTML = html;
@@ -2599,9 +2700,9 @@ function openDetailModal(dayId, slot, entry, act) {
 
 function renderEnrichmentHTML(data) {
   let html = '<div class="lbl">Trip Details</div><div class="enrich-box">';
-  if (data.driveMinutes != null) html += `<div class="enrich-row">🚗 ~${data.driveMinutes} min drive from condo</div>`;
-  if (data.menuUrl) html += `<div class="enrich-row">📋 <a href="${data.menuUrl}" target="_blank" rel="noopener">View menu</a></div>`;
-  if (data.hours) html += `<div class="enrich-row">🕒 Hours found on site — check the website link above for current hours</div>`;
+  if (data.driveMinutes != null) html += `<div class="enrich-row">~${data.driveMinutes} min drive from condo</div>`;
+  if (data.menuUrl) html += `<div class="enrich-row"><a href="${data.menuUrl}" target="_blank" rel="noopener">View menu</a></div>`;
+  if (data.hours) html += `<div class="enrich-row">Hours found on site — check the website link above for current hours</div>`;
   if (data.tips && data.tips.length) {
     data.tips.forEach(tip => {
       html += `<div class="enrich-row enrich-tip"><b>${tip.label}:</b> <span class="enrich-snippet">${tip.snippet}</span></div>`;
@@ -2667,7 +2768,7 @@ function openEditMode(dayId, slot) {
         <input class="edit-inp" id="editUrl" type="url" placeholder="https://..." value="${eff.url}">
       </div>
       <div class="dm-actions" style="margin-top:16px">
-        <button class="dm-btn maps" onclick="saveEdit('${dayId}',${slot})">💾 Save</button>
+        <button class="dm-btn maps" onclick="saveEdit('${dayId}',${slot})">Save</button>
         <button class="dm-btn site" onclick="clearOverride('${dayId}',${slot})">↺ Reset to default</button>
       </div>
     </div>
@@ -2889,7 +2990,7 @@ function tripStatus(trip) {
   const end   = new Date(trip.endDate   + 'T23:59:59').getTime();
   if (now < start) return { label: 'Upcoming', cls: 'trip-status-upcoming' };
   if (now > end)   return { label: 'Past',     cls: 'trip-status-past' };
-  return { label: '🟢 Live', cls: 'trip-status-live' };
+  return { label: 'Live', cls: 'trip-status-live' };
 }
 
 function renderTripsHome() {
