@@ -1296,6 +1296,39 @@ function migrateActIds() {
   return changed;
 }
 
+// A past bug in the resize-drag handler could leave orphaned "ghost" slots
+// with stale/inconsistent span values after a resize (the slot itself looked
+// empty in the day view but still blocked drops as a false conflict). This
+// rebuilds each day purely from its isStart entries — the source of truth —
+// discarding any orphaned continuation slots that don't line up.
+function repairSpanCorruption() {
+  let changed = false;
+  DAYS.forEach(d => {
+    const dayPlaced = state.placed[d.id];
+    if (!dayPlaced) return;
+    const rebuilt = {};
+    Object.keys(dayPlaced)
+      .map(Number)
+      .filter(s => dayPlaced[s] && dayPlaced[s].isStart)
+      .sort((a, b) => a - b)
+      .forEach(s => {
+        const entry = dayPlaced[s];
+        const span = Math.max(1, entry.span || 1);
+        for (let i = s; i < s + span; i++) {
+          if (rebuilt[i]) return; // overlapping starts — first one wins, don't clobber
+          rebuilt[i] = { actId: entry.actId, isStart: i === s, span, who: entry.who, attendees: entry.attendees };
+        }
+      });
+    const oldKeys = Object.keys(dayPlaced).sort().join(',');
+    const newKeys = Object.keys(rebuilt).sort().join(',');
+    if (oldKeys !== newKeys || JSON.stringify(dayPlaced) !== JSON.stringify(rebuilt)) {
+      state.placed[d.id] = rebuilt;
+      changed = true;
+    }
+  });
+  return changed;
+}
+
 async function loadBin() {
   try {
     const headers = {};
@@ -1353,7 +1386,8 @@ async function loadBin() {
     setSyncState('ok');
     const ownershipChanged = reconcileOwnership();
     const idsChanged = migrateActIds();
-    if (ownershipChanged || idsChanged) {
+    const spansChanged = repairSpanCorruption();
+    if (ownershipChanged || idsChanged || spansChanged) {
       renderAll();
       saveBin();
     }
@@ -2193,15 +2227,17 @@ function renderCalendar() {
               const delta = Math.round((y - startY) / sh);
               const newSpan = Math.max(1, Math.min(origSpan + delta, TOTAL_SLOTS - s));
               if (newSpan === entry.span) return;
+              const oldSpan = entry.span;
               // Clear old, check new
-              for (let i = s; i < s + entry.span; i++) delete state.placed[day.id][i];
+              for (let i = s; i < s + oldSpan; i++) delete state.placed[day.id][i];
               let ok = true;
               for (let i = s; i < s + newSpan; i++) { if (state.placed[day.id][i]) { ok = false; break; } }
               if (ok) {
                 for (let i = s; i < s + newSpan; i++) state.placed[day.id][i] = { actId: entry.actId, isStart: i === s, span: newSpan, who: entry.who, attendees: entry.attendees };
+                entry.span = newSpan; // keep in sync so the next move event clears the correct range
                 renderCalendar();
               } else {
-                for (let i = s; i < s + entry.span; i++) state.placed[day.id][i] = { actId: entry.actId, isStart: i === s, span: entry.span, who: entry.who, attendees: entry.attendees };
+                for (let i = s; i < s + oldSpan; i++) state.placed[day.id][i] = { actId: entry.actId, isStart: i === s, span: oldSpan, who: entry.who, attendees: entry.attendees };
               }
             };
             return onMove;
