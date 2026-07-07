@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>beach-plz</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap');
 
@@ -91,7 +89,7 @@ body {
 .app-body { display: flex; overflow: visible; position: relative; z-index: 2; gap: 16px; padding: 16px 0; align-items: stretch; }
 
 /* ── SIDEBAR ── */
-.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); display: flex; flex-direction: column; overflow: hidden; }
+.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); display: flex; flex-direction: column; overflow: hidden; max-height: 700px; align-self: flex-end; }
 .cal-column { display: flex; flex-direction: column; gap: 16px; flex: 1; min-width: 0; }
 .sidebar-inner { padding: 10px; overflow: hidden; flex: 1; display: flex; flex-direction: column; min-height: 0; }
 #acList { overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px; }
@@ -124,7 +122,7 @@ body {
 .ac-del:hover { border-color: var(--coral); color: var(--coral-d); background: #fffdf7; }
 
 /* ── CALENDAR ── */
-.cal-wrap { overflow-y: auto; overflow-x: auto; min-width: 0; max-height: 620px; border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
+.cal-wrap { overflow-y: auto; overflow-x: auto; min-width: 0; max-height: 700px; border: 1px solid rgba(214,236,232,.95); border-radius: 18px; transition: box-shadow .25s; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); }
 body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7), 0 0 0 2px var(--active-c); }
 .cal-grid { display: grid; }
 /* Desktop: 5 col, Mobile: 1 col — set by JS */
@@ -431,14 +429,11 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .condo-wifi-field input::placeholder { color: rgba(255,255,255,.55); font-weight: 500; }
 .condo-wifi-field input:focus { outline: 2px solid rgba(255,255,255,.6); background: rgba(255,255,255,.24); }
 .dinner-outer { padding: 0; position: relative; z-index: 2; }
-.dinner-outer-hdr { font-family: 'Baloo 2', sans-serif; font-size: 20px; color: var(--ocean-d); margin-bottom: 12px; }
-.dinner-section { display: flex; justify-content: center; }
+.dinner-section { display: flex; justify-content: center; -webkit-overflow-scrolling: touch; }
 .dinner-card { background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 420px; animation: dinnerCardIn .3s ease-out; }
 @keyframes dinnerCardIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
 .dinner-hdr { border-bottom: 2px solid var(--teal); padding-bottom: 6px; margin-bottom: 2px; }
 .dinner-day-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-.dinner-map-btn { font-size: 9.5px; font-weight: 700; color: var(--ocean-d); background: var(--sky-l); border: 1.5px solid var(--border); border-radius: 20px; padding: 3px 9px; cursor: pointer; white-space: nowrap; }
-.dinner-map-btn:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
 .dinner-day { font-weight: 800; font-size: 13px; color: var(--ocean-d); }
 .dinner-date { font-weight: 600; font-size: 10px; color: var(--muted); margin-left: 4px; }
 .dinner-plan { font-size: 11px; color: var(--muted); margin-top: 2px; }
@@ -481,8 +476,6 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .dinner-total { font-size: 11px; font-weight: 800; color: var(--ocean-d); }
 .dinner-clear-btn { font-size: 10px; font-weight: 700; color: var(--coral); background: none; border: 1.5px solid var(--coral); border-radius: 20px; padding: 4px 10px; cursor: pointer; }
 .dinner-clear-btn:hover { background: var(--coral); color: #fff; }
-.itinerary-modal-body { max-width: 640px; }
-.itinerary-map { width: 100%; height: 340px; border-radius: 12px; overflow: hidden; margin: 12px 0; border: 1.5px solid var(--border); background: var(--sky-l); }
 .itinerary-stops { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; }
 .itin-stop { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 5px 8px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; }
 .itin-stop .itin-num { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -500,7 +493,6 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
   .sidebar { display: flex; }
   .dinner-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; justify-content: stretch; }
   .dinner-card { max-width: none; padding: 18px 20px; gap: 10px; }
-  .dinner-outer-hdr { font-size: 24px; margin-bottom: 16px; }
 }
 @media (max-width: 767px) {
   .sidebar { display: none; }
@@ -844,7 +836,6 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
     <div class="cal-column">
       <!-- DINNER PLANNING + SHOPPING LISTS -->
       <div class="dinner-outer">
-        <h2 class="dinner-outer-hdr">Dinner Planning</h2>
         <div class="dinner-section" id="dinnerSection"></div>
       </div>
 
@@ -889,17 +880,6 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
   <div class="sea-glass-modal" id="detailModalBody"></div>
 </div>
 
-<!-- ITINERARY MAP MODAL -->
-<div class="modal-overlay" id="itineraryModal" style="display:none" onclick="if(event.target===this)closeItineraryMap()">
-  <div class="sea-glass-modal itinerary-modal-body">
-    <h3 id="itineraryTitle">Daily Itinerary</h3>
-    <div id="itineraryMapEl" class="itinerary-map"></div>
-    <div id="itineraryStopsList" class="itinerary-stops"></div>
-    <div class="mbtn-row">
-      <button class="mbtn mbtn-cancel" onclick="closeItineraryMap()">Close</button>
-    </div>
-  </div>
-</div>
 
 <!-- H-E-B HISTORY SEARCH MODAL -->
 <div class="modal-overlay" id="hebModal" style="display:none" onclick="if(event.target===this)closeHebModal()">
@@ -929,7 +909,7 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
       </div>
     </div>
     <div class="mfield"><label>Note (optional)</label><input id="mNote" placeholder="Location, tip, etc." maxlength="80"/></div>
-    <div class="mfield"><label>Address (optional, for itinerary map)</label><input id="mAddr" placeholder="e.g. 323 Beach St, Port Aransas, TX" maxlength="120"/></div>
+    <div class="mfield"><label>Address (optional)</label><input id="mAddr" placeholder="e.g. 323 Beach St, Port Aransas, TX" maxlength="120"/></div>
     <div class="mfield"><label>Website (optional)</label><input id="mUrl" placeholder="https://…" maxlength="200"/></div>
     <div class="mbtn-row">
       <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
@@ -1559,7 +1539,7 @@ function buildActCard(a, forSheet = false) {
     // Desktop: native drag-and-drop straight onto a calendar slot.
     div.draggable = true;
     div.addEventListener('dragstart', e => {
-      e.dataTransfer.effectAllowed = 'copy';
+      e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('application/json', JSON.stringify({ newActId: a.id }));
       if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => div.classList.add('ac-dragging'));
       else div.classList.add('ac-dragging');
@@ -2054,18 +2034,12 @@ function renderCardCalendar(grid) {
     wrap.addEventListener('scroll', () => {
       clearTimeout(scrollTimer);
       scrollTimer = setTimeout(() => {
-        const wrapRect = wrap.getBoundingClientRect();
-        const centerX = wrapRect.left + wrapRect.width / 2;
-        let closest = null, closestDist = Infinity;
-        wrap.querySelectorAll('.cc-col').forEach(col => {
-          const r = col.getBoundingClientRect();
-          const colCenter = r.left + r.width / 2;
-          const dist = Math.abs(colCenter - centerX);
-          if (dist < closestDist) { closestDist = dist; closest = col.dataset.dayId; }
-        });
+        const closest = findCenteredDay(wrap, '.cc-col');
         if (closest && closest !== ui.curDay) {
           ui.curDay = closest;
           highlightDayTab(closest);
+          const dinnerEl = document.getElementById('dinnerSection');
+          if (dinnerEl) scrollCarouselToDay(dinnerEl, closest, '.dinner-card');
         }
       }, 120);
     }, { passive: true });
@@ -2085,7 +2059,10 @@ function renderCalendar() {
   if (!desktop) {
     renderCardCalendar(grid);
     const newWrap = grid.querySelector('.cc-wrap');
-    if (newWrap) newWrap.scrollLeft = savedLeft;
+    if (newWrap) {
+      if (ui.calView === 'all') scrollCarouselToDay(newWrap, ui.curDay, '.cc-col');
+      else newWrap.scrollLeft = savedLeft;
+    }
     return;
   }
 
@@ -2145,10 +2122,11 @@ function renderCalendar() {
           pa.style.color = cat.text;
           pa.style.height = `${entry.span * sh - 4}px`;
           pa.draggable = true;
+          const isTiny = entry.span <= 1;
           pa.innerHTML = `
             <div class="pa-name">${eff.name}</div>
-            <div class="pa-dur">${durLabel(entry.span)}</div>
-            <div class="pa-meta">${slotToTime(s)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div>
+            ${isTiny ? '' : `<div class="pa-dur">${durLabel(entry.span)}</div>
+            <div class="pa-meta">${slotToTime(s)} · ${eff.cost === 0 ? 'Free' : `$${eff.cost}/p`}</div>`}
             <div class="pa-menu-btn" title="Options">⋯</div>
             <div class="pa-avatars">${att.map(id => `<span class="av-dot" style="background:${personColor(id)}">${personInitial(id)}</span>`).join('')}</div>
             <div class="pa-resize" title="Drag to resize"></div>
@@ -2274,20 +2252,21 @@ function renderDinners() {
   if (!container) return;
   container.innerHTML = '';
   const desktop = isDesktop();
-  const daysToRender = desktop ? DAYS : [DAYS.find(d => d.id === ui.curDay) || DAYS[0]];
-  // Set the grid explicitly in JS rather than leaning on a CSS media query —
-  // guarantees the layout always matches the exact same desktop/mobile decision
-  // used just above, with zero chance of the two disagreeing.
+  const daysToRender = DAYS; // all days always present — mobile scrolls/swipes between them
   if (desktop) {
     container.style.display = 'grid';
     container.style.gridTemplateColumns = `repeat(${daysToRender.length}, minmax(0, 1fr))`;
     container.style.gap = '16px';
     container.style.justifyContent = '';
+    container.style.overflowX = '';
+    container.style.scrollSnapType = '';
   } else {
     container.style.display = 'flex';
     container.style.gridTemplateColumns = '';
-    container.style.gap = '';
-    container.style.justifyContent = 'center';
+    container.style.gap = '0';
+    container.style.justifyContent = '';
+    container.style.overflowX = 'auto';
+    container.style.scrollSnapType = 'x mandatory';
   }
   daysToRender.forEach(day => {
     const dinner = state.dinners[day.id] || (state.dinners[day.id] = { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } });
@@ -2295,7 +2274,9 @@ function renderDinners() {
     if (dinner.out === undefined) dinner.out = false;
     const card = document.createElement('div');
     card.className = 'dinner-card';
-    card.style.maxWidth = desktop ? 'none' : '420px';
+    card.dataset.dayId = day.id;
+    if (desktop) { card.style.maxWidth = 'none'; card.style.flex = ''; card.style.scrollSnapAlign = ''; }
+    else { card.style.maxWidth = 'none'; card.style.flex = '0 0 100%'; card.style.scrollSnapAlign = 'center'; }
     const found = getDinnerActivity(day.id);
     const dinnerLabel = found ? `${found.act.name} · ${slotToTime(found.slot)}` : '';
     const total = dinner.items.reduce((sum, it) => sum + (Number(it.price) || 0), 0);
@@ -2303,7 +2284,6 @@ function renderDinners() {
       <div class="dinner-hdr">
         <div class="dinner-day-row">
           <div class="dinner-day">${day.name} <span class="dinner-date">${day.date}</span></div>
-          <button class="dinner-map-btn" type="button" title="View itinerary map">Map</button>
         </div>
         ${dinnerLabel ? `<div class="dinner-plan">On the calendar: ${dinnerLabel}</div>` : ''}
       </div>
@@ -2314,7 +2294,6 @@ function renderDinners() {
       <div class="dinner-body" id="dinnerBody-${day.id}"></div>
     `;
 
-    card.querySelector('.dinner-map-btn').addEventListener('click', () => openItineraryMap(day.id));
     card.querySelectorAll('.dinner-seg').forEach(btn => {
       btn.addEventListener('click', () => {
         dinner.out = btn.dataset.mode === 'out';
@@ -2474,6 +2453,53 @@ function renderDinners() {
 
     container.appendChild(card);
   });
+
+  if (!desktop) {
+    scrollCarouselToDay(container, ui.curDay, '.dinner-card');
+    let dinnerScrollTimer = null;
+    container.addEventListener('scroll', () => {
+      clearTimeout(dinnerScrollTimer);
+      dinnerScrollTimer = setTimeout(() => {
+        const closest = findCenteredDay(container, '.dinner-card');
+        if (closest && closest !== ui.curDay) {
+          ui.curDay = closest;
+          highlightDayTab(closest);
+          syncCalendarToDay(closest);
+        }
+      }, 120);
+    }, { passive: true });
+  }
+}
+
+// Finds which full-width carousel item is nearest the horizontal center of its
+// scroll container — shared logic for keeping the dinner and calendar
+// carousels in sync as the person swipes through either one.
+function findCenteredDay(container, itemSelector) {
+  const rect = container.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  let closest = null, closestDist = Infinity;
+  container.querySelectorAll(itemSelector).forEach(item => {
+    const r = item.getBoundingClientRect();
+    const dist = Math.abs((r.left + r.width / 2) - centerX);
+    if (dist < closestDist) { closestDist = dist; closest = item.dataset.dayId; }
+  });
+  return closest;
+}
+function scrollCarouselToDay(container, dayId, itemSelector) {
+  if (!container) return;
+  const item = container.querySelector(`${itemSelector}[data-day-id="${dayId}"]`);
+  if (item) container.scrollLeft = item.offsetLeft - container.offsetLeft;
+}
+// When one carousel (dinner or calendar) settles on a new day via swipe, bring
+// the other one to match — scroll it if it's already showing all days, or
+// just re-render it if it's in single-day mode.
+function syncCalendarToDay(dayId) {
+  const ccWrap = document.querySelector('#calGrid .cc-wrap');
+  if (ccWrap && ui.calView === 'all') {
+    scrollCarouselToDay(ccWrap, dayId, '.cc-col');
+  } else if (ui.calView === 'day') {
+    renderCalendar();
+  }
 }
 
 // ── GEOCODING (for custom activity addresses) ───────────────────────
@@ -2592,83 +2618,6 @@ async function openHebSearch(dayId, itemId) {
 }
 function closeHebModal() {
   document.getElementById('hebModal').style.display = 'none';
-}
-
-// ── ITINERARY MAP ─────────────────────────────────────────────────
-let itineraryLeafletMap = null;
-function getDayStops(dayId) {
-  const stops = [];
-  if (state.condoInfo?.lat && state.condoInfo?.lng) {
-    stops.push({ slot: -1, name: 'Condo (start)', lat: state.condoInfo.lat, lng: state.condoInfo.lng, time: '' });
-  }
-  const entries = Object.entries(state.placed[dayId] || {})
-    .filter(([, entry]) => entry && entry.isStart)
-    .map(([slotKey, entry]) => ({ slot: Number(slotKey), entry }))
-    .sort((a, b) => a.slot - b.slot);
-  entries.forEach(({ slot, entry }) => {
-    const act = getAct(entry.actId);
-    if (!act || act.lat == null || act.lng == null) return;
-    stops.push({ slot, name: `${act.e} ${act.name}`, lat: act.lat, lng: act.lng, time: slotToTime(slot) });
-  });
-  return stops;
-}
-
-function openItineraryMap(dayId) {
-  const day = DAYS.find(d => d.id === dayId);
-  document.getElementById('itineraryTitle').textContent = `${day?.name || ''} Itinerary`;
-  document.getElementById('itineraryModal').style.display = 'flex';
-
-  const stops = getDayStops(dayId);
-  const stopsListEl = document.getElementById('itineraryStopsList');
-  const mapEl = document.getElementById('itineraryMapEl');
-
-  if (stops.length < 2) {
-    stopsListEl.innerHTML = '';
-    mapEl.innerHTML = '<div class="itinerary-empty">Not enough located stops yet for a route.<br>Add activities with known addresses to this day to see them mapped.</div>';
-    if (itineraryLeafletMap) { itineraryLeafletMap.remove(); itineraryLeafletMap = null; }
-    return;
-  }
-
-  stopsListEl.innerHTML = stops.map((s, i) => `
-    <div class="itin-stop">
-      <span class="itin-num">${i + 1}</span>
-      <span class="itin-name">${s.name}</span>
-      <span class="itin-time">${s.time}</span>
-    </div>
-  `).join('');
-
-  mapEl.innerHTML = '';
-  setTimeout(() => {
-    if (itineraryLeafletMap) { itineraryLeafletMap.remove(); itineraryLeafletMap = null; }
-    itineraryLeafletMap = L.map('itineraryMapEl');
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(itineraryLeafletMap);
-
-    const bounds = [];
-    stops.forEach((s, i) => {
-      const marker = L.marker([s.lat, s.lng]).addTo(itineraryLeafletMap);
-      marker.bindPopup(`<b>${i + 1}. ${s.name}</b>${s.time ? '<br>' + s.time : ''}`);
-      bounds.push([s.lat, s.lng]);
-    });
-    itineraryLeafletMap.fitBounds(bounds, { padding: [30, 30] });
-
-    // Draw the route via OSRM (free public routing server)
-    const coordStr = stops.map(s => `${s.lng},${s.lat}`).join(';');
-    fetch(`https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (!data || !data.routes || !data.routes.length) return;
-        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-        L.polyline(coords, { color: '#1B8276', weight: 4, opacity: 0.75 }).addTo(itineraryLeafletMap);
-      })
-      .catch(() => {}); // route is a nice-to-have; markers alone still work if this fails
-  }, 50);
-}
-
-function closeItineraryMap() {
-  document.getElementById('itineraryModal').style.display = 'none';
-  if (itineraryLeafletMap) { itineraryLeafletMap.remove(); itineraryLeafletMap = null; }
 }
 
 // ── SHEET (mobile) ────────────────────────────────────────────────
