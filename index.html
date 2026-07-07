@@ -428,6 +428,29 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .condo-wifi-field input { width: 100%; padding: 10px 12px; border-radius: 10px; border: none; background: rgba(255,255,255,.16); color: #fff; font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 700; }
 .condo-wifi-field input::placeholder { color: rgba(255,255,255,.55); font-weight: 500; }
 .condo-wifi-field input:focus { outline: 2px solid rgba(255,255,255,.6); background: rgba(255,255,255,.24); }
+
+/* MASTER CHECKLIST */
+.checklist-outer { padding: 24px 0; position: relative; z-index: 2; }
+.checklist-hdr { font-family: 'Baloo 2', sans-serif; font-size: 20px; color: var(--ocean-d); margin-bottom: 12px; }
+.checklist-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 900px) { .checklist-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .checklist-grid { grid-template-columns: 1fr; } }
+.checklist-col { background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 16px; box-shadow: 0 10px 30px rgba(16,58,70,.18); display: flex; flex-direction: column; min-height: 160px; transition: box-shadow .15s, background .15s; }
+.checklist-col.drag-over { box-shadow: 0 0 0 3px var(--teal), 0 10px 30px rgba(16,58,70,.18); background: rgba(240,250,248,.85); }
+.checklist-col-hdr { padding: 10px 14px; border-radius: 16px 16px 0 0; font-weight: 800; font-size: 13px; color: #fff; }
+.checklist-items { flex: 1; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; min-height: 40px; }
+.checklist-item { display: flex; align-items: center; gap: 7px; padding: 5px 6px; border-radius: 8px; cursor: grab; }
+.checklist-item:hover { background: rgba(255,255,255,.5); }
+.checklist-item.dragging { opacity: .35; }
+.checklist-item input[type=checkbox] { width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+.checklist-item label { flex: 1; font-size: 12.5px; font-weight: 600; color: var(--text); cursor: pointer; }
+.checklist-item.checked label { opacity: .5; text-decoration: line-through; }
+.checklist-item .item-del { flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; border: none; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; opacity: .4; }
+.checklist-item .item-del:hover { opacity: 1; color: var(--coral-d); }
+.checklist-empty-hint { font-size: 10.5px; color: var(--muted); font-style: italic; padding: 6px; text-align: center; }
+.checklist-add-row { display: flex; gap: 6px; padding: 8px 10px 10px; }
+.checklist-add-row input { flex: 1; min-width: 0; padding: 6px 9px; border-radius: 8px; border: 1.5px solid var(--border); font-family: 'Nunito Sans', sans-serif; font-size: 11.5px; }
+.checklist-add-row button { width: 26px; height: 26px; border-radius: 8px; border: none; background: var(--teal); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
 .dinner-outer { padding: 0; position: relative; z-index: 2; }
 .dinner-section { display: flex; justify-content: center; -webkit-overflow-scrolling: touch; }
 .dinner-card { background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 420px; animation: dinnerCardIn .3s ease-out; }
@@ -845,6 +868,12 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
       </div>
     </div>
   </div>
+
+  <!-- MASTER CHECKLIST: house + food packing, drag between columns to assign -->
+  <div class="checklist-outer">
+    <h2 class="checklist-hdr">Packing & Shopping</h2>
+    <div class="checklist-grid" id="checklistGrid"></div>
+  </div>
 </div>
 
 <!-- FAB (mobile) -->
@@ -1062,6 +1091,7 @@ let state = {
   dinners: Object.fromEntries(DAYS.map(d => [d.id, { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } }])),
   enrichment: {},
   people: [], // [{id, name, color}] — accounts are open: anyone can create one, no password
+  masterChecklist: [], // [{id, text, column, checked}] — shared house/food packing list
 };
 let ui = {
   curDay: 'wed',
@@ -1215,7 +1245,7 @@ function setSyncState(s) {
 async function saveBin() {
   setSyncState('busy');
   try {
-    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, dinners: state.dinners, enrichment: state.enrichment, people: state.people };
+    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, dinners: state.dinners, enrichment: state.enrichment, people: state.people, masterChecklist: state.masterChecklist };
     const putRes = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1294,6 +1324,7 @@ async function loadBin() {
       });
     }
     if (record.enrichment) state.enrichment = { ...state.enrichment, ...record.enrichment };
+    if (record.masterChecklist) state.masterChecklist = record.masterChecklist;
     if (record.people && record.people.length) {
       state.people = record.people;
     } else if (!state.people.length) {
@@ -2232,6 +2263,7 @@ function renderAll() {
   renderSidebar();
   renderDinners();
   renderCondoCard();
+  renderMasterChecklist();
 }
 
 function renderCondoCard() {
@@ -2244,6 +2276,166 @@ function renderCondoCard() {
 function saveCondoField(field, value) {
   state.condoInfo[field] = value;
   saveBin();
+}
+
+// ── MASTER CHECKLIST (house + food, drag between columns to assign) ──
+const CHECKLIST_COLUMNS = [
+  { id: 'lacey', label: 'Lacey' },
+  { id: 'nicole', label: 'Nicole' },
+  { id: 'all', label: 'All' },
+  { id: 'buythere', label: 'Buy There' },
+];
+function checklistColColor(colId) {
+  if (colId === 'lacey') return personColor('lacey');
+  if (colId === 'nicole') return personColor('nicole');
+  if (colId === 'buythere') return '#d99b3f';
+  return '#0a7a6d';
+}
+
+function renderMasterChecklist() {
+  const grid = document.getElementById('checklistGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  CHECKLIST_COLUMNS.forEach(col => {
+    const colEl = document.createElement('div');
+    colEl.className = 'checklist-col';
+    colEl.dataset.col = col.id;
+    const items = state.masterChecklist.filter(it => it.column === col.id);
+    colEl.innerHTML = `
+      <div class="checklist-col-hdr" style="background:${checklistColColor(col.id)}">${col.label}</div>
+      <div class="checklist-items" id="checklistItems-${col.id}">
+        ${items.length ? '' : '<div class="checklist-empty-hint">Drag items here, or add below</div>'}
+      </div>
+      <div class="checklist-add-row">
+        <input type="text" placeholder="Add item…" id="checklistAdd-${col.id}" />
+        <button type="button" data-add-col="${col.id}">+</button>
+      </div>
+    `;
+    const itemsEl = colEl.querySelector('.checklist-items');
+    items.forEach(it => {
+      const row = document.createElement('div');
+      row.className = 'checklist-item' + (it.checked ? ' checked' : '');
+      row.draggable = true;
+      row.dataset.itemId = it.id;
+      row.innerHTML = `
+        <input type="checkbox" ${it.checked ? 'checked' : ''} id="ci-${it.id}">
+        <label for="ci-${it.id}">${it.text}</label>
+        <button type="button" class="item-del" title="Remove">✕</button>
+      `;
+      row.querySelector('input[type=checkbox]').addEventListener('change', e => {
+        it.checked = e.target.checked;
+        row.classList.toggle('checked', it.checked);
+        saveBin();
+      });
+      row.querySelector('.item-del').addEventListener('click', () => {
+        state.masterChecklist = state.masterChecklist.filter(x => x.id !== it.id);
+        renderMasterChecklist();
+        saveBin();
+      });
+      row.addEventListener('dragstart', e => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('application/json', JSON.stringify({ checklistItemId: it.id }));
+        if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => row.classList.add('dragging'));
+        else row.classList.add('dragging');
+      });
+      row.addEventListener('dragend', () => row.classList.remove('dragging'));
+      row.addEventListener('touchstart', e => startChecklistDrag(e, it.id, row), { passive: true });
+      itemsEl.appendChild(row);
+    });
+    colEl.querySelector(`#checklistAdd-${col.id}`).addEventListener('keydown', e => {
+      if (e.key === 'Enter') addChecklistItem(col.id);
+    });
+    colEl.querySelector('[data-add-col]').addEventListener('click', () => addChecklistItem(col.id));
+    colEl.addEventListener('dragover', e => { e.preventDefault(); colEl.classList.add('drag-over'); e.dataTransfer.dropEffect = 'move'; });
+    colEl.addEventListener('dragleave', () => colEl.classList.remove('drag-over'));
+    colEl.addEventListener('drop', e => {
+      e.preventDefault();
+      colEl.classList.remove('drag-over');
+      try {
+        const d = JSON.parse(e.dataTransfer.getData('application/json'));
+        if (d.checklistItemId) moveChecklistItem(d.checklistItemId, col.id);
+      } catch {}
+    });
+    grid.appendChild(colEl);
+  });
+}
+
+function addChecklistItem(column) {
+  const input = document.getElementById(`checklistAdd-${column}`);
+  const text = input.value.trim();
+  if (!text) return;
+  state.masterChecklist.push({ id: 'mc' + Date.now() + Math.random().toString(36).slice(2, 6), text, column, checked: false });
+  input.value = '';
+  renderMasterChecklist();
+  saveBin();
+}
+function moveChecklistItem(itemId, newColumn) {
+  const item = state.masterChecklist.find(x => x.id === itemId);
+  if (!item || item.column === newColumn) return;
+  item.column = newColumn;
+  renderMasterChecklist();
+  saveBin();
+}
+// Mobile touch-drag for reassigning a checklist item to a different column —
+// same hold-delay pattern as the sidebar-to-calendar drag, so it doesn't
+// hijack normal scrolling.
+function startChecklistDrag(e, itemId, sourceEl) {
+  if (e.touches.length !== 1) return;
+  const touch = e.touches[0];
+  const startX = touch.clientX, startY = touch.clientY;
+  let dragging = false, cancelled = false, ghost = null;
+  const rect = sourceEl.getBoundingClientRect();
+
+  const holdTimer = setTimeout(() => {
+    if (cancelled) return;
+    dragging = true;
+    ghost = sourceEl.cloneNode(true);
+    ghost.className = 'ac-drag-ghost';
+    ghost.style.left = rect.left + 'px';
+    ghost.style.top = rect.top + 'px';
+    ghost.style.width = rect.width + 'px';
+    document.body.appendChild(ghost);
+    sourceEl.classList.add('dragging');
+    if (navigator.vibrate) navigator.vibrate(12);
+  }, 160);
+
+  const onMove = (ev) => {
+    const t = ev.touches[0];
+    if (!dragging) {
+      if (Math.hypot(t.clientX - startX, t.clientY - startY) > 10) { cancelled = true; clearTimeout(holdTimer); cleanup(); }
+      return;
+    }
+    ev.preventDefault();
+    ghost.style.left = (t.clientX - rect.width / 2) + 'px';
+    ghost.style.top = (t.clientY - 20) + 'px';
+    ghost.style.pointerEvents = 'none';
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    const col = under?.closest('.checklist-col');
+    document.querySelectorAll('.checklist-col').forEach(c => c.classList.remove('drag-over'));
+    if (col) col.classList.add('drag-over');
+  };
+
+  const onEnd = (ev) => {
+    clearTimeout(holdTimer);
+    cleanup();
+    if (!dragging) return;
+    sourceEl.classList.remove('dragging');
+    document.querySelectorAll('.checklist-col').forEach(c => c.classList.remove('drag-over'));
+    if (ghost) ghost.remove();
+    const t = ev.changedTouches[0];
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    const col = under?.closest('.checklist-col');
+    if (col) moveChecklistItem(itemId, col.dataset.col);
+  };
+
+  function cleanup() {
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+    document.removeEventListener('touchcancel', onEnd);
+  }
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+  document.addEventListener('touchcancel', onEnd);
 }
 
 // ── DINNER PLANNING + SHOPPING LIST ─────────────────────────────────
