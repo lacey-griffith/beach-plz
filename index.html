@@ -86,11 +86,13 @@ body {
 .day-tab.on .dt-name { color: var(--ocean-d); }
 
 /* ── MAIN BODY ── */
-.app-body { display: flex; overflow: visible; position: relative; z-index: 2; gap: 16px; padding: 16px 0; align-items: stretch; }
+/* Mobile default: everything just stacks in source order (condo, sidebar
+   [hidden], dinner, calendar, checklist). Desktop rearranges via grid areas
+   below so the condo card sits beside the dinner row, above the sidebar. */
+.trip-content-wrap { display: block; }
 
 /* ── SIDEBAR ── */
-.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); display: flex; flex-direction: column; overflow: hidden; max-height: 700px; align-self: flex-end; }
-.cal-column { display: flex; flex-direction: column; gap: 16px; flex: 1; min-width: 0; }
+.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); display: flex; flex-direction: column; overflow: hidden; max-height: 700px; }
 .sidebar-inner { padding: 10px; overflow: hidden; flex: 1; display: flex; flex-direction: column; min-height: 0; }
 #acList { overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px; }
 .sidebar h2 { font-size: 9.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ocean); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 2px solid var(--teal); }
@@ -516,11 +518,24 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
   .sidebar { display: flex; }
   .dinner-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; justify-content: stretch; }
   .dinner-card { max-width: none; padding: 18px 20px; gap: 10px; }
+  .trip-content-wrap {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "condo   dinner"
+      "sidebar cal"
+      "checklist checklist";
+    gap: 16px;
+  }
+  .condo-card { grid-area: condo; margin: 0; }
+  .sidebar { grid-area: sidebar; }
+  .dinner-outer { grid-area: dinner; }
+  .cal-wrap { grid-area: cal; }
+  .checklist-outer { grid-area: checklist; }
 }
 @media (max-width: 767px) {
   .sidebar { display: none; }
-  .app-body { display: block; overflow: visible; }
-  .cal-column { display: block; }
   .cal-wrap { height: calc(100vh - 360px); overflow-y: auto; }
   .drag-hint { display: none; }
   .hdr { padding: 7px 12px; gap: 6px; }
@@ -835,38 +850,31 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
     </div>
   </div>
 
-  <!-- APP BODY -->
-  <div class="app-body">
-
-    <!-- SIDEBAR (desktop) -->
-    <div class="sidebar">
-      <div class="sidebar-inner">
-        <div class="who-bar" style="margin-bottom:8px;border-bottom:none;padding:0;background:transparent">
-          <button class="filter-toggle-btn" onclick="openFilterPopover(event)">Show: <span id="dFilterLbl">Everyone</span></button>
-        </div>
-        <button class="add-btn" onclick="openModal()">＋ Add custom activity</button>
-        <h2>Activities</h2>
-        <div class="ftabs" id="ftabs">
-          <div class="ftab on" data-f="all">All</div>
-          <div class="ftab" data-f="custom">Custom</div>
-          <div class="ftab" data-f="hidden" title="Removed activities">Hidden</div>
-        </div>
-        <div id="acList"></div>
+  <!-- SIDEBAR (desktop) -->
+  <div class="sidebar">
+    <div class="sidebar-inner">
+      <div class="who-bar" style="margin-bottom:8px;border-bottom:none;padding:0;background:transparent">
+        <button class="filter-toggle-btn" onclick="openFilterPopover(event)">Show: <span id="dFilterLbl">Everyone</span></button>
       </div>
+      <button class="add-btn" onclick="openModal()">＋ Add custom activity</button>
+      <h2>Activities</h2>
+      <div class="ftabs" id="ftabs">
+        <div class="ftab on" data-f="all">All</div>
+        <div class="ftab" data-f="custom">Custom</div>
+        <div class="ftab" data-f="hidden" title="Removed activities">Hidden</div>
+      </div>
+      <div id="acList"></div>
     </div>
+  </div>
 
-    <!-- CALENDAR COLUMN: dinner planning stacked above the calendar, same width -->
-    <div class="cal-column">
-      <!-- DINNER PLANNING + SHOPPING LISTS -->
-      <div class="dinner-outer">
-        <div class="dinner-section" id="dinnerSection"></div>
-      </div>
+  <!-- DINNER PLANNING + SHOPPING LISTS -->
+  <div class="dinner-outer">
+    <div class="dinner-section" id="dinnerSection"></div>
+  </div>
 
-      <!-- CALENDAR -->
-      <div class="cal-wrap">
-        <div class="cal-grid" id="calGrid"></div>
-      </div>
-    </div>
+  <!-- CALENDAR -->
+  <div class="cal-wrap">
+    <div class="cal-grid" id="calGrid"></div>
   </div>
 
   <!-- MASTER CHECKLIST: house + food packing, drag between columns to assign -->
