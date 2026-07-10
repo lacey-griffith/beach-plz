@@ -471,38 +471,19 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .venue-form { display: flex; flex-direction: column; gap: 10px; }
 .venue-links { display: flex; gap: 8px; }
 .venue-links .dm-btn { flex: 1; text-align: center; padding: 8px; font-size: 12px; }
-.dinner-servings { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--ocean-d); }
-.serv-btn { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--teal); background: var(--white); color: var(--teal); font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
-.serv-btn:hover { background: var(--teal); color: #fff; }
-.serv-count { min-width: 16px; text-align: center; }
-.dinner-list { display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; }
-.dinner-empty { font-size: 10.5px; color: var(--muted); text-align: center; padding: 10px 0; font-style: italic; }
-.dinner-item { display: flex; align-items: center; gap: 5px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px; }
-.dinner-item.checked { opacity: .5; }
-.dinner-item.checked .di-name { text-decoration: line-through; }
-.di-move-group { display: flex; flex-direction: column; gap: 1px; }
-.di-move { width: 14px; height: 12px; border: none; background: transparent; color: var(--muted); font-size: 9px; cursor: pointer; line-height: 1; padding: 0; }
-.di-move:hover:not(:disabled) { color: var(--teal); }
-.di-move:disabled { opacity: .25; cursor: default; }
-.di-check { width: 14px; height: 14px; flex-shrink: 0; accent-color: var(--teal); }
-.di-name { flex: 1; min-width: 0; border: none; background: transparent; font-size: 11px; font-weight: 600; color: var(--text); font-family: inherit; padding: 2px; }
-.di-name:focus { outline: 1.5px solid var(--teal); border-radius: 4px; }
-.di-price { width: 52px; border: 1px solid var(--border); border-radius: 6px; font-size: 10.5px; padding: 2px 4px; font-family: inherit; }
-.di-link { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--mint-l); color: var(--ocean-d); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-.di-link:hover { background: var(--teal); color: #fff; }
-.di-link:disabled { opacity: .6; cursor: default; }
-.di-heb { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--sand-d); color: var(--ocean-d); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-.di-heb:hover { background: var(--coral); color: #fff; }
-.di-del { width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--sand-d); color: var(--muted); font-size: 10px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-.di-del:hover { background: var(--coral); color: #fff; }
-.dinner-add-row { display: flex; gap: 6px; }
-.dinner-add-input { flex: 1; min-width: 0; border: 1.5px dashed var(--teal); border-radius: 8px; padding: 6px 8px; font-size: 11px; font-family: inherit; background: var(--mint-l); }
-.dinner-add-btn { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--teal); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
-.dinner-add-btn:hover { background: var(--ocean); }
-.dinner-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--border); }
-.dinner-total { font-size: 11px; font-weight: 800; color: var(--ocean-d); }
-.dinner-clear-btn { font-size: 10px; font-weight: 700; color: var(--coral); background: none; border: 1.5px solid var(--coral); border-radius: 20px; padding: 4px 10px; cursor: pointer; }
-.dinner-clear-btn:hover { background: var(--coral); color: #fff; }
+.meal-slot { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 6px; }
+.meal-slot:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+.meal-slot-hdr { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
+.meal-slot-label { font-weight: 800; font-size: 12px; color: var(--ocean-d); }
+.meal-toggle-mini { display: flex; gap: 4px; }
+.meal-seg { font-size: 9.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; border: 1.5px solid var(--teal); background: transparent; color: var(--teal); cursor: pointer; }
+.meal-seg.on { background: var(--teal); color: #fff; }
+.meal-plan-input { width: 100%; box-sizing: border-box; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 8px; font-size: 11.5px; font-family: inherit; background: var(--white); }
+.meal-added-row { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 10.5px; color: var(--muted); font-weight: 700; }
+.meal-added-row input { width: 13px; height: 13px; cursor: pointer; }
+.meal-quickadd-row { display: flex; gap: 6px; margin-top: 6px; }
+.meal-quickadd-row input { flex: 1; min-width: 0; border: 1.5px dashed var(--teal); border-radius: 8px; padding: 5px 7px; font-size: 10.5px; font-family: inherit; background: var(--mint-l); }
+.meal-quickadd-row button { width: 26px; height: 26px; border-radius: 50%; border: none; background: var(--teal); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
 .itinerary-stops { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; }
 .itin-stop { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 5px 8px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; }
 .itin-stop .itin-num { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -919,18 +900,6 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
   <div class="sea-glass-modal" id="detailModalBody"></div>
 </div>
 
-
-<!-- H-E-B HISTORY SEARCH MODAL -->
-<div class="modal-overlay" id="hebModal" style="display:none" onclick="if(event.target===this)closeHebModal()">
-  <div class="sea-glass-modal" style="max-width:480px">
-    <h3>Search Your H-E-B History</h3>
-    <div id="hebResultsList" class="itinerary-stops" style="max-height:320px"></div>
-    <div class="mbtn-row">
-      <button class="mbtn mbtn-cancel" onclick="closeHebModal()">Close</button>
-    </div>
-  </div>
-</div>
-
 <!-- CUSTOM ACTIVITY MODAL -->
 <div class="modal-overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal-card">
@@ -1098,7 +1067,7 @@ let state = {
   hiddenBase: [],
   condoInfo: { address: '', doorCode: '', wifi: '', wifiPw: '', checkIn: '', checkOut: '', notes: '', lat: CONDO_LOC.lat, lng: CONDO_LOC.lng },
   chat: [],
-  dinners: Object.fromEntries(DAYS.map(d => [d.id, { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } }])),
+  meals: Object.fromEntries(DAYS.map(d => [d.id, newDayMeals()])),
   enrichment: {},
   people: [], // [{id, name, color}] — accounts are open: anyone can create one, no password
   masterChecklist: [], // [{id, text, column, checked}] — shared house/food packing list
@@ -1255,7 +1224,7 @@ function setSyncState(s) {
 async function saveBin() {
   setSyncState('busy');
   try {
-    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, dinners: state.dinners, enrichment: state.enrichment, people: state.people, masterChecklist: state.masterChecklist };
+    const payload = { placed: state.placed, customActs: state.customActs, hiddenBase: state.hiddenBase, condoInfo: state.condoInfo, chat: state.chat, meals: state.meals, enrichment: state.enrichment, people: state.people, masterChecklist: state.masterChecklist };
     const putRes = await fetch(`${PROXY_BASE}/data/${DATA_PATH}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1361,9 +1330,9 @@ async function loadBin() {
     if (record.customActs) state.customActs = record.customActs;
     if (record.hiddenBase) state.hiddenBase = record.hiddenBase;
     if (record.condoInfo)  state.condoInfo  = { ...state.condoInfo, ...record.condoInfo };
-    if (record.dinners) {
+    if (record.meals) {
       DAYS.forEach(d => {
-        state.dinners[d.id] = record.dinners[d.id] || state.dinners[d.id] || { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } };
+        state.meals[d.id] = record.meals[d.id] || state.meals[d.id] || newDayMeals();
       });
     }
     if (record.enrichment) state.enrichment = { ...state.enrichment, ...record.enrichment };
@@ -2307,7 +2276,7 @@ function renderAll() {
   renderDayTabs();
   renderCalendar();
   renderSidebar();
-  renderDinners();
+  renderMeals();
   renderCondoCard();
   renderMasterChecklist();
 }
@@ -2500,7 +2469,27 @@ function startChecklistDrag(e, itemId, sourceEl) {
 }
 
 // ── DINNER PLANNING + SHOPPING LIST ─────────────────────────────────
-function renderDinners() {
+// ── MEAL PLANNING (Breakfast / Lunch / Dinner / Snacks+Drinks per day) ──
+// Each slot is either "cooking in" (a free-text plan note — ingredients live
+// on the Packing & Shopping board's All column, added there manually) or
+// "going out" (venue name/phone/menu/notes, same as the old dinner venue form).
+function newMealSlot() { return { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } }; }
+function newDayMeals() { return { breakfast: newMealSlot(), lunch: newMealSlot(), dinner: newMealSlot(), snacks: newMealSlot() }; }
+const MEAL_SLOTS = [
+  { key: 'breakfast', label: 'Breakfast', section: 'Breakfast' },
+  { key: 'lunch', label: 'Lunch', section: 'Lunches / Easy Meals' },
+  { key: 'dinner', label: 'Dinner', section: 'Condo Dinners' },
+  { key: 'snacks', label: 'Snacks + Drinks', section: 'Snacks + Pool Supplies' },
+];
+// Quick-adds a grocery item straight to the board's All column from a meal
+// card, so you don't have to scroll down to the checklist to log it.
+function addToAllChecklist(text, section) {
+  state.masterChecklist.push({ id: 'mc' + Date.now() + Math.random().toString(36).slice(2, 6), text, column: 'all', section, checked: false });
+  renderMasterChecklist();
+  saveBin();
+}
+
+function renderMeals() {
   const container = document.getElementById('dinnerSection');
   if (!container) return;
   container.innerHTML = '';
@@ -2522,187 +2511,116 @@ function renderDinners() {
     container.style.scrollSnapType = 'x mandatory';
   }
   daysToRender.forEach(day => {
-    const dinner = state.dinners[day.id] || (state.dinners[day.id] = { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } });
-    if (!dinner.venue) dinner.venue = { name: '', menu: '', phone: '', notes: '' };
-    if (dinner.out === undefined) dinner.out = false;
+    const dayMeals = state.meals[day.id] || (state.meals[day.id] = newDayMeals());
+    MEAL_SLOTS.forEach(slotDef => { if (!dayMeals[slotDef.key]) dayMeals[slotDef.key] = newMealSlot(); });
     const card = document.createElement('div');
     card.className = 'dinner-card';
     card.dataset.dayId = day.id;
     if (desktop) { card.style.maxWidth = 'none'; card.style.flex = ''; card.style.scrollSnapAlign = ''; }
     else { card.style.maxWidth = 'none'; card.style.flex = '0 0 100%'; card.style.scrollSnapAlign = 'center'; }
-    const found = getDinnerActivity(day.id);
-    const dinnerLabel = found ? `${found.act.name} · ${slotToTime(found.slot)}` : '';
-    const total = dinner.items.reduce((sum, it) => sum + (Number(it.price) || 0), 0);
+
     card.innerHTML = `
       <div class="dinner-hdr">
         <div class="dinner-day-row">
           <div class="dinner-day">${day.name} <span class="dinner-date">${day.date}</span></div>
         </div>
-        ${dinnerLabel ? `<div class="dinner-plan">On the calendar: ${dinnerLabel}</div>` : ''}
       </div>
-      <div class="dinner-toggle" role="group" aria-label="${day.name} dinner mode">
-        <button type="button" class="dinner-seg${!dinner.out ? ' on' : ''}" data-mode="in" aria-pressed="${!dinner.out}">Cooking in</button>
-        <button type="button" class="dinner-seg${dinner.out ? ' on' : ''}" data-mode="out" aria-pressed="${dinner.out}">Going out</button>
-      </div>
-      <div class="dinner-body" id="dinnerBody-${day.id}"></div>
+      <div id="mealSlots-${day.id}"></div>
     `;
+    const slotsEl = card.querySelector(`#mealSlots-${day.id}`);
 
-    card.querySelectorAll('.dinner-seg').forEach(btn => {
-      btn.addEventListener('click', () => {
-        dinner.out = btn.dataset.mode === 'out';
-        renderDinners(); saveBin();
-      });
-    });
+    MEAL_SLOTS.forEach(slotDef => {
+      const meal = dayMeals[slotDef.key];
+      if (!meal.venue) meal.venue = { name: '', menu: '', phone: '', notes: '' };
+      const slotEl = document.createElement('div');
+      slotEl.className = 'meal-slot';
 
-    const bodyEl = card.querySelector(`#dinnerBody-${day.id}`);
+      const calendarNote = slotDef.key === 'dinner'
+        ? (() => { const found = getDinnerActivity(day.id); return found ? `${found.act.name} · ${slotToTime(found.slot)}` : ''; })()
+        : '';
 
-    if (dinner.out) {
-      // ── GOING OUT: persistent, manually-entered venue info (no calendar auto-pull) ──
-      bodyEl.innerHTML = `
-        <div class="venue-form">
-          <div class="mfield"><label>Venue name</label><input type="text" class="venue-name" placeholder="e.g. The Gaff" value="${(dinner.venue.name || '').replace(/"/g, '&quot;')}"/></div>
-          <div class="mrow">
-            <div class="mfield"><label>Menu link (optional)</label><input type="url" class="venue-menu" placeholder="https://…" value="${(dinner.venue.menu || '').replace(/"/g, '&quot;')}"/></div>
-            <div class="mfield"><label>Phone (optional)</label><input type="tel" class="venue-phone" placeholder="(361) 555-0100" value="${(dinner.venue.phone || '').replace(/"/g, '&quot;')}"/></div>
-          </div>
-          <div class="mfield"><label>Notes (hours, parking, wait time, reservation info, etc.)</label>
-            <textarea class="venue-notes edit-ta" rows="3" placeholder="Anything worth remembering for the night...">${dinner.venue.notes || ''}</textarea>
-          </div>
-          <div class="venue-links">
-            ${dinner.venue.menu ? `<a class="dm-btn maps" href="${dinner.venue.menu}" target="_blank" rel="noopener">View menu</a>` : ''}
-            ${dinner.venue.phone ? `<a class="dm-btn site" href="tel:${dinner.venue.phone.replace(/[^0-9+]/g, '')}">Call</a>` : ''}
+      slotEl.innerHTML = `
+        <div class="meal-slot-hdr">
+          <span class="meal-slot-label">${slotDef.label}</span>
+          <div class="meal-toggle-mini" role="group" aria-label="${day.name} ${slotDef.label} mode">
+            <button type="button" class="meal-seg${!meal.out ? ' on' : ''}" data-mode="in">Cooking in</button>
+            <button type="button" class="meal-seg${meal.out ? ' on' : ''}" data-mode="out">Going out</button>
           </div>
         </div>
+        ${calendarNote ? `<div class="dinner-plan">On the calendar: ${calendarNote}</div>` : ''}
+        <div class="meal-slot-body"></div>
       `;
-      const saveVenue = () => {
-        dinner.venue.name = bodyEl.querySelector('.venue-name').value.trim();
-        dinner.venue.menu = bodyEl.querySelector('.venue-menu').value.trim();
-        dinner.venue.phone = bodyEl.querySelector('.venue-phone').value.trim();
-        dinner.venue.notes = bodyEl.querySelector('.venue-notes').value;
-        saveBin();
-      };
-      bodyEl.querySelector('.venue-name').addEventListener('change', () => { saveVenue(); renderDinners(); });
-      bodyEl.querySelector('.venue-menu').addEventListener('change', () => { saveVenue(); renderDinners(); });
-      bodyEl.querySelector('.venue-phone').addEventListener('change', () => { saveVenue(); renderDinners(); });
-      bodyEl.querySelector('.venue-notes').addEventListener('change', saveVenue);
-      container.appendChild(card);
-      return; // done rendering this card
-    }
 
-    // ── COOKING IN: servings + shopping list (unchanged behavior) ──
-    bodyEl.innerHTML = `
-      <div class="dinner-servings">
-        <span>Servings</span>
-        <button class="serv-btn" data-act="dec" type="button">−</button>
-        <span class="serv-count">${dinner.servings}</span>
-        <button class="serv-btn" data-act="inc" type="button">+</button>
-      </div>
-      <div class="dinner-list" id="dinnerList-${day.id}"></div>
-      <div class="dinner-add-row">
-        <input type="text" class="dinner-add-input" placeholder="Add item…" />
-        <button class="dinner-add-btn" type="button">+</button>
-      </div>
-      <div class="dinner-footer">
-        <span class="dinner-total">Est. total: $${total.toFixed(2)}</span>
-        <button class="dinner-clear-btn" type="button">Clear dinner</button>
-      </div>
-    `;
-
-    bodyEl.querySelector('[data-act="dec"]').addEventListener('click', () => {
-      dinner.servings = Math.max(1, dinner.servings - 1);
-      renderDinners(); saveBin();
-    });
-    bodyEl.querySelector('[data-act="inc"]').addEventListener('click', () => {
-      dinner.servings = dinner.servings + 1;
-      renderDinners(); saveBin();
-    });
-
-    const addInput = bodyEl.querySelector('.dinner-add-input');
-    const addItem = () => {
-      const name = addInput.value.trim();
-      if (!name) return;
-      dinner.items.push({ id: 'di' + Date.now() + Math.random().toString(36).slice(2, 6), name, price: null, checked: false });
-      addInput.value = '';
-      renderDinners(); saveBin();
-    };
-    bodyEl.querySelector('.dinner-add-btn').addEventListener('click', addItem);
-    addInput.addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); });
-
-    bodyEl.querySelector('.dinner-clear-btn').addEventListener('click', () => {
-      if (!dinner.items.length) return;
-      if (!confirm(`Clear all items for ${day.name}'s dinner?`)) return;
-      dinner.items = [];
-      renderDinners(); saveBin();
-    });
-
-    const listEl = bodyEl.querySelector(`#dinnerList-${day.id}`);
-    if (!dinner.items.length) {
-      listEl.innerHTML = '<div class="dinner-empty">No items yet — add what you need above</div>';
-    } else {
-      dinner.items.forEach((item, idx) => {
-        const row = document.createElement('div');
-        row.className = 'dinner-item' + (item.checked ? ' checked' : '');
-        row.innerHTML = `
-          <div class="di-move-group">
-            <button class="di-move" data-dir="up" title="Move up" type="button" ${idx === 0 ? 'disabled' : ''}>↑</button>
-            <button class="di-move" data-dir="down" title="Move down" type="button" ${idx === dinner.items.length - 1 ? 'disabled' : ''}>↓</button>
-          </div>
-          <input type="checkbox" class="di-check" ${item.checked ? 'checked' : ''} />
-          <input type="text" class="di-name" value="${(item.name || '').replace(/"/g, '&quot;')}" />
-          <input type="number" class="di-price" placeholder="$" min="0" step="0.01" value="${item.price ?? ''}" />
-          <button class="di-link" title="${item.sourceUrl ? 'Re-check price from saved link' : 'Paste a product link to auto-fill price'}" type="button">${item.sourceUrl ? 'Link' : 'Add link'}</button>
-          <button class="di-heb" title="Search your H-E-B order history" type="button">H</button>
-          <button class="di-del" title="Remove" type="button">✕</button>
-        `;
-        row.querySelector('.di-link').addEventListener('click', async () => {
-          const existing = item.sourceUrl || '';
-          const url = prompt('Paste the HEB (or other store) product link:', existing);
-          if (!url) return;
-          item.sourceUrl = url.trim();
-          const btn = row.querySelector('.di-link');
-          btn.textContent = '...';
-          btn.disabled = true;
-          const data = await fetchUrlEnrichment(item.sourceUrl);
-          btn.disabled = false;
-          if (data && data.price != null) {
-            item.price = data.price;
-            toast(`Price found: $${data.price.toFixed(2)}`, 's');
-          } else {
-            toast('Couldn\'t find a price on that page — you can still enter it manually.', 'w', 3500);
-          }
-          renderDinners(); saveBin();
+      slotEl.querySelectorAll('.meal-seg').forEach(btn => {
+        btn.addEventListener('click', () => {
+          meal.out = btn.dataset.mode === 'out';
+          renderMeals(); saveBin();
         });
-        row.querySelector('.di-heb').addEventListener('click', () => openHebSearch(day.id, item.id));
-        row.querySelector('.di-check').addEventListener('change', e => {
-          item.checked = e.target.checked;
-          row.classList.toggle('checked', item.checked);
-          saveBin();
-        });
-        row.querySelector('.di-name').addEventListener('change', e => {
-          item.name = e.target.value.trim() || item.name;
-          saveBin();
-        });
-        row.querySelector('.di-price').addEventListener('change', e => {
-          const v = parseFloat(e.target.value);
-          item.price = isNaN(v) ? null : v;
-          renderDinners(); saveBin();
-        });
-        row.querySelector('.di-del').addEventListener('click', () => {
-          dinner.items.splice(idx, 1);
-          renderDinners(); saveBin();
-        });
-        row.querySelectorAll('.di-move').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const dir = btn.dataset.dir;
-            const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
-            if (swapIdx < 0 || swapIdx >= dinner.items.length) return;
-            [dinner.items[idx], dinner.items[swapIdx]] = [dinner.items[swapIdx], dinner.items[idx]];
-            renderDinners(); saveBin();
-          });
-        });
-        listEl.appendChild(row);
       });
-    }
+
+      const bodyEl = slotEl.querySelector('.meal-slot-body');
+      if (meal.out) {
+        bodyEl.innerHTML = `
+          <div class="venue-form">
+            <div class="mfield"><label>Venue name</label><input type="text" class="venue-name" placeholder="e.g. The Gaff" value="${(meal.venue.name || '').replace(/"/g, '&quot;')}"/></div>
+            <div class="mrow">
+              <div class="mfield"><label>Menu link (optional)</label><input type="url" class="venue-menu" placeholder="https://…" value="${(meal.venue.menu || '').replace(/"/g, '&quot;')}"/></div>
+              <div class="mfield"><label>Phone (optional)</label><input type="tel" class="venue-phone" placeholder="(361) 555-0100" value="${(meal.venue.phone || '').replace(/"/g, '&quot;')}"/></div>
+            </div>
+            <div class="mfield"><label>Notes (hours, parking, wait time, reservation info, etc.)</label>
+              <textarea class="venue-notes edit-ta" rows="2" placeholder="Anything worth remembering...">${meal.venue.notes || ''}</textarea>
+            </div>
+            <div class="venue-links">
+              ${meal.venue.menu ? `<a class="dm-btn maps" href="${meal.venue.menu}" target="_blank" rel="noopener">View menu</a>` : ''}
+              ${meal.venue.phone ? `<a class="dm-btn site" href="tel:${meal.venue.phone.replace(/[^0-9+]/g, '')}">Call</a>` : ''}
+            </div>
+          </div>
+        `;
+        const saveVenue = () => {
+          meal.venue.name = bodyEl.querySelector('.venue-name').value.trim();
+          meal.venue.menu = bodyEl.querySelector('.venue-menu').value.trim();
+          meal.venue.phone = bodyEl.querySelector('.venue-phone').value.trim();
+          meal.venue.notes = bodyEl.querySelector('.venue-notes').value;
+          saveBin();
+        };
+        bodyEl.querySelector('.venue-name').addEventListener('change', () => { saveVenue(); renderMeals(); });
+        bodyEl.querySelector('.venue-menu').addEventListener('change', () => { saveVenue(); renderMeals(); });
+        bodyEl.querySelector('.venue-phone').addEventListener('change', () => { saveVenue(); renderMeals(); });
+        bodyEl.querySelector('.venue-notes').addEventListener('change', saveVenue);
+      } else {
+        bodyEl.innerHTML = `
+          <input type="text" class="meal-plan-input" placeholder="What's the plan? e.g. Burgers, coleslaw, fries" value="${(meal.plan || '').replace(/"/g, '&quot;')}"/>
+          <label class="meal-added-row">
+            <input type="checkbox" class="meal-added-check" ${meal.addedToAll ? 'checked' : ''}/>
+            Ingredients added to All
+          </label>
+          <div class="meal-quickadd-row">
+            <input type="text" class="meal-quickadd-input" placeholder="Quick-add an ingredient to All…" />
+            <button type="button" class="meal-quickadd-btn">+</button>
+          </div>
+        `;
+        bodyEl.querySelector('.meal-plan-input').addEventListener('change', e => {
+          meal.plan = e.target.value.trim();
+          saveBin();
+        });
+        bodyEl.querySelector('.meal-added-check').addEventListener('change', e => {
+          meal.addedToAll = e.target.checked;
+          saveBin();
+        });
+        const qaInput = bodyEl.querySelector('.meal-quickadd-input');
+        const doQuickAdd = () => {
+          const text = qaInput.value.trim();
+          if (!text) return;
+          addToAllChecklist(text, slotDef.section);
+          qaInput.value = '';
+          toast(`Added "${text}" to All → ${slotDef.section}`, 's', 2000);
+        };
+        bodyEl.querySelector('.meal-quickadd-btn').addEventListener('click', doQuickAdd);
+        qaInput.addEventListener('keydown', e => { if (e.key === 'Enter') doQuickAdd(); });
+      }
+
+      slotsEl.appendChild(slotEl);
+    });
 
     container.appendChild(card);
   });
@@ -2786,91 +2704,6 @@ async function fetchUrlEnrichment(targetUrl) {
     if (!r.ok) return null;
     return await r.json();
   } catch { return null; }
-}
-
-// ── H-E-B ORDER HISTORY SEARCH ───────────────────────────────────
-let hebHistoryCache = null;
-async function loadHebHistory() {
-  if (hebHistoryCache) return hebHistoryCache;
-  try {
-    const r = await fetch('https://raw.githubusercontent.com/lacey-griffith/stocked-and-loaded/main/src/seedData.js');
-    if (!r.ok) return null;
-    const text = await r.text();
-    const match = text.match(/const SEED_DATA = (\[[\s\S]*\])\s*export default/);
-    if (!match) return null;
-    const data = JSON.parse(match[1]);
-    const flat = {};
-    data.forEach(order => {
-      const orderDate = new Date(order.date.split(',').slice(0, 2).join(','));
-      order.items.forEach(item => {
-        const existing = flat[item.productId];
-        if (!existing || orderDate > existing._date) {
-          flat[item.productId] = { ...item, _date: orderDate };
-        }
-      });
-    });
-    hebHistoryCache = Object.values(flat);
-    return hebHistoryCache;
-  } catch { return null; }
-}
-
-function searchHebHistory(query, items, limit = 5) {
-  const qTokens = new Set(query.toLowerCase().split(/\s+/).filter(Boolean));
-  const qLower = query.toLowerCase();
-  const scored = [];
-  items.forEach(it => {
-    const nameLower = it.name.toLowerCase();
-    const nameTokens = new Set(nameLower.match(/\w+/g) || []);
-    let overlap = 0;
-    qTokens.forEach(t => { if (nameTokens.has(t)) overlap++; });
-    const substringBonus = nameLower.includes(qLower) ? 2 : 0;
-    const score = overlap + substringBonus;
-    if (score > 0) scored.push({ score, item: it });
-  });
-  scored.sort((a, b) => b.score - a.score || b.item._date - a.item._date);
-  return scored.slice(0, limit).map(s => s.item);
-}
-
-async function openHebSearch(dayId, itemId) {
-  const dinner = state.dinners[dayId];
-  const item = dinner.items.find(i => i.id === itemId);
-  if (!item) return;
-  document.getElementById('hebModal').style.display = 'flex';
-  const listEl = document.getElementById('hebResultsList');
-  listEl.innerHTML = '<div class="itinerary-empty">Searching your H-E-B history…</div>';
-
-  const history = await loadHebHistory();
-  if (!history) {
-    listEl.innerHTML = '<div class="itinerary-empty">Could not load your H-E-B history right now.</div>';
-    return;
-  }
-  const results = searchHebHistory(item.name, history);
-  if (!results.length) {
-    listEl.innerHTML = '<div class="itinerary-empty">No matches found in your past H-E-B orders.</div>';
-    return;
-  }
-  listEl.innerHTML = '';
-  results.forEach(r => {
-    const row = document.createElement('div');
-    row.className = 'itin-stop';
-    row.style.cursor = 'pointer';
-    row.innerHTML = `
-      <span class="itin-name">${r.name}</span>
-      <span class="itin-time">$${r.price.toFixed(2)}</span>
-    `;
-    row.addEventListener('click', () => {
-      item.price = r.price;
-      item.sourceUrl = null;
-      closeHebModal();
-      renderDinners();
-      saveBin();
-      toast(`Applied $${r.price.toFixed(2)} from your H-E-B history`, 's');
-    });
-    listEl.appendChild(row);
-  });
-}
-function closeHebModal() {
-  document.getElementById('hebModal').style.display = 'none';
 }
 
 // ── SHEET (mobile) ────────────────────────────────────────────────
@@ -3329,7 +3162,13 @@ async function submitNewTrip() {
     const initialState = {
       placed: Object.fromEntries(days.map(d => [d.id, {}])),
       customActs: [], hiddenBase: [], chat: [], condoInfo: {}, people: [],
-      dinners: Object.fromEntries(days.map(d => [d.id, { items: [], servings: 4, out: false, venue: { name: '', menu: '', phone: '', notes: '' } }])),
+      meals: Object.fromEntries(days.map(d => [d.id, {
+        breakfast: { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } },
+        lunch: { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } },
+        dinner: { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } },
+        snacks: { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } },
+      }])),
+      masterChecklist: [],
       enrichment: {},
     };
     const newPath = `trip-${Date.now()}.json`;
