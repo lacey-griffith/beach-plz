@@ -791,10 +791,6 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 <div class="who-bar">
   <div class="who-row2">
     <button class="filter-toggle-btn" onclick="openFilterPopover(event)">Show: <span id="mFilterLbl">Everyone</span></button>
-    <label class="show-both-lbl">
-      <input type="checkbox" class="show-both-cb" id="mCalView" onchange="setCalView(this.checked ? 'all' : 'day')">
-      All Days
-    </label>
   </div>
 </div>
 
@@ -3334,7 +3330,6 @@ const Ambient = {
 hydrateHeader();
 setSyncState('busy');
 setWho(ui.currentWho);
-document.getElementById('mCalView') && (document.getElementById('mCalView').checked = ui.calView === 'all');
 document.getElementById('condoWifi').addEventListener('change', e => saveCondoField('wifi', e.target.value));
 document.getElementById('condoWifiPw').addEventListener('change', e => saveCondoField('wifiPw', e.target.value));
 renderAll();
