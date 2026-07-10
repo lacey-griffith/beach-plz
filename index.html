@@ -407,9 +407,9 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 
 /* ── DINNER PLANNING ── */
 /* CONDO CALLOUT */
-.trip-content-wrap { padding: 0 16px; }
+.trip-content-wrap { padding: 20px 16px 0; }
 @media (min-width: 768px) {
-  .trip-content-wrap { max-width: 1360px; margin: 0 auto; padding: 0 16px; }
+  .trip-content-wrap { max-width: 1360px; margin: 0 auto; padding: 28px 16px 0; }
 }
 .condo-card {
   background: linear-gradient(135deg, var(--ocean-d), var(--ocean), var(--ocean-l));
@@ -449,6 +449,9 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .checklist-item.checked label { opacity: .5; text-decoration: line-through; }
 .checklist-item .item-del { flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; border: none; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; opacity: .4; }
 .checklist-item .item-del:hover { opacity: 1; color: var(--coral-d); }
+.checklist-item .item-dup, .checklist-item .item-edit { flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; border: none; background: transparent; color: var(--muted); font-size: 10.5px; cursor: pointer; opacity: .4; }
+.checklist-item .item-dup:hover, .checklist-item .item-edit:hover { opacity: 1; color: var(--teal); }
+.ci-edit-input { flex: 1; font-size: 12.5px; font-weight: 600; color: var(--text); font-family: 'Nunito Sans', sans-serif; border: 1.5px solid var(--teal); border-radius: 6px; padding: 2px 6px; }
 .checklist-empty-hint { font-size: 10.5px; color: var(--muted); font-style: italic; padding: 6px; text-align: center; }
 .checklist-section-hdr { font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 8px 6px 2px; }
 .checklist-section-hdr:first-child { padding-top: 2px; }
@@ -468,8 +471,9 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .meal-slot:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
 .meal-slot-hdr { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
 .meal-slot-label { font-weight: 800; font-size: 12px; color: var(--ocean-d); }
-.meal-added-row { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 10.5px; color: var(--muted); font-weight: 700; }
-.meal-added-row input { width: 13px; height: 13px; cursor: pointer; }
+.meal-title-input { width: 100%; margin-top: 6px; padding: 7px 9px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); font-family: 'Nunito Sans', sans-serif; font-size: 12.5px; font-weight: 600; color: var(--text); }
+.meal-title-input:focus { outline: none; border-color: var(--teal); }
+.meal-title-input::placeholder { color: var(--muted); font-weight: 500; }
 .itinerary-stops { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; }
 .itin-stop { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 5px 8px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; }
 .itin-stop .itin-num { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -2342,9 +2346,11 @@ function renderMasterChecklist() {
       row.className = 'checklist-item' + (it.checked ? ' checked' : '');
       row.draggable = true;
       row.dataset.itemId = it.id;
+      const isAllCol = col.id === 'all';
       row.innerHTML = `
         <input type="checkbox" ${it.checked ? 'checked' : ''} id="ci-${it.id}">
-        <label for="ci-${it.id}">${it.text}</label>
+        <label for="ci-${it.id}" class="ci-label">${it.text}</label>
+        ${isAllCol ? `<button type="button" class="item-dup" title="Duplicate (e.g. both bringing it)">⎘</button><button type="button" class="item-edit" title="Edit">✎</button>` : ''}
         <button type="button" class="item-del" title="Remove">✕</button>
       `;
       row.querySelector('input[type=checkbox]').addEventListener('change', e => {
@@ -2357,6 +2363,16 @@ function renderMasterChecklist() {
         renderMasterChecklist();
         saveBin();
       });
+      if (isAllCol) {
+        row.querySelector('.item-dup').addEventListener('click', e => {
+          e.stopPropagation();
+          duplicateChecklistItem(it.id);
+        });
+        row.querySelector('.item-edit').addEventListener('click', e => {
+          e.stopPropagation();
+          startEditChecklistItem(it.id, row.querySelector('.ci-label'));
+        });
+      }
       row.addEventListener('dragstart', e => {
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('application/json', JSON.stringify({ checklistItemId: it.id }));
@@ -2394,6 +2410,39 @@ function addChecklistItem(column) {
   input.value = '';
   renderMasterChecklist();
   saveBin();
+}
+function duplicateChecklistItem(itemId) {
+  const idx = state.masterChecklist.findIndex(x => x.id === itemId);
+  if (idx === -1) return;
+  const copy = { ...state.masterChecklist[idx], id: 'mc' + Date.now() + Math.random().toString(36).slice(2, 6), checked: false };
+  state.masterChecklist.splice(idx + 1, 0, copy);
+  renderMasterChecklist();
+  saveBin();
+}
+function startEditChecklistItem(itemId, labelEl) {
+  const it = state.masterChecklist.find(x => x.id === itemId);
+  if (!it || !labelEl) return;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'ci-edit-input';
+  input.value = it.text;
+  labelEl.replaceWith(input);
+  input.focus();
+  input.select();
+  let done = false;
+  const commit = () => {
+    if (done) return;
+    done = true;
+    const val = input.value.trim();
+    if (val) it.text = val;
+    renderMasterChecklist();
+    saveBin();
+  };
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    else if (e.key === 'Escape') { done = true; renderMasterChecklist(); }
+  });
 }
 function moveChecklistItem(itemId, newColumn) {
   const item = state.masterChecklist.find(x => x.id === itemId);
@@ -2469,7 +2518,7 @@ function startChecklistDrag(e, itemId, sourceEl) {
 // Each slot mirrors whatever's placed on the calendar for that meal's time
 // window (see getMealActivity) — no manual entry. The only thing you set
 // by hand is whether the ingredients have been logged on the All column.
-function newMealSlot() { return { addedToAll: false }; }
+function newMealSlot() { return { title: '' }; }
 function newDayMeals() { return { breakfast: newMealSlot(), lunch: newMealSlot(), dinner: newMealSlot(), snacks: newMealSlot() }; }
 const MEAL_SLOTS = [
   { key: 'breakfast', label: 'Breakfast' },
@@ -2477,10 +2526,22 @@ const MEAL_SLOTS = [
   { key: 'dinner', label: 'Dinner' },
   { key: 'snacks', label: 'Snacks + Drinks' },
 ];
+function escAttr(str) { return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+let mealTitleSaveTimer = null;
+function saveMealTitleDebounced() {
+  clearTimeout(mealTitleSaveTimer);
+  mealTitleSaveTimer = setTimeout(saveBin, 600);
+}
 
 function renderMeals() {
   const container = document.getElementById('dinnerSection');
   if (!container) return;
+  // Preserve focus/cursor on a meal title input across the innerHTML rebuild below.
+  const activeEl = document.activeElement;
+  let focused = null;
+  if (activeEl && activeEl.classList && activeEl.classList.contains('meal-title-input')) {
+    focused = { dayId: activeEl.dataset.dayId, slot: activeEl.dataset.slot, start: activeEl.selectionStart, end: activeEl.selectionEnd };
+  }
   container.innerHTML = '';
   const desktop = isDesktop();
   const daysToRender = DAYS; // all days always present — mobile scrolls/swipes between them
@@ -2530,20 +2591,23 @@ function renderMeals() {
           <span class="meal-slot-label">${slotDef.label}</span>
         </div>
         ${calendarNote ? `<div class="dinner-plan">On the calendar: ${calendarNote}</div>` : ''}
-        <label class="meal-added-row">
-          <input type="checkbox" class="meal-added-check" ${meal.addedToAll ? 'checked' : ''}/>
-          Ingredients added to All
-        </label>
+        <input type="text" class="meal-title-input" data-day-id="${day.id}" data-slot="${slotDef.key}" placeholder="What's the plan?" value="${escAttr(meal.title || '')}" />
       `;
-      slotEl.querySelector('.meal-added-check').addEventListener('change', e => {
-        meal.addedToAll = e.target.checked;
-        saveBin();
+      const titleInput = slotEl.querySelector('.meal-title-input');
+      titleInput.addEventListener('input', e => {
+        meal.title = e.target.value;
+        saveMealTitleDebounced();
       });
       slotsEl.appendChild(slotEl);
     });
 
     container.appendChild(card);
   });
+
+  if (focused) {
+    const el = container.querySelector(`.meal-title-input[data-day-id="${focused.dayId}"][data-slot="${focused.slot}"]`);
+    if (el) { el.focus(); try { el.setSelectionRange(focused.start, focused.end); } catch {} }
+  }
 
   if (!desktop) {
     scrollCarouselToDay(container, ui.curDay, '.dinner-card');
