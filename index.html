@@ -464,26 +464,12 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .dinner-day { font-weight: 800; font-size: 13px; color: var(--ocean-d); }
 .dinner-date { font-weight: 600; font-size: 10px; color: var(--muted); margin-left: 4px; }
 .dinner-plan { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.dinner-toggle { display: flex; gap: 6px; margin-bottom: 4px; }
-.dinner-seg { flex: 1; border: none; border-radius: 8px; padding: 7px 6px; font-family: 'Nunito Sans', sans-serif; font-size: 12px; font-weight: 800; cursor: pointer; background: var(--sand-d); color: var(--muted); }
-.dinner-seg.on { background: var(--teal); color: #fff; }
-.dinner-seg:nth-child(2).on { background: var(--amber); }
-.venue-form { display: flex; flex-direction: column; gap: 10px; }
-.venue-links { display: flex; gap: 8px; }
-.venue-links .dm-btn { flex: 1; text-align: center; padding: 8px; font-size: 12px; }
 .meal-slot { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 6px; }
 .meal-slot:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
 .meal-slot-hdr { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
 .meal-slot-label { font-weight: 800; font-size: 12px; color: var(--ocean-d); }
-.meal-toggle-mini { display: flex; gap: 4px; }
-.meal-seg { font-size: 9.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; border: 1.5px solid var(--teal); background: transparent; color: var(--teal); cursor: pointer; }
-.meal-seg.on { background: var(--teal); color: #fff; }
-.meal-plan-input { width: 100%; box-sizing: border-box; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 8px; font-size: 11.5px; font-family: inherit; background: var(--white); }
 .meal-added-row { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 10.5px; color: var(--muted); font-weight: 700; }
 .meal-added-row input { width: 13px; height: 13px; cursor: pointer; }
-.meal-quickadd-row { display: flex; gap: 6px; margin-top: 6px; }
-.meal-quickadd-row input { flex: 1; min-width: 0; border: 1.5px dashed var(--teal); border-radius: 8px; padding: 5px 7px; font-size: 10.5px; font-family: inherit; background: var(--mint-l); }
-.meal-quickadd-row button { width: 26px; height: 26px; border-radius: 50%; border: none; background: var(--teal); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
 .itinerary-stops { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; }
 .itin-stop { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 5px 8px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; }
 .itin-stop .itin-num { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -1160,17 +1146,27 @@ function durLabel(slots) {
   return m < 60 ? `${m}min` : m % 60 === 0 ? `${m/60}hr` : `${Math.floor(m/60)}hr ${m%60}min`;
 }
 
-// ── DINNER DETECTION ──────────────────────────────────────────────
-// Finds the food-type activity placed latest in the evening (5pm+) for a given day.
-function getDinnerActivity(dayId) {
-  const dinnerCutoffSlot = (17 - H_START) * 2; // 5:00pm
+// ── MEAL CALENDAR SYNC ────────────────────────────────────────────
+// Finds the food-type activity placed in a given meal's time window for a
+// day, so Meal Cards can mirror the calendar instead of needing manual entry.
+// Picks the latest-placed match in the window if there's more than one.
+const MEAL_TIME_WINDOWS = {
+  breakfast: [0, (11 - H_START) * 2],              // day start .. 11:00am
+  lunch: [(11 - H_START) * 2, (17 - H_START) * 2],  // 11:00am .. 5:00pm
+  dinner: [(17 - H_START) * 2, Infinity],           // 5:00pm .. end of day
+  snacks: null, // no dedicated calendar window — always blank
+};
+function getMealActivity(dayId, slotKey) {
+  const win = MEAL_TIME_WINDOWS[slotKey];
+  if (!win) return null;
+  const [lo, hi] = win;
   let best = null;
-  Object.entries(state.placed[dayId] || {}).forEach(([slotKey, entry]) => {
+  Object.entries(state.placed[dayId] || {}).forEach(([slotKeyStr, entry]) => {
     if (!entry || !entry.isStart) return;
     const act = getAct(entry.actId);
     if (!act || act.type !== 'food') return;
-    const slot = Number(slotKey);
-    if (slot < dinnerCutoffSlot) return;
+    const slot = Number(slotKeyStr);
+    if (slot < lo || slot >= hi) return;
     if (!best || slot > best.slot) best = { slot, entry, act };
   });
   return best;
@@ -2470,24 +2466,17 @@ function startChecklistDrag(e, itemId, sourceEl) {
 
 // ── DINNER PLANNING + SHOPPING LIST ─────────────────────────────────
 // ── MEAL PLANNING (Breakfast / Lunch / Dinner / Snacks+Drinks per day) ──
-// Each slot is either "cooking in" (a free-text plan note — ingredients live
-// on the Packing & Shopping board's All column, added there manually) or
-// "going out" (venue name/phone/menu/notes, same as the old dinner venue form).
-function newMealSlot() { return { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } }; }
+// Each slot mirrors whatever's placed on the calendar for that meal's time
+// window (see getMealActivity) — no manual entry. The only thing you set
+// by hand is whether the ingredients have been logged on the All column.
+function newMealSlot() { return { addedToAll: false }; }
 function newDayMeals() { return { breakfast: newMealSlot(), lunch: newMealSlot(), dinner: newMealSlot(), snacks: newMealSlot() }; }
 const MEAL_SLOTS = [
-  { key: 'breakfast', label: 'Breakfast', section: 'Breakfast' },
-  { key: 'lunch', label: 'Lunch', section: 'Lunches / Easy Meals' },
-  { key: 'dinner', label: 'Dinner', section: 'Condo Dinners' },
-  { key: 'snacks', label: 'Snacks + Drinks', section: 'Snacks + Pool Supplies' },
+  { key: 'breakfast', label: 'Breakfast' },
+  { key: 'lunch', label: 'Lunch' },
+  { key: 'dinner', label: 'Dinner' },
+  { key: 'snacks', label: 'Snacks + Drinks' },
 ];
-// Quick-adds a grocery item straight to the board's All column from a meal
-// card, so you don't have to scroll down to the checklist to log it.
-function addToAllChecklist(text, section) {
-  state.masterChecklist.push({ id: 'mc' + Date.now() + Math.random().toString(36).slice(2, 6), text, column: 'all', section, checked: false });
-  renderMasterChecklist();
-  saveBin();
-}
 
 function renderMeals() {
   const container = document.getElementById('dinnerSection');
@@ -2531,94 +2520,25 @@ function renderMeals() {
 
     MEAL_SLOTS.forEach(slotDef => {
       const meal = dayMeals[slotDef.key];
-      if (!meal.venue) meal.venue = { name: '', menu: '', phone: '', notes: '' };
+      const found = getMealActivity(day.id, slotDef.key);
+      const calendarNote = found ? `${found.act.name} · ${slotToTime(found.slot)}` : '';
+
       const slotEl = document.createElement('div');
       slotEl.className = 'meal-slot';
-
-      const calendarNote = slotDef.key === 'dinner'
-        ? (() => { const found = getDinnerActivity(day.id); return found ? `${found.act.name} · ${slotToTime(found.slot)}` : ''; })()
-        : '';
-
       slotEl.innerHTML = `
         <div class="meal-slot-hdr">
           <span class="meal-slot-label">${slotDef.label}</span>
-          <div class="meal-toggle-mini" role="group" aria-label="${day.name} ${slotDef.label} mode">
-            <button type="button" class="meal-seg${!meal.out ? ' on' : ''}" data-mode="in">Cooking in</button>
-            <button type="button" class="meal-seg${meal.out ? ' on' : ''}" data-mode="out">Going out</button>
-          </div>
         </div>
         ${calendarNote ? `<div class="dinner-plan">On the calendar: ${calendarNote}</div>` : ''}
-        <div class="meal-slot-body"></div>
+        <label class="meal-added-row">
+          <input type="checkbox" class="meal-added-check" ${meal.addedToAll ? 'checked' : ''}/>
+          Ingredients added to All
+        </label>
       `;
-
-      slotEl.querySelectorAll('.meal-seg').forEach(btn => {
-        btn.addEventListener('click', () => {
-          meal.out = btn.dataset.mode === 'out';
-          renderMeals(); saveBin();
-        });
+      slotEl.querySelector('.meal-added-check').addEventListener('change', e => {
+        meal.addedToAll = e.target.checked;
+        saveBin();
       });
-
-      const bodyEl = slotEl.querySelector('.meal-slot-body');
-      if (meal.out) {
-        bodyEl.innerHTML = `
-          <div class="venue-form">
-            <div class="mfield"><label>Venue name</label><input type="text" class="venue-name" placeholder="e.g. The Gaff" value="${(meal.venue.name || '').replace(/"/g, '&quot;')}"/></div>
-            <div class="mrow">
-              <div class="mfield"><label>Menu link (optional)</label><input type="url" class="venue-menu" placeholder="https://…" value="${(meal.venue.menu || '').replace(/"/g, '&quot;')}"/></div>
-              <div class="mfield"><label>Phone (optional)</label><input type="tel" class="venue-phone" placeholder="(361) 555-0100" value="${(meal.venue.phone || '').replace(/"/g, '&quot;')}"/></div>
-            </div>
-            <div class="mfield"><label>Notes (hours, parking, wait time, reservation info, etc.)</label>
-              <textarea class="venue-notes edit-ta" rows="2" placeholder="Anything worth remembering...">${meal.venue.notes || ''}</textarea>
-            </div>
-            <div class="venue-links">
-              ${meal.venue.menu ? `<a class="dm-btn maps" href="${meal.venue.menu}" target="_blank" rel="noopener">View menu</a>` : ''}
-              ${meal.venue.phone ? `<a class="dm-btn site" href="tel:${meal.venue.phone.replace(/[^0-9+]/g, '')}">Call</a>` : ''}
-            </div>
-          </div>
-        `;
-        const saveVenue = () => {
-          meal.venue.name = bodyEl.querySelector('.venue-name').value.trim();
-          meal.venue.menu = bodyEl.querySelector('.venue-menu').value.trim();
-          meal.venue.phone = bodyEl.querySelector('.venue-phone').value.trim();
-          meal.venue.notes = bodyEl.querySelector('.venue-notes').value;
-          saveBin();
-        };
-        bodyEl.querySelector('.venue-name').addEventListener('change', () => { saveVenue(); renderMeals(); });
-        bodyEl.querySelector('.venue-menu').addEventListener('change', () => { saveVenue(); renderMeals(); });
-        bodyEl.querySelector('.venue-phone').addEventListener('change', () => { saveVenue(); renderMeals(); });
-        bodyEl.querySelector('.venue-notes').addEventListener('change', saveVenue);
-      } else {
-        bodyEl.innerHTML = `
-          <input type="text" class="meal-plan-input" placeholder="What's the plan? e.g. Burgers, coleslaw, fries" value="${(meal.plan || '').replace(/"/g, '&quot;')}"/>
-          <label class="meal-added-row">
-            <input type="checkbox" class="meal-added-check" ${meal.addedToAll ? 'checked' : ''}/>
-            Ingredients added to All
-          </label>
-          <div class="meal-quickadd-row">
-            <input type="text" class="meal-quickadd-input" placeholder="Quick-add an ingredient to All…" />
-            <button type="button" class="meal-quickadd-btn">+</button>
-          </div>
-        `;
-        bodyEl.querySelector('.meal-plan-input').addEventListener('change', e => {
-          meal.plan = e.target.value.trim();
-          saveBin();
-        });
-        bodyEl.querySelector('.meal-added-check').addEventListener('change', e => {
-          meal.addedToAll = e.target.checked;
-          saveBin();
-        });
-        const qaInput = bodyEl.querySelector('.meal-quickadd-input');
-        const doQuickAdd = () => {
-          const text = qaInput.value.trim();
-          if (!text) return;
-          addToAllChecklist(text, slotDef.section);
-          qaInput.value = '';
-          toast(`Added "${text}" to All → ${slotDef.section}`, 's', 2000);
-        };
-        bodyEl.querySelector('.meal-quickadd-btn').addEventListener('click', doQuickAdd);
-        qaInput.addEventListener('keydown', e => { if (e.key === 'Enter') doQuickAdd(); });
-      }
-
       slotsEl.appendChild(slotEl);
     });
 
@@ -2641,10 +2561,6 @@ function renderMeals() {
     }, { passive: true });
   }
 }
-
-// Finds which full-width carousel item is nearest the horizontal center of its
-// scroll container — shared logic for keeping the dinner and calendar
-// carousels in sync as the person swipes through either one.
 function findCenteredDay(container, itemSelector) {
   const rect = container.getBoundingClientRect();
   const centerX = rect.left + rect.width / 2;
