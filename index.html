@@ -482,6 +482,18 @@ body.has-active .cal-wrap { box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 
 .checklist-add-row { display: flex; gap: 6px; padding: 8px 10px 10px; }
 .checklist-add-row input { flex: 1; min-width: 0; padding: 6px 9px; border-radius: 8px; border: 1.5px solid var(--border); font-family: 'Nunito Sans', sans-serif; font-size: 11.5px; }
 .checklist-add-row button { width: 26px; height: 26px; border-radius: 8px; border: none; background: var(--teal); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+/* ── Mobile long-press action sheet for reassigning checklist items ── */
+.cl-sheet-overlay { position: fixed; inset: 0; background: rgba(27,60,70,.55); z-index: 400; display: flex; align-items: flex-end; justify-content: center; }
+.cl-sheet { background: var(--white); width: 100%; max-width: 480px; border-radius: 22px 22px 0 0; padding: 10px 16px calc(20px + env(safe-area-inset-bottom)); box-shadow: 0 -10px 40px rgba(16,58,70,.3); animation: clSheetUp .22s ease-out; }
+@keyframes clSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.cl-sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 4px auto 14px; }
+.cl-sheet-item { font-family: 'Nunito Sans', sans-serif; font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 14px; padding: 0 8px; font-weight: 600; }
+.cl-sheet-item b { color: var(--text); font-weight: 800; }
+.cl-sheet-opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border-radius: 14px; border: none; background: rgba(240,250,248,.7); font-family: 'Nunito Sans', sans-serif; font-size: 14.5px; font-weight: 800; color: var(--text); margin-bottom: 8px; cursor: pointer; }
+.cl-sheet-opt .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.cl-sheet-opt.current { outline: 2px solid var(--teal); outline-offset: -2px; }
+.cl-sheet-cancel { width: 100%; padding: 12px; border-radius: 14px; border: none; background: transparent; color: var(--muted); font-weight: 700; font-size: 13.5px; margin-top: 4px; }
 .dinner-outer { padding: 0; position: relative; z-index: 2; }
 .dinner-section { display: flex; justify-content: center; -webkit-overflow-scrolling: touch; }
 .dinner-card { background: rgba(240,250,248,.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(214,236,232,.95); border-radius: 18px; box-shadow: 0 12px 40px rgba(16,58,70,.22), inset 0 1px 0 rgba(255,255,255,.7); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 420px; animation: dinnerCardIn .3s ease-out; }
@@ -2496,7 +2508,7 @@ function renderMasterChecklist() {
         else row.classList.add('dragging');
       });
       row.addEventListener('dragend', () => row.classList.remove('dragging'));
-      row.addEventListener('touchstart', e => startChecklistDrag(e, it.id, row), { passive: true });
+      row.addEventListener('touchstart', e => startChecklistLongPress(e, it.id, row), { passive: true });
       itemsEl.appendChild(row);
       });
     });
@@ -2567,56 +2579,34 @@ function moveChecklistItem(itemId, newColumn) {
   renderMasterChecklist();
   saveBin();
 }
-// Mobile touch-drag for reassigning a checklist item to a different column —
-// same hold-delay pattern as the sidebar-to-calendar drag, so it doesn't
-// hijack normal scrolling.
-function startChecklistDrag(e, itemId, sourceEl) {
+// Mobile: long-press a checklist item to open a bottom action sheet for
+// reassigning it, instead of dragging (dragging was hard to land on the
+// right column on a small screen). Desktop keeps native HTML5 drag/drop.
+function startChecklistLongPress(e, itemId, sourceEl) {
   if (e.touches.length !== 1) return;
   const touch = e.touches[0];
   const startX = touch.clientX, startY = touch.clientY;
-  let dragging = false, cancelled = false, ghost = null;
-  const rect = sourceEl.getBoundingClientRect();
+  let fired = false, cancelled = false;
 
   const holdTimer = setTimeout(() => {
     if (cancelled) return;
-    dragging = true;
-    ghost = sourceEl.cloneNode(true);
-    ghost.className = 'ac-drag-ghost';
-    ghost.style.left = rect.left + 'px';
-    ghost.style.top = rect.top + 'px';
-    ghost.style.width = rect.width + 'px';
-    document.body.appendChild(ghost);
+    fired = true;
     sourceEl.classList.add('dragging');
-    if (navigator.vibrate) navigator.vibrate(12);
-  }, 160);
+    if (navigator.vibrate) navigator.vibrate(15);
+    openChecklistActionSheet(itemId);
+    cleanup();
+  }, 420);
 
   const onMove = (ev) => {
+    if (fired) return;
     const t = ev.touches[0];
-    if (!dragging) {
-      if (Math.hypot(t.clientX - startX, t.clientY - startY) > 10) { cancelled = true; clearTimeout(holdTimer); cleanup(); }
-      return;
-    }
-    ev.preventDefault();
-    ghost.style.left = (t.clientX - rect.width / 2) + 'px';
-    ghost.style.top = (t.clientY - 20) + 'px';
-    ghost.style.pointerEvents = 'none';
-    const under = document.elementFromPoint(t.clientX, t.clientY);
-    const col = under?.closest('.checklist-col');
-    document.querySelectorAll('.checklist-col').forEach(c => c.classList.remove('drag-over'));
-    if (col) col.classList.add('drag-over');
+    if (Math.hypot(t.clientX - startX, t.clientY - startY) > 10) { cancelled = true; clearTimeout(holdTimer); cleanup(); }
   };
-
-  const onEnd = (ev) => {
+  const onEnd = () => {
+    cancelled = true;
     clearTimeout(holdTimer);
     cleanup();
-    if (!dragging) return;
-    sourceEl.classList.remove('dragging');
-    document.querySelectorAll('.checklist-col').forEach(c => c.classList.remove('drag-over'));
-    if (ghost) ghost.remove();
-    const t = ev.changedTouches[0];
-    const under = document.elementFromPoint(t.clientX, t.clientY);
-    const col = under?.closest('.checklist-col');
-    if (col) moveChecklistItem(itemId, col.dataset.col);
+    if (fired) setTimeout(() => sourceEl.classList.remove('dragging'), 200);
   };
 
   function cleanup() {
@@ -2624,9 +2614,40 @@ function startChecklistDrag(e, itemId, sourceEl) {
     document.removeEventListener('touchend', onEnd);
     document.removeEventListener('touchcancel', onEnd);
   }
-  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchmove', onMove, { passive: true });
   document.addEventListener('touchend', onEnd);
   document.addEventListener('touchcancel', onEnd);
+}
+
+function openChecklistActionSheet(itemId) {
+  const it = state.masterChecklist.find(x => x.id === itemId);
+  if (!it) return;
+  document.querySelectorAll('.cl-sheet-overlay').forEach(el => el.remove());
+  const plainText = it.text.replace(/<[^>]+>/g, '');
+  const overlay = document.createElement('div');
+  overlay.className = 'cl-sheet-overlay';
+  overlay.innerHTML = `
+    <div class="cl-sheet">
+      <div class="cl-sheet-handle"></div>
+      <div class="cl-sheet-item">Move <b>${plainText}</b> to…</div>
+      ${CHECKLIST_COLUMNS.map(col => `
+        <button type="button" class="cl-sheet-opt${col.id === it.column ? ' current' : ''}" data-col="${col.id}">
+          <span class="dot" style="background:${checklistColColor(col.id)}"></span>
+          ${col.label}${col.id === it.column ? ' ✓' : ''}
+        </button>
+      `).join('')}
+      <button type="button" class="cl-sheet-cancel">Cancel</button>
+    </div>
+  `;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  overlay.querySelector('.cl-sheet-cancel').addEventListener('click', () => overlay.remove());
+  overlay.querySelectorAll('.cl-sheet-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      moveChecklistItem(itemId, btn.dataset.col);
+      overlay.remove();
+    });
+  });
+  document.body.appendChild(overlay);
 }
 
 // ── DINNER PLANNING + SHOPPING LIST ─────────────────────────────────
