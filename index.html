@@ -2591,7 +2591,6 @@ function startChecklistLongPress(e, itemId, sourceEl) {
   const holdTimer = setTimeout(() => {
     if (cancelled) return;
     fired = true;
-    sourceEl.classList.add('dragging');
     if (navigator.vibrate) navigator.vibrate(15);
     openChecklistActionSheet(itemId);
     cleanup();
@@ -2606,7 +2605,6 @@ function startChecklistLongPress(e, itemId, sourceEl) {
     cancelled = true;
     clearTimeout(holdTimer);
     cleanup();
-    if (fired) setTimeout(() => sourceEl.classList.remove('dragging'), 200);
   };
 
   function cleanup() {
