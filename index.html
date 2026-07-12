@@ -88,9 +88,9 @@ body {
 .day-tab.on .dt-name { color: var(--ocean-d); }
 
 /* ── MAIN BODY ── */
-/* Mobile default: everything just stacks in source order (condo, sidebar
-   [hidden], dinner, calendar, checklist). Desktop rearranges via grid areas
-   below so the condo card sits beside the dinner row, above the sidebar. */
+/* Mobile default: everything just stacks in source order (info banners,
+   sidebar [hidden], calendar, dinner, checklist). Desktop rearranges via grid
+   areas below so the banners span the top, above the sidebar/calendar/dinner. */
 .trip-content-wrap { display: block; }
 
 /* ── SIDEBAR ── */
@@ -438,40 +438,21 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 @media (min-width: 768px) {
   .trip-content-wrap { max-width: 1360px; margin: 0 auto; padding: 28px 16px 0; }
 }
-.condo-slider-wrap { position: relative; z-index: 2; margin: 16px 0 0; }
-.condo-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; border-radius: 20px; scrollbar-width: none; align-items: stretch; }
-.condo-slider::-webkit-scrollbar { display: none; }
-.condo-slider > .slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; display: flex; }
-.condo-slider-dots { display: flex; gap: 6px; justify-content: center; margin-top: 9px; }
-.slider-dot { width: 7px; height: 7px; border-radius: 50%; border: none; background: rgba(20,52,52,.22); cursor: pointer; padding: 0; transition: all .15s; }
-.slider-dot.on { background: var(--ocean); width: 20px; border-radius: 4px; }
-.condo-card {
-  background: linear-gradient(135deg, var(--ocean-d), var(--ocean), var(--ocean-l));
-  color: white;
-  border-radius: 20px;
-  padding: 26px 28px;
-  box-shadow: 0 14px 40px rgba(16,58,70,.28);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.condo-card h3 { font-family: var(--font-heading); font-size: 24px; font-weight: 700; letter-spacing: .01em; margin-bottom: 4px; }
-.condo-card .condo-addr { font-size: 14px; opacity: .92; margin-bottom: 18px; }
-.condo-card .condo-addr a { color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,.5); }
-.condo-wifi-grid { display: flex; gap: 16px; flex-wrap: wrap; }
-.condo-wifi-field { flex: 1; min-width: 180px; }
-.condo-wifi-field label { display: block; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .8; margin-bottom: 6px; }
-.condo-wifi-field input { width: 100%; padding: 10px 12px; border-radius: 10px; border: none; background: rgba(255,255,255,.16); color: #fff; font-family: var(--font-body); font-size: 14px; font-weight: 700; }
-.condo-wifi-field input::placeholder { color: rgba(255,255,255,.55); font-weight: 500; }
-.condo-wifi-field input:focus { outline: 2px solid rgba(255,255,255,.6); background: rgba(255,255,255,.24); }
-.safety-card { background: rgba(255,247,242,.94); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 20px; padding: 24px 26px; box-shadow: 0 14px 40px rgba(16,58,70,.22); border: 1px solid rgba(232,137,106,.32); color: var(--text); flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.safety-card h3 { font-family: var(--font-heading); font-size: 20px; color: var(--coral-d); margin-bottom: 12px; }
-.safety-sec { margin-bottom: 11px; }
-.safety-sec:last-child { margin-bottom: 0; }
-.safety-sec h4 { font-size: 9.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-.safety-tip { font-size: 12px; color: var(--coral-d); font-weight: 700; margin-bottom: 4px; line-height: 1.4; }
-.safety-tip:last-child { margin-bottom: 0; }
+.info-banners { position: relative; z-index: 2; margin: 16px 0 0; display: flex; flex-direction: column; gap: 10px; }
+@media (min-width: 768px) { .info-banners { flex-direction: row; } }
+.info-banner { border-radius: 14px; padding: 11px 18px; display: flex; align-items: center; gap: 12px 18px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.condo-banner { background: linear-gradient(120deg, var(--ocean-d), var(--ocean), var(--ocean-l)); color: #fff; box-shadow: 0 8px 24px rgba(16,58,70,.24); }
+.cb-title { font-family: var(--font-heading); font-size: 15px; font-weight: 700; letter-spacing: .01em; white-space: nowrap; }
+.cb-addr { font-size: 11px; opacity: .9; margin-top: 1px; }
+.cb-addr a { color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,.5); }
+.cb-wifi { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.cb-wifi input { width: 128px; padding: 7px 10px; border-radius: 9px; border: none; background: rgba(255,255,255,.18); color: #fff; font-family: var(--font-body); font-size: 12px; font-weight: 700; }
+.cb-wifi input::placeholder { color: rgba(255,255,255,.6); font-weight: 500; }
+.cb-wifi input:focus { outline: 2px solid rgba(255,255,255,.6); background: rgba(255,255,255,.26); }
+.safety-banner { background: rgba(255,247,242,.94); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(232,137,106,.32); box-shadow: 0 8px 24px rgba(16,58,70,.16); color: var(--text); }
+.sb-title { font-family: var(--font-heading); font-size: 15px; font-weight: 700; color: var(--coral-d); white-space: nowrap; }
+.sb-tips { display: flex; gap: 6px 14px; flex-wrap: wrap; }
+.sb-tip { font-size: 10.5px; font-weight: 700; color: var(--coral-d); line-height: 1.3; white-space: nowrap; }
 
 /* MASTER CHECKLIST */
 .checklist-outer { padding: 24px 0; position: relative; z-index: 2; }
@@ -520,14 +501,21 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 .dinner-day-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .dinner-day { font-weight: 800; font-size: 13px; color: var(--ocean-d); }
 .dinner-date { font-weight: 600; font-size: 10px; color: var(--muted); margin-left: 4px; }
-.dinner-plan { font-size: 11px; color: var(--muted); margin-top: 2px; min-height: 28px; line-height: 1.35; }
-.meal-slot { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 6px; min-height: 92px; }
+.dinner-plan { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+.meal-slot { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 6px; }
 .meal-slot:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
-.meal-slot-hdr { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
+.meal-slot-hdr { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; }
 .meal-slot-label { font-weight: 800; font-size: 12px; color: var(--ocean-d); }
-.meal-title-input { width: 100%; margin-top: 6px; padding: 7px 9px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); font-family: var(--font-body); font-size: 12.5px; font-weight: 600; color: var(--text); }
-.meal-title-input:focus { outline: none; border-color: var(--teal); }
-.meal-title-input::placeholder { color: var(--muted); font-weight: 500; }
+.meal-items-list { display: flex; flex-direction: column; gap: 3px; }
+.meal-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text); padding: 3px 0; }
+.meal-item-x { flex-shrink: 0; width: 15px; height: 15px; border-radius: 50%; border: none; background: transparent; color: var(--muted); font-size: 10px; cursor: pointer; opacity: .45; }
+.meal-item-x:hover { opacity: 1; color: var(--coral-d); }
+.meal-items-empty { font-size: 11px; color: var(--muted); font-style: italic; }
+.dinner-add-row { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 2px solid var(--teal); flex-wrap: wrap; }
+.dinner-add-input { flex: 1 1 120px; min-width: 0; padding: 7px 9px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); font-family: var(--font-body); font-size: 12.5px; font-weight: 600; color: var(--text); }
+.dinner-add-input:focus { outline: none; border-color: var(--teal); }
+.dinner-add-select { flex: 0 0 auto; padding: 7px 8px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); font-family: var(--font-body); font-size: 12px; font-weight: 600; color: var(--text); }
+.dinner-add-btn { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--teal); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
 .itinerary-stops { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; }
 .itin-stop { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 5px 8px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; }
 .itin-stop .itin-num { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -548,14 +536,15 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
   .trip-content-wrap {
     display: grid;
     grid-template-columns: var(--sidebar-w) 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto auto auto;
     grid-template-areas:
-      "condo   dinner"
+      "banner  banner"
       "sidebar cal"
+      "sidebar dinner"
       "checklist checklist";
     gap: 16px;
   }
-  .condo-slider-wrap { grid-area: condo; margin: 0; }
+  .info-banners { grid-area: banner; margin: 0; }
   .sidebar { grid-area: sidebar; }
   .dinner-outer { grid-area: dinner; }
   .cal-carousel-wrap { grid-area: cal; min-width: 0; }
@@ -924,47 +913,27 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 </div>
 
 <div class="trip-content-wrap">
-  <!-- CONDO / BEACH SAFETY SLIDER -->
-  <div class="condo-slider-wrap">
-    <button class="slider-arrow slider-arrow-l" id="condoPrevBtn" onclick="navCondoSlide(-1)" aria-label="Previous card">‹</button>
-    <div class="condo-slider" id="condoSlider">
-      <div class="slide">
-        <div class="condo-card">
-          <h3 id="condoTitle">Unit 212 — Executive Keys Condos</h3>
-          <div class="condo-addr"><a id="condoAddrLink" href="https://www.google.com/maps/search/?api=1&query=800+Access+Road+1-A+Port+Aransas+TX+78373" target="_blank" rel="noopener">800 Access Road 1-A, Port Aransas, TX 78373</a></div>
-          <div class="condo-wifi-grid">
-            <div class="condo-wifi-field">
-              <label>WiFi Network</label>
-              <input type="text" id="condoWifi" placeholder="Network name">
-            </div>
-            <div class="condo-wifi-field">
-              <label>WiFi Password</label>
-              <input type="text" id="condoWifiPw" placeholder="Password">
-            </div>
-          </div>
-        </div>
+  <!-- CONDO / BEACH SAFETY BANNERS -->
+  <div class="info-banners">
+    <div class="info-banner condo-banner">
+      <div>
+        <div class="cb-title" id="condoTitle">Unit 212 — Executive Keys Condos</div>
+        <div class="cb-addr"><a id="condoAddrLink" href="https://www.google.com/maps/search/?api=1&query=800+Access+Road+1-A+Port+Aransas+TX+78373" target="_blank" rel="noopener">800 Access Road 1-A, Port Aransas, TX 78373</a></div>
       </div>
-      <div class="slide">
-        <div class="safety-card">
-          <h3>Beach Safety</h3>
-          <div class="safety-sec">
-            <h4>Jellyfish Sting</h4>
-            <div class="safety-tip">Seawater (not fresh!) → remove tentacles → lidocaine → hydrocortisone. Never rub or pee on it.</div>
-          </div>
-          <div class="safety-sec">
-            <h4>Gulf Hazards</h4>
-            <div class="safety-tip"><strong>Stingray shuffle</strong> your feet going in</div>
-            <div class="safety-tip"><strong>Man o' War</strong> (purple balloon) on sand? Skip the water</div>
-            <div class="safety-tip">Sunscreen every <strong>90 min</strong> + hydrate often</div>
-            <div class="safety-tip">Turtle on beach? Call <strong>1-866-887-8535</strong></div>
-          </div>
-        </div>
+      <div class="cb-wifi">
+        <input type="text" id="condoWifi" placeholder="WiFi network">
+        <input type="text" id="condoWifiPw" placeholder="WiFi password">
       </div>
     </div>
-    <button class="slider-arrow slider-arrow-r" id="condoNextBtn" onclick="navCondoSlide(1)" aria-label="Next card">›</button>
-    <div class="condo-slider-dots">
-      <button type="button" class="slider-dot on" data-idx="0" onclick="goCondoSlide(0)" aria-label="Show condo card"></button>
-      <button type="button" class="slider-dot" data-idx="1" onclick="goCondoSlide(1)" aria-label="Show beach safety card"></button>
+    <div class="info-banner safety-banner">
+      <div class="sb-title">🩹 Beach Safety</div>
+      <div class="sb-tips">
+        <span class="sb-tip">Jellyfish: seawater (not fresh) → remove tentacles → lidocaine → hydrocortisone</span>
+        <span class="sb-tip">Stingray shuffle your feet</span>
+        <span class="sb-tip">Purple flag (Man o' War)? Skip the water</span>
+        <span class="sb-tip">Sunscreen every 90 min + hydrate</span>
+        <span class="sb-tip">Turtle on beach? 1-866-887-8535</span>
+      </div>
     </div>
   </div>
 
@@ -985,13 +954,6 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
     </div>
   </div>
 
-  <!-- DINNER PLANNING + SHOPPING LISTS -->
-  <div class="dinner-outer">
-    <button class="carousel-arrow carousel-arrow-l" id="dinnerPrevBtn" onclick="navDay(-1)" aria-label="Previous day">‹</button>
-    <div class="dinner-section" id="dinnerSection"></div>
-    <button class="carousel-arrow carousel-arrow-r" id="dinnerNextBtn" onclick="navDay(1)" aria-label="Next day">›</button>
-  </div>
-
   <!-- CALENDAR -->
   <div class="cal-carousel-wrap">
     <button class="carousel-arrow carousel-arrow-l" id="calPrevBtn" onclick="navDay(-1)" aria-label="Previous day">‹</button>
@@ -999,6 +961,13 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
       <div class="cal-grid" id="calGrid"></div>
     </div>
     <button class="carousel-arrow carousel-arrow-r" id="calNextBtn" onclick="navDay(1)" aria-label="Next day">›</button>
+  </div>
+
+  <!-- DINNER PLANNING + SHOPPING LISTS -->
+  <div class="dinner-outer">
+    <button class="carousel-arrow carousel-arrow-l" id="dinnerPrevBtn" onclick="navDay(-1)" aria-label="Previous day">‹</button>
+    <div class="dinner-section" id="dinnerSection"></div>
+    <button class="carousel-arrow carousel-arrow-r" id="dinnerNextBtn" onclick="navDay(1)" aria-label="Next day">›</button>
   </div>
 
   <!-- MASTER CHECKLIST: house + food packing, drag between columns to assign -->
@@ -1798,42 +1767,6 @@ function updateCarouselArrows() {
   ['calNextBtn', 'dinnerNextBtn'].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = atEnd; });
 }
 
-// ── CONDO / BEACH SAFETY SLIDER (2 slides, swipe or arrows/dots) ──
-function goCondoSlide(idx) {
-  const wrap = document.getElementById('condoSlider');
-  if (!wrap) return;
-  const slide = wrap.children[idx];
-  if (slide) wrap.scrollTo({ left: slide.offsetLeft - wrap.offsetLeft, behavior: 'smooth' });
-}
-function navCondoSlide(delta) {
-  const wrap = document.getElementById('condoSlider');
-  if (!wrap) return;
-  const w = wrap.clientWidth || 1;
-  const cur = Math.round(wrap.scrollLeft / w);
-  goCondoSlide(Math.max(0, Math.min(1, cur + delta)));
-}
-function updateCondoSliderUI() {
-  const wrap = document.getElementById('condoSlider');
-  if (!wrap) return;
-  const w = wrap.clientWidth || 1;
-  const idx = Math.max(0, Math.min(1, Math.round(wrap.scrollLeft / w)));
-  document.querySelectorAll('.slider-dot').forEach((d, i) => d.classList.toggle('on', i === idx));
-  const prevBtn = document.getElementById('condoPrevBtn');
-  const nextBtn = document.getElementById('condoNextBtn');
-  if (prevBtn) prevBtn.disabled = idx === 0;
-  if (nextBtn) nextBtn.disabled = idx === 1;
-}
-(function initCondoSlider() {
-  const wrap = document.getElementById('condoSlider');
-  if (!wrap) return;
-  let t = null;
-  wrap.addEventListener('scroll', () => {
-    clearTimeout(t);
-    t = setTimeout(updateCondoSliderUI, 80);
-  }, { passive: true });
-  window.addEventListener('resize', updateCondoSliderUI);
-  updateCondoSliderUI();
-})();
 
 function highlightDayTab(dayId) {
   document.querySelectorAll('#dayTabs .day-tab').forEach(t => {
@@ -2818,7 +2751,7 @@ function openChecklistActionSheet(itemId) {
 // Each slot mirrors whatever's placed on the calendar for that meal's time
 // window (see getMealActivity) — no manual entry. The only thing you set
 // by hand is whether the ingredients have been logged on the All column.
-function newMealSlot() { return { title: '' }; }
+function newMealSlot() { return { items: [] }; }
 function newDayMeals() { return { breakfast: newMealSlot(), lunch: newMealSlot(), dinner: newMealSlot(), snacks: newMealSlot() }; }
 const MEAL_SLOTS = [
   { key: 'breakfast', label: 'Breakfast' },
@@ -2827,21 +2760,29 @@ const MEAL_SLOTS = [
   { key: 'snacks', label: 'Snacks + Drinks' },
 ];
 function escAttr(str) { return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
-let mealTitleSaveTimer = null;
-function saveMealTitleDebounced() {
-  clearTimeout(mealTitleSaveTimer);
-  mealTitleSaveTimer = setTimeout(saveBin, 600);
+function escHtml(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function addMealItem(dayId, slotKey, text) {
+  const val = (text || '').trim();
+  if (!val) return;
+  const dayMeals = state.meals[dayId] || (state.meals[dayId] = newDayMeals());
+  if (!dayMeals[slotKey]) dayMeals[slotKey] = newMealSlot();
+  if (!dayMeals[slotKey].items) dayMeals[slotKey].items = [];
+  dayMeals[slotKey].items.push({ id: 'mi' + Date.now() + Math.random().toString(36).slice(2, 6), text: val });
+  saveBin();
+  renderMeals();
+}
+function removeMealItem(dayId, slotKey, itemId) {
+  const dayMeals = state.meals[dayId];
+  if (!dayMeals || !dayMeals[slotKey] || !dayMeals[slotKey].items) return;
+  dayMeals[slotKey].items = dayMeals[slotKey].items.filter(i => i.id !== itemId);
+  saveBin();
+  renderMeals();
 }
 
 function renderMeals() {
   const container = document.getElementById('dinnerSection');
   if (!container) return;
-  // Preserve focus/cursor on a meal title input across the innerHTML rebuild below.
-  const activeEl = document.activeElement;
-  let focused = null;
-  if (activeEl && activeEl.classList && activeEl.classList.contains('meal-title-input')) {
-    focused = { dayId: activeEl.dataset.dayId, slot: activeEl.dataset.slot, start: activeEl.selectionStart, end: activeEl.selectionEnd };
-  }
   container.innerHTML = '';
   const desktop = isDesktop();
   const daysToRender = DAYS; // all days always present — mobile scrolls/swipes between them
@@ -2862,7 +2803,7 @@ function renderMeals() {
   }
   daysToRender.forEach(day => {
     const dayMeals = state.meals[day.id] || (state.meals[day.id] = newDayMeals());
-    MEAL_SLOTS.forEach(slotDef => { if (!dayMeals[slotDef.key]) dayMeals[slotDef.key] = newMealSlot(); });
+    MEAL_SLOTS.forEach(slotDef => { if (!dayMeals[slotDef.key]) dayMeals[slotDef.key] = newMealSlot(); if (!dayMeals[slotDef.key].items) dayMeals[slotDef.key].items = []; });
     const card = document.createElement('div');
     card.className = 'dinner-card';
     card.dataset.dayId = day.id;
@@ -2876,6 +2817,13 @@ function renderMeals() {
         </div>
       </div>
       <div id="mealSlots-${day.id}"></div>
+      <div class="dinner-add-row">
+        <input type="text" class="dinner-add-input" id="addItemInput-${day.id}" placeholder="Add an item…" maxlength="60" />
+        <select class="dinner-add-select" id="addItemSelect-${day.id}">
+          ${MEAL_SLOTS.map(s => `<option value="${s.key}">${s.label}</option>`).join('')}
+        </select>
+        <button class="dinner-add-btn" id="addItemBtn-${day.id}" type="button" aria-label="Add item">＋</button>
+      </div>
     `;
     const slotsEl = card.querySelector(`#mealSlots-${day.id}`);
 
@@ -2883,6 +2831,7 @@ function renderMeals() {
       const meal = dayMeals[slotDef.key];
       const found = getMealActivity(day.id, slotDef.key);
       const calendarNote = found ? `${found.act.name} · ${slotToTime(found.slot)}` : '';
+      const items = meal.items || [];
 
       const slotEl = document.createElement('div');
       slotEl.className = 'meal-slot';
@@ -2890,24 +2839,28 @@ function renderMeals() {
         <div class="meal-slot-hdr">
           <span class="meal-slot-label">${slotDef.label}</span>
         </div>
-        ${`<div class="dinner-plan">${calendarNote ? `On the calendar: ${calendarNote}` : ''}</div>`}
-        <input type="text" class="meal-title-input" data-day-id="${day.id}" data-slot="${slotDef.key}" placeholder="What's the plan?" value="${escAttr(meal.title || '')}" />
+        ${calendarNote ? `<div class="dinner-plan">${escHtml(calendarNote)}</div>` : ''}
+        <div class="meal-items-list">
+          ${items.length ? items.map(item => `
+            <div class="meal-item">
+              <button class="meal-item-x" type="button" onclick="removeMealItem('${day.id}','${slotDef.key}','${item.id}')" aria-label="Remove item">✕</button>
+              <span>${escHtml(item.text)}</span>
+            </div>
+          `).join('') : ''}
+        </div>
       `;
-      const titleInput = slotEl.querySelector('.meal-title-input');
-      titleInput.addEventListener('input', e => {
-        meal.title = e.target.value;
-        saveMealTitleDebounced();
-      });
       slotsEl.appendChild(slotEl);
     });
 
     container.appendChild(card);
-  });
 
-  if (focused) {
-    const el = container.querySelector(`.meal-title-input[data-day-id="${focused.dayId}"][data-slot="${focused.slot}"]`);
-    if (el) { el.focus(); try { el.setSelectionRange(focused.start, focused.end); } catch {} }
-  }
+    const addInput = card.querySelector(`#addItemInput-${day.id}`);
+    const addSelect = card.querySelector(`#addItemSelect-${day.id}`);
+    const addBtn = card.querySelector(`#addItemBtn-${day.id}`);
+    const submitAdd = () => { addMealItem(day.id, addSelect.value, addInput.value); };
+    addBtn.addEventListener('click', submitAdd);
+    addInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitAdd(); } });
+  });
 
   if (!desktop) {
     scrollCarouselToDay(container, ui.curDay, '.dinner-card');
@@ -3471,10 +3424,10 @@ async function submitNewTrip() {
       placed: Object.fromEntries(days.map(d => [d.id, {}])),
       customActs: [], hiddenBase: [], chat: [], condoInfo: {}, people: [],
       meals: Object.fromEntries(days.map(d => [d.id, {
-        breakfast: { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } },
-        lunch: { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } },
-        dinner: { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } },
-        snacks: { out: false, plan: '', addedToAll: false, venue: { name: '', menu: '', phone: '', notes: '' } },
+        breakfast: { out: false, plan: '', addedToAll: false, items: [], venue: { name: '', menu: '', phone: '', notes: '' } },
+        lunch: { out: false, plan: '', addedToAll: false, items: [], venue: { name: '', menu: '', phone: '', notes: '' } },
+        dinner: { out: false, plan: '', addedToAll: false, items: [], venue: { name: '', menu: '', phone: '', notes: '' } },
+        snacks: { out: false, plan: '', addedToAll: false, items: [], venue: { name: '', menu: '', phone: '', notes: '' } },
       }])),
       masterChecklist: [],
       enrichment: {},
