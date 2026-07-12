@@ -196,6 +196,9 @@ body {
 .check-item .item-edit:hover, .check-item .item-dup:hover { opacity: 1; color: var(--teal); }
 .ci-edit-input { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); font-family: 'Nunito Sans', sans-serif; border: 1.5px solid var(--teal); border-radius: 6px; padding: 3px 7px; }
 .mc-section-hdr { font-size: 9px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); padding: 6px 0 2px; }
+.mc-parent-hdr { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ocean-d); padding: 8px 0 0; border-top: 1px solid var(--border); margin-top: 4px; }
+.mc-parent-hdr:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+.mc-section-hdr.sub { padding-left: 4px; opacity: .8; }
 .mc-col + .mc-col { border-top: 1px solid var(--border); }
 
 /* FOOTER DIVIDER */
@@ -503,12 +506,33 @@ function renderMasterChecklist() {
       if (!(key in bySection)) { bySection[key] = []; order.push(key); }
       bySection[key].push(it);
     });
+    let lastParent = null;
     order.forEach(key => {
       if (key) {
-        const hdr = document.createElement('div');
-        hdr.className = 'mc-section-hdr';
-        hdr.textContent = key;
-        itemsEl.appendChild(hdr);
+        const sepIdx = key.indexOf(':');
+        if (sepIdx !== -1) {
+          const parent = key.slice(0, sepIdx);
+          const sub = key.slice(sepIdx + 1);
+          if (parent !== lastParent) {
+            const phdr = document.createElement('div');
+            phdr.className = 'mc-parent-hdr';
+            phdr.textContent = parent.toUpperCase();
+            itemsEl.appendChild(phdr);
+            lastParent = parent;
+          }
+          const hdr = document.createElement('div');
+          hdr.className = 'mc-section-hdr sub';
+          hdr.textContent = sub;
+          itemsEl.appendChild(hdr);
+        } else {
+          lastParent = null;
+          const hdr = document.createElement('div');
+          hdr.className = 'mc-section-hdr';
+          hdr.textContent = key;
+          itemsEl.appendChild(hdr);
+        }
+      } else {
+        lastParent = null;
       }
       bySection[key].forEach(it => {
         const row = document.createElement('div');
