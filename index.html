@@ -478,6 +478,9 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 .checklist-empty-hint { font-size: 10.5px; color: var(--muted); font-style: italic; padding: 6px; text-align: center; }
 .checklist-section-hdr { font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 8px 6px 2px; }
 .checklist-section-hdr:first-child { padding-top: 2px; }
+.checklist-parent-hdr { font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--ocean-d); padding: 10px 6px 0; border-top: 1px solid var(--border); margin-top: 4px; }
+.checklist-parent-hdr:first-child { border-top: none; margin-top: 0; padding-top: 2px; }
+.checklist-section-hdr.sub { padding-left: 6px; opacity: .8; }
 .checklist-add-row { display: flex; gap: 6px; padding: 8px 10px 10px; }
 .checklist-add-row input { flex: 1; min-width: 0; padding: 6px 9px; border-radius: 8px; border: 1.5px solid var(--border); font-family: var(--font-body); font-size: 11.5px; }
 .checklist-add-row button { width: 26px; height: 26px; border-radius: 8px; border: none; background: var(--teal); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
@@ -2560,12 +2563,33 @@ function renderMasterChecklist() {
       if (!(key in bySection)) { bySection[key] = []; sectionOrder.push(key); }
       bySection[key].push(it);
     });
+    let lastParent = null;
     sectionOrder.forEach(key => {
       if (key) {
-        const hdr = document.createElement('div');
-        hdr.className = 'checklist-section-hdr';
-        hdr.textContent = key;
-        itemsEl.appendChild(hdr);
+        const sepIdx = key.indexOf(':');
+        if (sepIdx !== -1) {
+          const parent = key.slice(0, sepIdx);
+          const sub = key.slice(sepIdx + 1);
+          if (parent !== lastParent) {
+            const phdr = document.createElement('div');
+            phdr.className = 'checklist-parent-hdr';
+            phdr.textContent = parent.toUpperCase();
+            itemsEl.appendChild(phdr);
+            lastParent = parent;
+          }
+          const hdr = document.createElement('div');
+          hdr.className = 'checklist-section-hdr sub';
+          hdr.textContent = sub;
+          itemsEl.appendChild(hdr);
+        } else {
+          lastParent = null;
+          const hdr = document.createElement('div');
+          hdr.className = 'checklist-section-hdr';
+          hdr.textContent = key;
+          itemsEl.appendChild(hdr);
+        }
+      } else {
+        lastParent = null;
       }
       bySection[key].forEach(it => {
       const row = document.createElement('div');
