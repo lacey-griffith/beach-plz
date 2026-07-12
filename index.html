@@ -511,11 +511,12 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 .meal-item-x { flex-shrink: 0; width: 15px; height: 15px; border-radius: 50%; border: none; background: transparent; color: var(--muted); font-size: 10px; cursor: pointer; opacity: .45; }
 .meal-item-x:hover { opacity: 1; color: var(--coral-d); }
 .meal-items-empty { font-size: 11px; color: var(--muted); font-style: italic; }
-.dinner-add-row { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 2px solid var(--teal); flex-wrap: wrap; }
-.dinner-add-input { flex: 1 1 120px; min-width: 0; padding: 7px 9px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); font-family: var(--font-body); font-size: 12.5px; font-weight: 600; color: var(--text); }
+.dinner-add-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--teal); }
+.dinner-add-input { flex: 1 1 auto; min-width: 0; height: 34px; padding: 0 10px; border-radius: 9px; border: 1.5px solid var(--border); background: var(--white); font-family: var(--font-body); font-size: 12.5px; font-weight: 600; color: var(--text); }
 .dinner-add-input:focus { outline: none; border-color: var(--teal); }
-.dinner-add-select { flex: 0 0 auto; padding: 7px 8px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); font-family: var(--font-body); font-size: 12px; font-weight: 600; color: var(--text); }
-.dinner-add-btn { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--teal); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+.dinner-add-select { flex: 0 0 auto; max-width: 136px; height: 34px; padding: 0 8px; border-radius: 9px; border: 1.5px solid var(--border); background: var(--white); font-family: var(--font-body); font-size: 12px; font-weight: 600; color: var(--text); }
+.dinner-add-btn { flex-shrink: 0; width: 34px; height: 34px; border-radius: 9px; border: none; background: var(--teal); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background .15s; }
+.dinner-add-btn:hover { background: var(--ocean); }
 .itinerary-stops { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; }
 .itin-stop { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 5px 8px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; }
 .itin-stop .itin-num { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -540,7 +541,7 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
     grid-template-areas:
       "banner  banner"
       "sidebar cal"
-      "sidebar dinner"
+      "dinner  dinner"
       "checklist checklist";
     gap: 16px;
   }
