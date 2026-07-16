@@ -717,44 +717,7 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
     </filter>
   </defs>
 </svg>
-<div class="ambient-layer" data-ambient="ocean" aria-hidden="true">
-  <div class="amb-bg-jelly" style="left:6%;top:14%;animation-delay:.4s"><img src="assets/pink-jelly.png" alt="" style="filter:url(#jellyWave1)"></div>
-  <div class="amb-bg-jelly" style="right:8%;top:22%;animation-delay:2s"><img src="assets/orange-jelly.png" alt="" style="filter:url(#jellyWave2)"></div>
-  <div class="amb-bg-jelly" style="left:14%;bottom:18%;animation-delay:3.4s"><img src="assets/green-jelly.png" alt="" style="filter:url(#jellyWave3)"></div>
-  <div class="amb-bg-star" style="left:4%;bottom:8%"><img src="assets/orange-star.png" alt=""></div>
-  <div class="amb-bg-star" style="right:5%;bottom:10%;animation-delay:1.6s"><img src="assets/blue-star.png" alt=""></div>
-  <div class="amb-bg-weed" style="left:2%"><img src="assets/seaweed.png" alt=""></div>
-  <div class="amb-bg-weed" style="right:3%;animation-delay:.8s"><img src="assets/kelp-green.png" alt=""></div>
-  <div class="amb-curious" id="ambCuriousA"><img src="assets/fish-gold.png" alt="" style="height:56px"></div>
-  <div class="amb-curious" id="ambCuriousB"><img src="assets/fish-blue.png" alt="" style="height:50px"></div>
-  <div class="amb-school-fish" id="ambSchool0"><img src="assets/fish-gold.png" alt="" style="height:34px"></div>
-  <div class="amb-school-fish" id="ambSchool1"><img src="assets/fish-blue.png" alt="" style="height:26px"></div>
-  <div class="amb-school-fish" id="ambSchool2"><img src="assets/fish-gold.png" alt="" style="height:22px"></div>
-  <div class="amb-school-fish" id="ambSchool3"><img src="assets/fish-blue.png" alt="" style="height:19px"></div>
-  <div class="amb-school-fish" id="ambSchool4"><img src="assets/fish-gold.png" alt="" style="height:17px"></div>
-  <div class="amb-seahorse" id="ambSeahorse"><img src="assets/seahorse-blue.png" alt=""></div>
-  <div class="amb-turtle" id="ambTurtle">
-    <div class="amb-turtle-body">
-      <img src="assets/turtle-blue-crop.png" alt="">
-      <img src="assets/turtle-flipL.png" alt="" class="amb-flip-l">
-      <img src="assets/turtle-flipR.png" alt="" class="amb-flip-r">
-    </div>
-  </div>
-</div>
-
-<div class="ambient-layer-witchy" data-ambient="witchy" aria-hidden="true" style="display:none">
-  <div class="w-moon-glow"><img src="assets/witchy/moon-glow.png" alt=""></div>
-  <div class="w-web-tl"><img src="assets/witchy/web-corner.png" alt=""></div>
-  <div class="w-web-tr"><img src="assets/witchy/web-corner.png" alt=""></div>
-  <div class="w-spider-deco"><img src="assets/witchy/spider.png" alt=""></div>
-  <div class="w-sparkle" style="top:12%;left:8%"><img src="assets/witchy/sparkle.png" alt=""></div>
-  <div class="w-sparkle" style="top:34%;right:16%;animation-delay:1.4s"><img src="assets/witchy/sparkle.png" alt=""></div>
-  <div class="w-sparkle" style="top:58%;left:5%;animation-delay:2.2s"><img src="assets/witchy/sparkle.png" alt=""></div>
-  <div class="w-raven"><img src="assets/witchy/raven.png" alt=""></div>
-  <div class="w-raven-drift"><img src="assets/witchy/raven-drift.png" alt=""></div>
-  <div class="w-cat"><img src="assets/witchy/cat.png" alt=""></div>
-  <div class="w-tree-corner"><img src="assets/witchy/tree-corner.png" alt=""></div>
-</div>
+<div id="ambientRoot"></div>
 
 
 <!-- TRIPS HOME SCREEN -->
@@ -1185,8 +1148,6 @@ function applyTheme(themeId) {
   document.body.style.backgroundColor = t.bodyBgColor || '';
   document.body.style.backgroundImage = t.bodyBg || '';
   document.body.dataset.theme = t.id;
-  const showAmbient = t.ambient;
-  document.querySelectorAll('[data-ambient]').forEach(el => { el.style.display = (el.dataset.ambient === showAmbient) ? '' : 'none'; });
 }
 function renderThemePicker(gridId, selectedId, onSelect) {
   const grid = document.getElementById(gridId);
@@ -1277,6 +1238,49 @@ function generateTripDays(startStr, endStr) {
 
 const _activeTrip = getActiveTripConfig();
 applyTheme(_activeTrip.theme || DEFAULT_THEME);
+renderAmbient((_activeTrip.theme && THEMES[_activeTrip.theme] && !THEMES[_activeTrip.theme].locked) ? _activeTrip.theme : DEFAULT_THEME);
+
+// Builds ambient decoration markup for ONE theme only — the inactive theme's
+// images are never added to the DOM, so the browser never fetches them.
+// Also trimmed to fewer continuously-animated elements (was: turtle + 5 school
+// fish + 2 curious fish + seahorse for ocean; 3 sparkles + raven + raven-drift
+// + cat + spider for witchy) to cut per-frame JS work on mobile.
+function renderAmbient(themeId) {
+  const root = document.getElementById('ambientRoot');
+  if (!root) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (themeId === 'witchy') {
+    root.innerHTML = `
+      <div class="ambient-layer-witchy" aria-hidden="true">
+        <div class="w-moon-glow"><img src="assets/witchy/moon-glow.png" alt="" loading="lazy" decoding="async"></div>
+        <div class="w-web-tl"><img src="assets/witchy/web-corner.png" alt="" loading="lazy" decoding="async"></div>
+        <div class="w-web-tr"><img src="assets/witchy/web-corner.png" alt="" loading="lazy" decoding="async"></div>
+        <div class="w-spider-deco"><img src="assets/witchy/spider.png" alt="" loading="lazy" decoding="async"></div>
+        <div class="w-sparkle" style="top:12%;left:8%"><img src="assets/witchy/sparkle.png" alt="" loading="lazy" decoding="async"></div>
+        <div class="w-raven"><img src="assets/witchy/raven.png" alt="" loading="lazy" decoding="async"></div>
+        <div class="w-cat"><img src="assets/witchy/cat.png" alt="" loading="lazy" decoding="async"></div>
+        <div class="w-tree-corner"><img src="assets/witchy/tree-corner.png" alt="" loading="lazy" decoding="async"></div>
+      </div>`;
+    return;
+  }
+  root.innerHTML = `
+    <div class="ambient-layer" aria-hidden="true">
+      <div class="amb-bg-jelly" style="left:6%;top:14%;animation-delay:.4s"><img src="assets/pink-jelly.png" alt="" style="filter:url(#jellyWave1)" loading="lazy" decoding="async"></div>
+      <div class="amb-bg-jelly" style="right:8%;top:22%;animation-delay:2s"><img src="assets/orange-jelly.png" alt="" style="filter:url(#jellyWave2)" loading="lazy" decoding="async"></div>
+      <div class="amb-bg-star" style="left:4%;bottom:8%"><img src="assets/orange-star.png" alt="" loading="lazy" decoding="async"></div>
+      <div class="amb-bg-weed" style="left:2%"><img src="assets/seaweed.png" alt="" loading="lazy" decoding="async"></div>
+      <div class="amb-school-fish" id="ambSchool0"><img src="assets/fish-gold.png" alt="" style="height:34px" loading="lazy" decoding="async"></div>
+      <div class="amb-school-fish" id="ambSchool1"><img src="assets/fish-blue.png" alt="" style="height:26px" loading="lazy" decoding="async"></div>
+      <div class="amb-school-fish" id="ambSchool2"><img src="assets/fish-gold.png" alt="" style="height:22px" loading="lazy" decoding="async"></div>
+      <div class="amb-turtle" id="ambTurtle">
+        <div class="amb-turtle-body">
+          <img src="assets/turtle-blue-crop.png" alt="" loading="lazy" decoding="async">
+          <img src="assets/turtle-flipL.png" alt="" class="amb-flip-l" loading="lazy" decoding="async">
+          <img src="assets/turtle-flipR.png" alt="" class="amb-flip-r" loading="lazy" decoding="async">
+        </div>
+      </div>
+    </div>`;
+}
 
 // ── CONFIG ────────────────────────────────────────────────────────
 const PROXY_BASE = 'https://beach-plz-proxy.lacey-griffith04.workers.dev';
@@ -3647,8 +3651,6 @@ const SCHOOL_MEMBERS = [
   { dx: 0,   dy: 0,   phase: 0.0 },
   { dx: -30, dy: 12,  phase: 1.1 },
   { dx: 26,  dy: -9,  phase: 2.3 },
-  { dx: -16, dy: -19, phase: 3.6 },
-  { dx: 11,  dy: 20,  phase: 0.6 },
 ];
 const Ambient = {
   start() {
@@ -3656,25 +3658,16 @@ const Ambient = {
     if (typeof requestAnimationFrame !== 'function') return;
     this.turtleEl = document.getElementById('ambTurtle');
     this.schoolEls = SCHOOL_MEMBERS.map((_, i) => document.getElementById('ambSchool' + i));
-    this.curiousAEl = document.getElementById('ambCuriousA');
-    this.curiousBEl = document.getElementById('ambCuriousB');
-    this.seahorseEl = document.getElementById('ambSeahorse');
     if (!this.turtleEl) return;
     const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
     const vw = window.innerWidth, vh = window.innerHeight;
     this.turtleStart = now;
     this.school = { x: vw * 0.5, y: vh * 0.4, tx: vw * 0.5, ty: vh * 0.4, vx: 0, face: 1, nextAt: now + 1200 };
-    this.cA = { x: vw * 0.22, y: vh * 0.5, tx: vw * 0.22, ty: vh * 0.5, face: 1, phase: 0, paused: false, nextAt: now + 400 };
-    this.cB = { x: vw * 0.74, y: vh * 0.34, tx: vw * 0.74, ty: vh * 0.34, face: 1, phase: 2, paused: false, nextAt: now + 1600 };
-    this.sh = { active: false, startAt: now + 2500, dir: 1, prog: 0, activatedAt: 0 };
     this.lastT = now;
     const loop = (t) => {
       const dt = Math.min(0.05, (t - this.lastT) / 1000); this.lastT = t;
       this.stepTurtle(t);
       this.stepSchool(t, dt);
-      this.stepCurious(this.cA, this.curiousAEl, t, dt);
-      this.stepCurious(this.cB, this.curiousBEl, t, dt);
-      this.stepSeahorse(t, dt);
       this._raf = requestAnimationFrame(loop);
     };
     this._raf = requestAnimationFrame(loop);
@@ -3718,47 +3711,6 @@ const Ambient = {
       const wob = Math.sin(t / 500 + m.phase) * 4;
       el.style.transform = 'translate(' + (s.x + m.dx) + 'px,' + (s.y + m.dy + bobY + wob) + 'px) scaleX(' + s.face + ')';
     });
-  },
-  stepCurious(s, el, t, dt) {
-    if (!el) return;
-    const vw = window.innerWidth, vh = window.innerHeight;
-    if (t >= s.nextAt) {
-      if (s.paused) {
-        s.paused = false;
-        s.tx = 70 + Math.random() * (vw - 140);
-        s.ty = vh * (0.14 + Math.random() * 0.68);
-        s.nextAt = t + 5000 + Math.random() * 5000;
-      } else {
-        s.paused = true;
-        s.nextAt = t + 700 + Math.random() * 1500;
-      }
-    }
-    const dx = s.tx - s.x, dy = s.ty - s.y, dist = Math.hypot(dx, dy);
-    if (dist < 14 && !s.paused) { s.paused = true; s.nextAt = Math.min(s.nextAt, t + 600 + Math.random() * 1300); }
-    const speed = s.paused ? 7 : 78;
-    if (dist > 0.5) {
-      s.x += (dx / dist) * speed * dt;
-      s.y += (dy / dist) * speed * dt;
-      if (Math.abs(dx) > 5) s.face = dx < 0 ? 1 : -1;
-    }
-    const wob = Math.sin(t / 320 + s.phase) * 4;
-    el.style.transform = 'translate(' + s.x + 'px,' + (s.y + wob) + 'px) scaleX(' + s.face + ')';
-  },
-  stepSeahorse(t, dt) {
-    const el = this.seahorseEl; if (!el) return;
-    const s = this.sh, vw = window.innerWidth, vh = window.innerHeight;
-    if (!s.active && t >= s.startAt) { s.active = true; s.prog = 0; s.activatedAt = t; }
-    if (!s.active) { el.style.opacity = '0'; return; }
-    s.prog += dt / 25;
-    if (s.prog >= 1) { s.active = false; s.startAt = s.activatedAt + 60000; s.dir *= -1; el.style.opacity = '0'; return; }
-    el.style.opacity = '0.62';
-    const startX = s.dir > 0 ? -150 : vw + 150;
-    const endX = s.dir > 0 ? vw + 150 : -150;
-    const x = startX + (endX - startX) * s.prog;
-    const y = vh * 0.64 + Math.sin(s.prog * Math.PI * 5) * 34;
-    const rock = Math.sin(s.prog * Math.PI * 11) * 6;
-    const face = s.dir > 0 ? -1 : 1;
-    el.style.transform = 'translate(' + x + 'px,' + y + 'px) scaleX(' + face + ') rotate(' + rock + 'deg)';
   },
   stop() { if (this._raf) cancelAnimationFrame(this._raf); },
 };
