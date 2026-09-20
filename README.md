@@ -7,6 +7,7 @@ Port Aransas Trip Planner — July 22–26, 2026
 |------|-----|
 | 🗓️ Trip Planner | https://lacey-griffith.github.io/beach-plz/ |
 | 🛒 Packing & Lists | https://lacey-griffith.github.io/beach-plz/lists.html |
+| 🎉 Party Planner | https://lacey-griffith.github.io/beach-plz/party.html |
 
 ## The Crew
 Nicole · RJ · Tyler · Gracie · Lacey
