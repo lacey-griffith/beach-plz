@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Party Planner 🎉</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap');
+
+:root {
+  --ocean: #0a7a6d; --ocean-d: #0b5f5f; --teal: #0e7a6d;
+  --coral: #e8896a; --coral-d: #a04b31; --coral-bg: #fbeae2;
+  --berry: #c96f8a; --berry-d: #964261; --berry-bg: #f8e6ec;
+  --amber: #d99b3f; --amber-d: #8a5a1c; --amber-bg: #fbeed7;
+  --green: #57a86f; --green-d: #2f6a48; --green-bg: #e6f2eb;
+  --red: #c0453a; --red-bg: #fbe4e1;
+  --text: #143434; --muted: #5c6b66; --border: #ece2ca; --white: #fff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { min-height: 100%; }
+body {
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  background-color: #3d97b3;
+  background-image: linear-gradient(180deg, #2a7d9e 0%, #3d97b3 26%, #5fb2c4 52%, #86c8cf 74%, #b7dccf 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-size: 15px;
+}
+.page { max-width: 560px; margin: 0 auto; padding: 14px 14px 60px; }
+button { font-family: inherit; cursor: pointer; }
+
+/* top bar */
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.pill-btn { background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.35); border-radius: 999px;
+  color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  padding: 6px 12px; text-decoration: none; display: inline-flex; align-items: center; }
+
+/* cards */
+.card { background: rgba(255,255,255,.94); border-radius: 18px; border: 1px solid rgba(255,255,255,.8);
+  box-shadow: 0 8px 26px rgba(16,58,70,.16); padding: 16px; margin-bottom: 14px; }
+
+/* setup */
+.setup h1 { font-family: 'Baloo 2', sans-serif; font-size: 28px; color: var(--berry-d); line-height: 1.1; }
+.setup .sub { color: var(--muted); margin: 4px 0 14px; }
+.setup label.lbl { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); margin: 12px 0 5px; }
+.setup input { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1.5px solid var(--border);
+  font-family: inherit; font-size: 16px; color: var(--text); background: #fff; }
+.setup input:focus { outline: none; border-color: var(--berry); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tbtn { padding: 14px 8px; border-radius: 14px; border: 2px solid var(--border); background: #fff;
+  font-weight: 800; font-size: 16px; color: var(--text); }
+.tbtn.on { border-color: var(--berry); background: var(--berry-bg); color: var(--berry-d); }
+.err { color: var(--red); font-weight: 700; font-size: 13px; min-height: 18px; margin-top: 10px; }
+.big-btn { width: 100%; margin-top: 8px; padding: 15px; border: none; border-radius: 14px; color: #fff;
+  background: linear-gradient(135deg, var(--berry-d), var(--berry)); font-weight: 800; font-size: 17px;
+  font-family: 'Baloo 2', sans-serif; box-shadow: 0 4px 14px rgba(150,66,97,.3); }
+.link-btn { background: none; border: none; color: var(--muted); font-weight: 700; font-size: 13px; margin-top: 10px; width: 100%; padding: 8px; }
+
+/* hero */
+.hero { background: linear-gradient(135deg, var(--berry-d), var(--coral)); color: #fff; padding: 18px 16px 16px; }
+.hero .who { font-family: 'Baloo 2', sans-serif; font-size: 26px; font-weight: 800; line-height: 1.1; }
+.hero .when { font-size: 13px; opacity: .92; margin-top: 3px; font-weight: 600; }
+.hero .count { font-family: 'Baloo 2', sans-serif; font-size: 34px; font-weight: 800; margin-top: 10px; line-height: 1; }
+.hero .count small { font-size: 14px; font-weight: 700; opacity: .9; }
+.bar { height: 10px; background: rgba(255,255,255,.28); border-radius: 999px; overflow: hidden; margin-top: 12px; }
+.bar > i { display: block; height: 100%; background: #fff; border-radius: 999px; transition: width .25s; }
+.barlbl { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-top: 5px; opacity: .95; }
+.status { margin-top: 12px; padding: 10px 12px; border-radius: 12px; font-weight: 800; font-size: 14px; line-height: 1.35; }
+.status.ok { background: rgba(255,255,255,.22); }
+.status.warn { background: #fff; color: var(--red); }
+.status.tight { background: rgba(255,255,255,.22); font-weight: 700; font-size: 13px; margin-top: 8px; }
+
+/* tabs */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.tab { padding: 11px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,.45); background: rgba(255,255,255,.2);
+  color: #fff; font-weight: 800; font-size: 14px; }
+.tab.on { background: #fff; color: var(--berry-d); border-color: #fff; }
+
+/* groups */
+.group { background: rgba(255,255,255,.94); border-radius: 16px; margin-bottom: 12px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.8); box-shadow: 0 6px 20px rgba(16,58,70,.13); }
+.ghdr { width: 100%; display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: none; border: none; text-align: left; }
+.ghdr .gt { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 16px; color: var(--ocean-d); }
+.ghdr .gs { font-size: 12px; color: var(--muted); font-weight: 600; }
+.ghdr .gc { margin-left: auto; font-size: 12px; font-weight: 800; color: var(--muted); }
+.ghdr .arrow { color: var(--muted); font-size: 12px; transition: transform .15s; }
+.group.open .arrow { transform: rotate(180deg); }
+.group.over .gt { color: var(--red); }
+.group.over { border: 1.5px solid var(--red); }
+.gbody { display: none; padding: 0 12px 8px; }
+.group.open .gbody { display: block; }
+
+/* tasks */
+.task { display: flex; align-items: flex-start; gap: 10px; padding: 10px 2px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.task:first-child { border-top: none; }
+.chk { width: 28px; height: 28px; flex-shrink: 0; border-radius: 9px; border: 2px solid var(--ocean); background: #fff;
+  color: transparent; font-size: 16px; font-weight: 900; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.task.done .chk { background: var(--teal); border-color: var(--teal); color: #fff; }
+.tmain { flex: 1; min-width: 0; cursor: pointer; padding-top: 3px; }
+.ttl { font-weight: 700; font-size: 15px; line-height: 1.3; }
+.task.done .ttl { text-decoration: line-through; color: var(--muted); font-weight: 600; }
+.must { display: inline-block; font-size: 9.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  background: var(--amber-bg); color: var(--amber-d); padding: 2px 6px; border-radius: 6px; margin-left: 4px; vertical-align: 1px; }
+.late { font-size: 11.5px; color: var(--red); font-weight: 700; margin-top: 2px; }
+.chev { background: none; border: none; color: var(--muted); font-size: 12px; padding: 8px 4px; }
+.tip { flex-basis: 100%; margin: 0 0 4px 38px; background: var(--amber-bg); border-radius: 12px; padding: 10px 12px; }
+.tip ul { list-style: none; }
+.tip li { font-size: 13.5px; line-height: 1.4; padding: 3px 0 3px 16px; position: relative; color: #4a3512; }
+.tip li::before { content: '•'; position: absolute; left: 3px; font-weight: 900; color: var(--amber-d); }
+.tact { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.sbtn { padding: 7px 12px; border-radius: 999px; border: 1.5px solid var(--border); background: #fff; font-size: 12px; font-weight: 800; color: var(--ocean-d); }
+.sbtn.pri { background: var(--ocean); border-color: var(--ocean); color: #fff; }
+.sbtn.del { color: var(--coral-d); }
+
+.empty { padding: 14px 4px; color: var(--muted); font-weight: 700; font-size: 14px; text-align: center; }
+.addrow { display: flex; gap: 8px; margin: 4px 0 12px; }
+.addrow input { flex: 1; padding: 12px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,.6); font-family: inherit; font-size: 16px; background: rgba(255,255,255,.94); }
+.addrow button { width: 48px; border-radius: 12px; border: none; background: var(--ocean-d); color: #fff; font-size: 24px; font-weight: 700; }
+.donetoggle { width: 100%; padding: 11px; border-radius: 12px; border: 1.5px dashed rgba(255,255,255,.7); background: transparent; color: #fff; font-weight: 800; font-size: 13px; }
+
+/* party day */
+.tl { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); align-items: flex-start; }
+.tl:first-of-type { border-top: none; }
+.tl .tm { width: 74px; flex-shrink: 0; font-weight: 800; font-size: 13px; color: var(--berry-d); padding-top: 4px; }
+.tl .tx { flex: 1; font-weight: 700; line-height: 1.3; padding-top: 3px; }
+.tl .tx small { display: block; font-weight: 600; color: var(--muted); font-size: 12.5px; margin-top: 1px; }
+.tl.done .tx { text-decoration: line-through; color: var(--muted); }
+.tl.done .tx small { text-decoration: none; }
+.tl.now { background: var(--berry-bg); border-radius: 12px; padding-left: 8px; padding-right: 8px; }
+.tl.gap { border-top: none; padding: 2px 0; }
+.h2 { font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 700; color: var(--ocean-d); margin-bottom: 4px; }
+.h2 small { font-family: 'Nunito Sans', sans-serif; font-size: 12px; color: var(--muted); font-weight: 600; margin-left: 6px; }
+.math { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.mcell { background: var(--green-bg); border-radius: 12px; padding: 10px 12px; }
+.mcell b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 20px; color: var(--green-d); line-height: 1.1; }
+.mcell span { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.mcell em { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+/* sheet */
+.sheet-bg { position: fixed; inset: 0; background: rgba(10,40,50,.5); z-index: 50; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { background: #fff; width: 100%; max-width: 560px; border-radius: 22px 22px 0 0; padding: 18px 16px 28px; }
+.sheet h3 { font-family: 'Baloo 2', sans-serif; color: var(--berry-d); font-size: 20px; margin-bottom: 10px; }
+.sheet .big-btn { margin-top: 8px; }
+.sheet .big-btn.alt { background: #fff; color: var(--ocean-d); border: 2px solid var(--border); box-shadow: none; }
+.sheet .big-btn.danger { background: #fff; color: var(--red); border: 2px solid var(--red-bg); box-shadow: none; }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ocean-d); color: #fff;
+  padding: 10px 18px; border-radius: 999px; font-weight: 800; font-size: 13px; z-index: 60; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.sync { text-align: center; color: rgba(255,255,255,.9); font-size: 11.5px; font-weight: 700; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="page" id="app"></div>
+
+<script>
+/* ───────── constants ───────── */
+const PROXY = 'https://beach-plz-proxy.lacey-griffith04.workers.dev';
+const LS_ACTIVE = 'party_active';
+const LSK = id => 'party_' + id;
+
+/* ───────── date helpers (local, YYYY-MM-DD) ───────── */
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseD = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parseD(s); d.setDate(d.getDate() + n); return ymd(d); };
+const diffDays = (a, b) => Math.round((parseD(a) - parseD(b)) / 864e5);
+const today = () => ymd(new Date());
+const fmtDate = s => parseD(s).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+const fmtMin = total => { total = ((total % 1440) + 1440) % 1440; let h = Math.floor(total / 60); const m = total % 60;
+  const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return `${h}:${pad(m)} ${ap}`; };
+const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+const ord = n => { const v = n % 100; return n + (['th','st','nd','rd'][(v - 20) % 10] || ['th','st','nd','rd'][v] || 'th'); };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ───────── task templates ───────── */
+// f: b = both, k = kids only, a = adults only. lead = ideal days before the party (negative = after).
+const TEMPL = [
+  { id:'plan', cat:'📍', t:'Lock in date, time & place', lead:30, must:1, f:'b', tip:[
+    'Pick a start AND end time (kids ≈ 2 hrs, adults ≈ 3–4 hrs).',
+    'Confirm the space is actually free.',
+    'Write it in one spot so every invite matches.'] },
+  { id:'guests', cat:'👥', t:'Finalize the guest list', lead:28, must:1, f:'b', tip:[
+    'Names + phone numbers in one place (Notes app is fine).',
+    'Headcount drives food, chairs and cake size.'],
+    kTip:['Count the kids AND the parents who will stay. Siblings welcome? Decide now.'],
+    aTip:['Plus-ones? Decide now so you are not guessing on food.'] },
+  { id:'invites', cat:'💌', t:'Send invites (do this first!)', lead:21, must:1, f:'b', inv:1, tip:[
+    'A group text is fine on a short timeline.',
+    'Include: date, time, address, RSVP-by date.',
+    'Set RSVP-by about 4 days before the party.'],
+    kTip:['Ask parents about food allergies, and say drop-off or stay is fine.'],
+    aTip:['Say if it is BYOB and suggest rideshare.'] },
+  { id:'budget', cat:'💰', t:'Set a budget', lead:28, f:'b', tip:[
+    'Pick ONE total number and stick to it.',
+    'Rough split: food & drinks 50%, cake 15%, decor 15%, fun/favors 20%.'] },
+  { id:'theme', cat:'🎈', t:'Pick a theme & 2–3 colors', lead:14, f:'b', tip:[
+    'Colors matter more than characters. Plates, balloons and cake all follow them.',
+    'One theme + one palette. Keep it simple.'] },
+  { id:'cake', cat:'🎂', t:'Order (or plan) the cake', lead:10, must:1, f:'b', tip:[
+    'Bakeries want 3–7 days notice. Order today if buying.',
+    'Servings: quarter sheet ≈ 12–20, half sheet ≈ 30–40.',
+    'No time? Grocery-store cake, cupcakes or a box mix all work.'],
+    kTip:['Ask about allergies before you order.'] },
+  { id:'menu', cat:'🍕', t:'Plan the menu', lead:10, must:1, f:'b', tip:[
+    'Keep it simple: 1 main + 2 sides + something sweet (cake counts).'],
+    kTip:['Kid-proof: pizza, fruit, veggie tray, chips, juice/water.'],
+    aTip:['Grazing board + a hot app or two + a filling option so nobody drinks on an empty stomach.'] },
+  { id:'rentals', cat:'🪑', t:'Book rentals or borrow gear', lead:12, f:'b', tip:[
+    'Tables, chairs, tent, coolers, bounce house. Rentals book up, so call today.',
+    'Or borrow from family and neighbors (free!).',
+    'Chairs for about half your guests if mingling, all of them if sit-down.'] },
+  { id:'act-k', cat:'🎲', t:'Plan 2–3 activities', lead:10, f:'k', tip:[
+    'One active game (freeze dance, relay, pin the tail).',
+    'One hands-on thing (craft, sensory table, decorate a cupcake).',
+    'Gather supplies this week.',
+    'Have a backup indoor game if the weather turns.'] },
+  { id:'act-a', cat:'🎶', t:'Plan the vibe (music + 1 optional game)', lead:7, f:'a', tip:[
+    'Playlist for 3+ hours. Download it so Wi-Fi does not matter.',
+    'One optional game (cornhole, cards, trivia). No forced fun.'] },
+  { id:'bar', cat:'🍹', t:'Plan the drinks', lead:7, f:'a', tip:[
+    '1 signature drink + beer/wine/seltzer + 2 non-alcoholic options.',
+    'Rule of thumb: about 1 drink per person per hour, plus 1.',
+    'Ice: 1–2 lbs per person. More than you think.'] },
+  { id:'gifts-k', cat:'🎁', t:'Decide: open gifts at the party or later?', lead:6, f:'k', tip:[
+    'Under 6? Open at home. Way less overwhelming.',
+    'If opening there, assign one person to jot down who gave what.'] },
+  { id:'safety-k', cat:'🩹', t:'Allergy + safety check', lead:5, must:1, f:'k', tip:[
+    'Collect allergies from RSVPs and label the food.',
+    'Plan roughly 1 adult per 4–5 kids.',
+    'First-aid kit, a quiet spot, wipes and paper towels handy.',
+    'Scan the yard/house for hazards (pool gate, pets, stairs).'] },
+  { id:'rides-a', cat:'🚗', t:'Plan rides + safety', lead:5, must:1, f:'a', tip:[
+    'Suggest rideshare or a designated driver in the invite.',
+    'Serve real food plus lots of water and non-alcoholic options.',
+    'Line up one person who stays clear-headed.',
+    'Have a couch/spare-room plan for anyone who should not drive.'] },
+  { id:'neighbors-a', cat:'📣', t:'Give the neighbors a heads-up', lead:5, f:'a', tip:[
+    'Tell them the date and end time and share your number.',
+    'Cheapest way to avoid a noise-complaint ending.'] },
+  { id:'weather', cat:'☁️', t:'Make a weather backup plan', lead:5, f:'b', tip:[
+    'Check the forecast now and again 2 days before.',
+    'Backup: tent, garage, or an indoor layout. Decide your call time (morning of).',
+    'Fully indoors? Skip this one.'] },
+  { id:'supplies', cat:'🛍️', t:'Buy decor & party supplies', lead:6, f:'b', tip:[
+    'Plates, cups, napkins, forks, tablecloth.',
+    'Balloons, banner, candles + lighter, tape.',
+    'Trash bags, paper towels, wet wipes, cake knife.'] },
+  { id:'favors-k', cat:'🎁', t:'Goody bags / favors', lead:5, f:'k', tip:[
+    '3–4 small things + a treat is plenty.',
+    'One per kid + 2 extras. Check treats for allergens.'] },
+  { id:'rsvp', cat:'📲', t:'Chase RSVPs & lock the headcount', lead:4, must:1, f:'b', tip:[
+    'Text everyone who has not replied.',
+    'Update your final number. All your shopping depends on it.'] },
+  { id:'music', cat:'🔊', t:'Playlist + test the speaker', lead:3, f:'b', tip:[
+    'Download the playlist (no Wi-Fi drama).',
+    'Charge the speaker and test the volume where you will use it.'] },
+  { id:'confirm', cat:'✅', t:'Confirm vendors & line up helpers', lead:2, must:1, f:'b', tip:[
+    'Text the bakery / rental / entertainer to confirm times.',
+    'Ask 1–2 people to help with setup or cleanup.'] },
+  { id:'grocery', cat:'🛒', t:'Grocery run (perishables + drinks)', lead:2, must:1, f:'b', tip:[
+    'Shop AFTER the headcount is final. The Party Day tab has quantities.',
+    'Ice: buy the day before or morning of.',
+    'Write the list by aisle to save time.'] },
+  { id:'clean', cat:'🧹', t:'Clean only what guests will see', lead:2, f:'b', tip:[
+    'Entry, bathroom, kitchen, party space. That is it.',
+    'Stock the bathroom: TP, soap, hand towels, small trash can.',
+    'Clear a spot for coats and gifts.'] },
+  { id:'prep', cat:'🥣', t:'Prep make-ahead food', lead:1, f:'b', tip:[
+    'Chop, marinate, assemble. Whatever can happen tonight.',
+    'Clear fridge space for the party food.'] },
+  { id:'setup', cat:'🎀', t:'Set up tables, chairs & decor', lead:1, f:'b', tip:[
+    'Do everything non-perishable tonight.',
+    'Helium balloons last about 10 hrs, so inflate those day-of. Air-filled ones can go up tonight.'] },
+  { id:'charge', cat:'🔋', t:'Charge phone + clear storage', lead:1, f:'b', tip:[
+    'Free up phone space for photos and video.',
+    'Ask one person to be the photographer so you are in a few pics.'] },
+  { id:'pickup', cat:'🎂', t:'Pick up cake + ice', lead:0, must:1, f:'b', tip:[
+    'Check the name/message before you leave the bakery.',
+    'Keep the cake flat: floorboard, not the seat.',
+    'Buy ice the morning of.'] },
+  { id:'dayof', cat:'🎉', t:'Follow the Party Day plan', lead:0, must:1, f:'b', tip:[
+    'Open the Party Day tab for the hour-by-hour timeline.',
+    'You do not have to remember any of it. Just check things off.'] },
+  { id:'thanks', cat:'💌', t:'Clean up + send thank-yous', lead:-1, f:'b', tip:[
+    'A quick thank-you text to guests within a day or two.',
+    'Freeze leftover cake slices for later!'] }
+];
+
+const TL = {
+  kids: { len: 120, items: [
+    [-240, 'Pick up cake + balloons, grab ice'],
+    [-180, 'Set up food & drink table, chill drinks'],
+    [-120, 'Decorate: banner, balloons, tablecloth'],
+    [-60,  'Activity supplies out, snacks in bowls', 'Cake kit ready: candles, lighter, knife, plates'],
+    [-30,  'Quick walkthrough. Bathroom stocked, trash cans out, music on', 'Then get yourself ready!'],
+    [0,    'Doors open. Greet kids, point them to the first activity'],
+    [30,   'Activity / games time'],
+    [60,   'Food & drinks'],
+    [85,   'Cake + singing', 'Photos!'],
+    [105,  'Free play + hand out goody bags'],
+    [120,  'Party ends. Thank the parents, say goodbyes'],
+    [150,  'Quick reset', 'Trash out, leftovers in the fridge, gifts in one safe spot'] ] },
+  adults: { len: 210, items: [
+    [-300, 'Pick up ice, cake and last groceries'],
+    [-240, 'Chill drinks, set up the bar / coolers'],
+    [-180, 'Decorate, set up seating and lights'],
+    [-90,  'Final food prep, put out non-perishables'],
+    [-45,  'Music on, quick walkthrough, get ready', 'Bathroom stocked, trash + recycling marked'],
+    [-15,  'Lights on, candles lit, bug spray out'],
+    [0,    'Doors open. Drink in every hand'],
+    [45,   'Food out'],
+    [120,  'Cake / toast', 'Photos!'],
+    [180,  'Refresh water + snacks', 'Quiet check on rides'],
+    [210,  'Wrap up. Make sure everyone has a safe ride'],
+    [240,  'Quick reset', 'Trash out, leftovers away, gifts in one spot'] ] }
+};
+
+/* ───────── state ───────── */
+let S = null;                    // saved party
+let etag = null, pushT = null, syncState = 'local';
+const ui = { tab: 'todo', exp: new Set(), open: {}, showDone: false, sheet: false, editing: false, err: '',
+  form: { name: '', type: '', age: '', date: '', time: '', guests: '', touchedTime: false, touchedGuests: false } };
+
+function loadLocal(id) { try { return JSON.parse(localStorage.getItem(LSK(id))); } catch { return null; } }
+function saveLocal() { try { localStorage.setItem(LSK(S.id), JSON.stringify(S)); localStorage.setItem(LS_ACTIVE, S.id); } catch {} }
+function newId() { return 'p' + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4); }
+function tipFor(t, type) { return [...t.tip, ...((type === 'kids' ? t.kTip : t.aTip) || [])]; }
+
+/* ───────── scheduling: turns "ideal lead times" into real due dates ───────── */
+function schedule(cfg, prev) {
+  const t0 = today();
+  const left = diffDays(cfg.date, t0);
+  const prevMap = new Map((prev || []).map(t => [t.id, t]));
+  const want = TEMPL.filter(t => t.f === 'b' || t.f === (cfg.type === 'kids' ? 'k' : 'a'));
+  const now = Date.now();
+  const out = [], clamp = [];
+  want.forEach((t, i) => {
+    const p = prevMap.get(t.id);
+    const nat = addDays(cfg.date, -t.lead);
+    const item = { id: t.id, o: i, cat: t.cat, title: t.t, tip: tipFor(t, cfg.type), must: t.must ? 1 : 0, inv: t.inv ? 1 : 0,
+      lead: t.lead, due: nat, done: false, ts: now };
+    if (p && p.del) { item.del = 1; item.done = !!p.done; item.due = p.due; item.ts = now; }
+    else if (p && p.done) { item.done = true; item.due = p.due; item.ts = p.ts || now; }
+    else if (t.lead >= 0 && nat <= t0) clamp.push(item);
+    out.push(item);
+  });
+  // Tasks that should already have happened get spread over the next few days (must-dos first)
+  clamp.sort((a, b) => (b.must - a.must) || (b.lead - a.lead) || (a.o - b.o));
+  const spread = Math.max(1, Math.min(3, left));
+  const per = Math.max(1, Math.ceil(clamp.length / spread));
+  clamp.forEach((it, i) => { it.due = addDays(t0, Math.min(spread - 1, Math.floor(i / per))); });
+  // keep the user's own tasks
+  (prev || []).filter(t => t.custom).forEach(t => out.push({ ...t, due: t.due > cfg.date ? cfg.date : t.due }));
+  return out;
+}
+
+/* ───────── sync (best effort: localStorage always works, proxy is a bonus) ───────── */
+function setSync(s) { syncState = s; const el = document.getElementById('syncline'); if (el) el.innerHTML = syncHtml(); }
+function syncHtml() {
+  return syncState === 'busy' ? 'Saving…' : syncState === 'ok' ? '● Synced. Share link in ⚙︎ opens this same plan'
+    : syncState === 'err' ? 'Saved on this device (sync offline)' : 'Saved on this device';
+}
+function schedulePush() { clearTimeout(pushT); setSync('busy'); pushT = setTimeout(push, 1500); }
+async function push() {
+  if (!S) return;
+  try {
+    const r = await fetch(`${PROXY}/data/party-${S.id}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(S) });
+    etag = null; setSync(r.ok ? 'ok' : 'err');
+  } catch { setSync('err'); }
+}
+function merge(a, b) {
+  const base = (b.sTs || 0) > (a.sTs || 0) ? { ...b } : { ...a };
+  const map = new Map();
+  [...(a.tasks || []), ...(b.tasks || [])].forEach(t => { const c = map.get(t.id); if (!c || (t.ts || 0) > (c.ts || 0)) map.set(t.id, t); });
+  base.tasks = [...map.values()].sort((x, y) => (x.o - y.o) || (x.id < y.id ? -1 : 1));
+  const day = {}, ad = a.day || {}, bd = b.day || {};
+  new Set([...Object.keys(ad), ...Object.keys(bd)]).forEach(k => { const x = ad[k], y = bd[k]; day[k] = !x ? y : !y ? x : (y.ts > x.ts ? y : x); });
+  base.day = day;
+  return base;
+}
+async function pull() {
+  if (!S) return;
+  const typing = document.activeElement && document.activeElement.tagName === 'INPUT';
+  try {
+    const h = {}; if (etag) h['If-None-Match'] = etag;
+    const r = await fetch(`${PROXY}/data/party-${S.id}.json`, { headers: h });
+    if (r.status === 304) { setSync('ok'); return; }
+    if (r.status === 404) { await push(); return; }
+    if (!r.ok) { setSync('err'); return; }
+    etag = r.headers.get('ETag');
+    const { record } = await r.json();
+    if (!record || !record.cfg) { setSync('ok'); return; }
+    const merged = merge(S, record);
+    const changed = JSON.stringify(merged) !== JSON.stringify(S);
+    if (changed) { S = merged; saveLocal(); if (!typing) render(); }
+    if (JSON.stringify(merged) !== JSON.stringify(record)) schedulePush(); else setSync('ok');
+  } catch { setSync('err'); }
+}
+
+function commit(touchSettings) {
+  if (touchSettings) S.sTs = Date.now();
+  saveLocal(); render(); schedulePush();
+}
+
+/* ───────── derived data ───────── */
+function view() {
+  const t0 = today(), pd = S.cfg.date;
+  const list = S.tasks.filter(t => !t.del);
+  const open = list.filter(t => !t.done);
+  const over = open.filter(t => t.due < t0).sort((a, b) => a.due.localeCompare(b.due) || a.o - b.o);
+  const rest = list.filter(t => t.due >= t0);
+  const days = [...new Set(rest.map(t => t.due))].sort();
+  const groups = days.map(d => ({ d, tasks: rest.filter(t => t.due === d).sort((a, b) => (a.done - b.done) || (a.o - b.o)) }));
+  const doneHidden = list.filter(t => t.done && t.due < t0);
+  const nextTask = open.filter(t => t.due >= t0).sort((a, b) => a.due.localeCompare(b.due) || a.o - b.o)[0];
+  return { t0, pd, list, open, over, groups, doneHidden, nextTask, left: diffDays(pd, t0) };
+}
+function dayLabel(d, v) {
+  const n = diffDays(d, v.t0);
+  if (d === v.pd) return ['🎉 Party day', fmtDate(d)];
+  if (d > v.pd) return ['After the party', fmtDate(d)];
+  const togo = diffDays(v.pd, d);
+  const sub = `${fmtDate(d)} · ${togo} day${togo === 1 ? '' : 's'} before`;
+  if (n === 0) return ['Today', sub];
+  if (n === 1) return ['Tomorrow', sub];
+  return [fmtDate(d), `${togo} day${togo === 1 ? '' : 's'} before the party`];
+}
+
+/* ───────── rendering ───────── */
+function render() {
+  const app = document.getElementById('app');
+  if (!S || ui.editing) { app.innerHTML = setupHtml(); return; }
+  app.innerHTML = mainHtml();
+}
+
+function setupHtml() {
+  const f = ui.form, minDate = today();
+  const editing = ui.editing;
+  return `
+  <div class="topbar">
+    <a class="pill-btn" href="index.html">← Trips</a>
+    ${editing ? '<button class="pill-btn" data-a="cancelEdit">Cancel</button>' : ''}
+  </div>
+  <div class="card setup">
+    <h1>${editing ? 'Party details' : '🎉 Party Planner'}</h1>
+    <p class="sub">${editing ? 'Change anything and your schedule updates.' : 'Answer 5 quick things and I will build your checklist.'}</p>
+
+    <label class="lbl">Who's the party for?</label>
+    <input data-f="name" value="${esc(f.name)}" placeholder="e.g. Mia" autocomplete="off">
+
+    <label class="lbl">Kids or adults?</label>
+    <div class="toggle">
+      <button class="tbtn ${f.type === 'kids' ? 'on' : ''}" data-a="type" data-v="kids">🎈 Kids</button>
+      <button class="tbtn ${f.type === 'adults' ? 'on' : ''}" data-a="type" data-v="adults">🥂 Adults</button>
+    </div>
+
+    <div class="row2">
+      <div><label class="lbl">Party date</label><input type="date" data-f="date" min="${minDate}" value="${esc(f.date)}"></div>
+      <div><label class="lbl">Start time</label><input type="time" data-f="time" value="${esc(f.time)}"></div>
+    </div>
+    <div class="row2">
+      <div><label class="lbl">Guests (rough is fine)</label><input type="number" inputmode="numeric" min="1" data-f="guests" value="${esc(f.guests)}" placeholder="15"></div>
+      <div><label class="lbl">Turning (optional)</label><input type="number" inputmode="numeric" min="1" data-f="age" value="${esc(f.age)}" placeholder="7"></div>
+    </div>
+    <div class="err">${esc(ui.err)}</div>
+    <button class="big-btn" data-a="saveSetup">${editing ? 'Save changes' : 'Build my plan 🎉'}</button>
+  </div>`;
+}
+
+function mainHtml() {
+  const v = view(), c = S.cfg;
+  const total = v.list.length, done = v.list.filter(t => t.done).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const title = c.age ? `${esc(c.name)} turns ${c.age}` : `${esc(c.name)}'s party`;
+  const startMin = toMin(c.time);
+  let countTxt;
+  if (v.left > 1) countTxt = `${v.left} <small>days to go</small>`;
+  else if (v.left === 1) countTxt = `Tomorrow! <small>🎉</small>`;
+  else if (v.left === 0) countTxt = `Today! <small>🎉</small>`;
+  else countTxt = `<small>Party's done. Cleanup + thank-yous!</small>`;
+
+  const todayOpen = v.open.filter(t => t.due === v.t0).length;
+  let status;
+  if (pct === 100) status = `<div class="status ok">🎉 Every single thing is done. You're ready!</div>`;
+  else if (v.over.length) status = `<div class="status warn">⚠️ ${v.over.length} overdue. Knock those out first.</div>`;
+  else if (todayOpen) status = `<div class="status ok">✅ On track. ${todayOpen} thing${todayOpen === 1 ? '' : 's'} left for today.</div>`;
+  else if (v.nextTask) status = `<div class="status ok">✅ Today is done! Next up: ${esc(v.nextTask.title)} (${dayLabel(v.nextTask.due, v)[0]})</div>`;
+  else status = '';
+  const mustLeft = v.open.filter(t => t.must).length;
+  const tight = (v.left >= 0 && v.left < 21)
+    ? `<div class="status tight">⏱ Only ${v.left} day${v.left === 1 ? '' : 's'} out, so I squeezed the schedule. ${mustLeft} must-do${mustLeft === 1 ? '' : 's'} left.</div>` : '';
+
+  return `
+  <div class="topbar">
+    <a class="pill-btn" href="index.html">← Trips</a>
+    <button class="pill-btn" data-a="sheet">⚙︎ Party</button>
+  </div>
+  <div class="card hero">
+    <div class="who">${title}</div>
+    <div class="when">${fmtDate(c.date)} · ${fmtMin(startMin)} · ${c.type === 'kids' ? '🎈 Kids party' : '🥂 Adult party'} · ${c.guests} guests</div>
+    <div class="count">${countTxt}</div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="barlbl"><span>${done} of ${total} done</span><span>${pct}%</span></div>
+    ${status}${tight}
+  </div>
+  <div class="tabs">
+    <button class="tab ${ui.tab === 'todo' ? 'on' : ''}" data-a="tab" data-v="todo">✅ To-Do</button>
+    <button class="tab ${ui.tab === 'day' ? 'on' : ''}" data-a="tab" data-v="day">🎉 Party Day</button>
+  </div>
+  ${ui.tab === 'todo' ? todoHtml(v) : dayHtml(v)}
+  <div class="sync" id="syncline">${syncHtml()}</div>
+  ${ui.sheet ? sheetHtml() : ''}`;
+}
+
+function taskHtml(t, v, overdue) {
+  const open = ui.exp.has(t.id);
+  const canSnooze = !t.done && t.due < S.cfg.date;
+  return `
+  <div class="task ${t.done ? 'done' : ''}">
+    <button class="chk" data-a="toggle" data-id="${t.id}" aria-label="Mark done">✓</button>
+    <div class="tmain" data-a="exp" data-id="${t.id}">
+      <div class="ttl">${t.cat} ${esc(t.title)}${t.must && !t.done ? '<span class="must">must-do</span>' : ''}</div>
+      ${overdue ? `<div class="late">Was due ${fmtDate(t.due)}</div>` : ''}
+    </div>
+    <button class="chev" data-a="exp" data-id="${t.id}" aria-label="Details">${open ? '▲' : '▼'}</button>
+    ${open ? `<div class="tip">
+      ${t.tip && t.tip.length ? `<ul>${t.tip.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<ul><li>Your own task. Do it, check it off.</li></ul>'}
+      <div class="tact">
+        ${t.inv ? '<button class="sbtn pri" data-a="copyInvite">📋 Copy invite text</button>' : ''}
+        ${canSnooze ? `<button class="sbtn" data-a="snooze" data-id="${t.id}">Do it tomorrow</button>` : ''}
+        <button class="sbtn del" data-a="del" data-id="${t.id}">Remove</button>
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+function groupHtml(key, title, sub, tasks, v, opts) {
+  const doneCt = tasks.filter(t => t.done).length;
+  const defOpen = opts.over || key <= addDays(v.t0, 1);
+  const isOpen = ui.open[key] !== undefined ? ui.open[key] : defOpen;
+  return `
+  <div class="group ${isOpen ? 'open' : ''} ${opts.over ? 'over' : ''}">
+    <button class="ghdr" data-a="grp" data-k="${key}" data-def="${defOpen ? 1 : 0}">
+      <div><div class="gt">${title}</div><div class="gs">${sub}</div></div>
+      <span class="gc">${doneCt}/${tasks.length}</span><span class="arrow">▼</span>
+    </button>
+    <div class="gbody">${tasks.map(t => taskHtml(t, v, opts.over)).join('')}</div>
+  </div>`;
+}
+
+function todoHtml(v) {
+  let h = '';
+  if (v.over.length) h += groupHtml('over', '⚠️ Overdue', 'Catch up on these first', v.over, v, { over: true });
+  v.groups.forEach(g => {
+    const [t, s] = dayLabel(g.d, v);
+    h += groupHtml(g.d, t, s, g.tasks, v, {});
+  });
+  if (!v.groups.length && !v.over.length) h += '<div class="card"><div class="empty">Nothing here. Add a task below.</div></div>';
+  h += `<div class="addrow"><input id="newTask" placeholder="Add your own task…" maxlength="80"><button data-a="add" aria-label="Add task">＋</button></div>`;
+  if (v.doneHidden.length) {
+    h += `<button class="donetoggle" data-a="showDone">${ui.showDone ? 'Hide' : 'Show'} ${v.doneHidden.length} finished earlier</button>`;
+    if (ui.showDone) h += `<div class="group open" style="margin-top:12px"><div class="gbody">${v.doneHidden.map(t => taskHtml(t, v, false)).join('')}</div></div>`;
+  }
+  return h;
+}
+
+function dayHtml(v) {
+  const c = S.cfg, kind = c.type, tl = TL[kind], start = toMin(c.time);
+  const isToday = v.t0 === c.date;
+  let nowMarked = false;
+  const rows = tl.items.map((it, i) => {
+    const key = kind + '-' + i, on = !!(S.day[key] && S.day[key].v);
+    let cls = on ? 'done' : '';
+    if (isToday && !on && !nowMarked) { cls += ' now'; nowMarked = true; }
+    return `<div class="tl ${cls}">
+      <div class="tm">${fmtMin(start + it[0])}</div>
+      <div class="tx">${esc(it[1])}${it[2] ? `<small>${esc(it[2])}</small>` : ''}</div>
+      <button class="chk" data-a="dayToggle" data-k="${key}" aria-label="Mark done">✓</button>
+    </div>`;
+  }).join('');
+
+  const G = Math.max(1, parseInt(c.guests, 10) || 1);
+  const cells = kind === 'kids' ? [
+    [Math.ceil(G * 2 / 8), 'large pizzas', '2 slices per kid. Add 1 if parents eat too'],
+    [G * 2, 'drinks', 'juice boxes / water'],
+    [G, 'cake servings', G <= 20 ? 'quarter sheet or 12–24 cupcakes' : 'half sheet'],
+    [G + 2, 'goody bags', 'one per kid + 2 spares'],
+    [G * 2, 'plates + napkins', 'seconds happen'],
+    [Math.ceil(G * 1), 'lbs of ice', 'if using coolers']
+  ] : [
+    [G * 10, 'bites of food', 'if it is not a full meal'],
+    [G * 4, 'drinks total', 'about 1/hr + 1. Keep 25%+ non-alcoholic'],
+    [Math.ceil(G * 1.5), 'lbs of ice', 'more if it is hot out'],
+    [G, 'cake servings', 'or a dessert spread'],
+    [G * 3, 'cups', 'people set them down and grab new ones'],
+    [G * 4, 'napkins', 'trust me']
+  ];
+  return `
+  <div class="card">
+    <div class="h2">Hour-by-hour <small>tap to check off</small></div>
+    ${rows}
+  </div>
+  <div class="card">
+    <div class="h2">Party math <small>for ${G} guests</small></div>
+    <div class="math">${cells.map(x => `<div class="mcell"><b>${x[0]}</b><span>${x[1]}</span><em>${x[2]}</em></div>`).join('')}</div>
+  </div>`;
+}
+
+function sheetHtml() {
+  return `
+  <div class="sheet-bg" data-a="closeSheet">
+    <div class="sheet">
+      <h3>Party options</h3>
+      <button class="big-btn alt" data-a="edit">✏️ Edit party details</button>
+      <button class="big-btn alt" data-a="share">🔗 Copy share link</button>
+      <button class="big-btn danger" data-a="newParty">Start a brand new party</button>
+      <button class="link-btn" data-a="closeSheet">Close</button>
+    </div>
+  </div>`;
+}
+
+function toast(msg) {
+  const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg; document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+}
+function copyText(txt, okMsg) {
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast(okMsg); } catch { prompt('Copy this:', txt); } ta.remove(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast(okMsg), fallback);
+  else fallback();
+}
+
+function inviteText() {
+  const c = S.cfg, start = toMin(c.time), len = TL[c.type].len;
+  const rsvpBy = fmtDate(addDays(c.date, -4));
+  const when = `${fmtDate(c.date)}, ${fmtMin(start)} – ${fmtMin(start + len)}`;
+  if (c.type === 'kids') {
+    return `🎉 You're invited to ${c.name}'s ${c.age ? ord(+c.age) + ' ' : ''}birthday party! 🎈\n📅 ${when}\n📍 [address]\n\nPlease RSVP by ${rsvpBy} and let me know about any food allergies. Parents are welcome to stay or drop off!`;
+  }
+  return `🥂 ${c.name}'s ${c.age ? ord(+c.age) + ' ' : ''}birthday bash!\n📅 ${when}\n📍 [address]\n\nFood + drinks provided (BYOB if you have a favorite). Please RSVP by ${rsvpBy}, and plan a rideshare or DD! 🚗`;
+}
+
+/* ───────── actions ───────── */
+function findTask(id) { return S.tasks.find(t => t.id === id); }
+const actions = {
+  type(el) { ui.form.type = el.dataset.v;
+    if (!ui.form.touchedTime) ui.form.time = ui.form.type === 'kids' ? '14:00' : '18:00';
+    if (!ui.form.touchedGuests) ui.form.guests = ui.form.type === 'kids' ? '12' : '20';
+    render(); },
+  saveSetup() {
+    const f = ui.form, name = f.name.trim(), g = parseInt(f.guests, 10);
+    if (!name) return fail('Who is the party for?');
+    if (!f.type) return fail('Pick kids or adults.');
+    if (!f.date) return fail('Pick the party date.');
+    if (f.date < today() && !ui.editing) return fail('That date has already passed.');
+    if (!f.time) return fail('Pick a start time.');
+    if (!g || g < 1) return fail('About how many guests?');
+    ui.err = '';
+    const cfg = { name, type: f.type, age: f.age ? String(parseInt(f.age, 10) || '') : '', date: f.date, time: f.time, guests: g };
+    if (ui.editing && S) { S.cfg = cfg; S.tasks = schedule(cfg, S.tasks); S.day = S.day || {}; ui.editing = false; ui.exp = new Set(); commit(true); }
+    else { S = { v: 1, id: newId(), sTs: Date.now(), cfg, tasks: schedule(cfg, []), day: {} }; ui.tab = 'todo'; commit(true); pushUrl(); startSync(); }
+  },
+  cancelEdit() { ui.editing = false; render(); },
+  tab(el) { ui.tab = el.dataset.v; render(); },
+  sheet() { ui.sheet = true; render(); },
+  closeSheet() { ui.sheet = false; render(); },
+  edit() { const c = S.cfg; ui.form = { name: c.name, type: c.type, age: c.age || '', date: c.date, time: c.time, guests: String(c.guests), touchedTime: true, touchedGuests: true };
+    ui.sheet = false; ui.editing = true; ui.err = ''; render(); },
+  share() { ui.sheet = false; render(); copyText(location.origin + location.pathname + '?p=' + S.id, 'Link copied 🔗'); },
+  newParty() { if (!confirm('Start a brand new party? This one stays saved on this device but you will leave it.')) return;
+    try { localStorage.removeItem(LS_ACTIVE); } catch {}
+    S = null; ui.sheet = false; ui.editing = false; ui.err = '';
+    ui.form = { name: '', type: '', age: '', date: '', time: '', guests: '', touchedTime: false, touchedGuests: false };
+    history.replaceState(null, '', location.pathname); render(); },
+  toggle(el) { const t = findTask(el.dataset.id); if (!t) return; t.done = !t.done; t.ts = Date.now(); commit(); },
+  exp(el) { const id = el.dataset.id; ui.exp.has(id) ? ui.exp.delete(id) : ui.exp.add(id); render(); },
+  grp(el) { const k = el.dataset.k, cur = ui.open[k] !== undefined ? ui.open[k] : el.dataset.def === '1'; ui.open[k] = !cur; render(); },
+  snooze(el) { const t = findTask(el.dataset.id); if (!t) return; const nd = addDays(today() > t.due ? today() : t.due, 1);
+    t.due = nd > S.cfg.date ? S.cfg.date : nd; t.ts = Date.now(); commit(); toast('Moved to ' + (t.due === addDays(today(), 1) ? 'tomorrow' : fmtDate(t.due))); },
+  del(el) { const t = findTask(el.dataset.id); if (!t) return; t.del = 1; t.ts = Date.now(); commit(); },
+  add() { const inp = document.getElementById('newTask'); const title = inp && inp.value.trim(); if (!title) return;
+    const due = today();
+    S.tasks.push({ id: 'c' + Date.now().toString(36), o: 1000 + S.tasks.length, cat: '📝', title, tip: [], must: 0, inv: 0, lead: 0, due, done: false, ts: Date.now(), custom: 1 });
+    ui.open[due] = true; commit(); },
+  showDone() { ui.showDone = !ui.showDone; render(); },
+  copyInvite() { copyText(inviteText(), 'Invite text copied 📋'); },
+  dayToggle(el) { const k = el.dataset.k; const cur = S.day[k] && S.day[k].v; S.day[k] = { v: !cur, ts: Date.now() }; commit(); }
+};
+function fail(msg) { ui.err = msg; render(); }
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-a]');
+  if (!el) return;
+  if (el.classList.contains('sheet-bg') && e.target !== el) return;
+  const fn = actions[el.dataset.a];
+  if (fn) fn(el);
+});
+document.addEventListener('input', e => {
+  const f = e.target.dataset && e.target.dataset.f;
+  if (!f) return;
+  ui.form[f] = e.target.value;
+  if (f === 'time') ui.form.touchedTime = true;
+  if (f === 'guests') ui.form.touchedGuests = true;
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id === 'newTask') actions.add();
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) pull(); });
+
+let syncTimer = null;
+function startSync() { if (syncTimer) return; syncTimer = setInterval(pull, 30000); }
+function pushUrl() { try { history.replaceState(null, '', location.pathname + '?p=' + S.id); } catch {} }
+
+/* ───────── boot ───────── */
+async function boot() {
+  const qid = new URLSearchParams(location.search).get('p');
+  let id = qid; if (!id) { try { id = localStorage.getItem(LS_ACTIVE); } catch {} }
+  if (id) S = loadLocal(id);
+  if (!S && qid) {                       // shared link on a new device: pull it down
+    S = { v: 1, id: qid, sTs: 0, cfg: null, tasks: [], day: {} };
+    try {
+      const r = await fetch(`${PROXY}/data/party-${qid}.json`);
+      if (r.ok) { const { record } = await r.json(); if (record && record.cfg) { S = record; saveLocal(); } else S = null; } else S = null;
+    } catch { S = null; }
+    if (!S) ui.err = 'Could not find that party. Start a new one below.';
+  }
+  if (S && !S.day) S.day = {};
+  render();
+  if (S) { pushUrl(); pull(); startSync(); }
+}
+boot();
+</script>
+</body>
+</html>
