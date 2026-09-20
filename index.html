@@ -682,6 +682,7 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
   background: rgba(255,255,255,.55); color: var(--ocean-d); font-family: var(--font-body); font-weight: 800;
   font-size: 15px; cursor: pointer; transition: background .12s; }
 .trips-new-btn:active { background: rgba(255,255,255,.85); }
+.trips-party-btn { display: block; text-align: center; text-decoration: none; margin-top: 12px; border-color: var(--lacey-d, #c96f8a); color: #964261; }
 .trips-toggle-btn { background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.3);
   border-radius: 999px; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 6px 12px; cursor: pointer; font-family: var(--font-body);
   flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; }
@@ -731,6 +732,7 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
     </div>
     <div class="trips-list" id="tripsList"></div>
     <button class="trips-new-btn" onclick="openNewTripForm()">＋ Plan a new trip</button>
+    <a class="trips-new-btn trips-party-btn" href="party.html">🎉 Party planner</a>
   </div>
 </div>
 
