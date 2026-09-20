@@ -146,6 +146,21 @@ button { font-family: inherit; cursor: pointer; }
 .sheet .big-btn.alt { background: #fff; color: var(--ocean-d); border: 2px solid var(--border); box-shadow: none; }
 .sheet .big-btn.danger { background: #fff; color: var(--red); border: 2px solid var(--red-bg); box-shadow: none; }
 
+.qcard { border-left: 6px solid var(--berry); }
+.qtop { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--berry-d); margin-bottom: 6px; }
+.qtext { font-family: 'Baloo 2', sans-serif; font-size: 21px; font-weight: 700; line-height: 1.2; color: var(--text); margin-bottom: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { padding: 11px 14px; border-radius: 999px; border: 2px solid var(--border); background: #fff; font-weight: 800; font-size: 14.5px; color: var(--text); }
+.chip.on { border-color: var(--berry); background: var(--berry-bg); color: var(--berry-d); }
+.qin { display: flex; gap: 8px; align-items: center; }
+.qin span { font-weight: 800; font-size: 18px; }
+.qin input { flex: 1; padding: 12px; border-radius: 10px; border: 1.5px solid var(--border); font-family: inherit; font-size: 16px; }
+.qsave { margin-top: 10px; width: 100%; padding: 12px; border: none; border-radius: 12px; background: var(--berry-d); color: #fff; font-weight: 800; font-size: 15px; }
+.qrow { width: 100%; display: flex; justify-content: space-between; gap: 10px; text-align: left; padding: 11px 2px; background: none; border: none; border-top: 1px solid var(--border); font-size: 14px; color: var(--text); }
+.qrow:first-of-type { border-top: none; }
+.qrow b { color: var(--berry-d); text-align: right; }
+.qrow b.none { color: var(--muted); font-weight: 600; }
+.qsk { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px; }
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ocean-d); color: #fff;
   padding: 10px 18px; border-radius: 999px; font-weight: 800; font-size: 13px; z-index: 60; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
 .sync { text-align: center; color: rgba(255,255,255,.9); font-size: 11.5px; font-weight: 700; margin-top: 14px; }
@@ -174,8 +189,16 @@ const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m;
 const ord = n => { const v = n % 100; return n + (['th','st','nd','rd'][(v - 20) % 10] || ['th','st','nd','rd'][v] || 'th'); };
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+const has = (a, k, v) => Array.isArray(a[k]) && a[k].includes(v);
+const isY2K = c => /y2k|2000|00s|millennium/i.test(c.theme || '');
+const themed = c => !!c.theme && c.theme !== 'No theme';
+const inPl = (a, ...v) => v.includes(a.place);
+const money = n => '$' + Math.round(n).toLocaleString('en-US');
+
 /* ───────── task templates ───────── */
 // f: b = both, k = kids only, a = adults only. lead = ideal days before the party (negative = after).
+// when(cfg, answers) = optional rule that turns a task on/off based on the quick-question answers.
+// tipFn(cfg, answers, baseTips) = optional tips that adapt to answers.
 const TEMPL = [
   { id:'plan', cat:'📍', t:'Lock in date, time & place', lead:30, must:1, f:'b', tip:[
     'Pick a start AND end time (kids ≈ 2 hrs, adults ≈ 3–4 hrs).',
@@ -192,37 +215,73 @@ const TEMPL = [
     'Set RSVP-by about 4 days before the party.'],
     kTip:['Ask parents about food allergies, and say drop-off or stay is fine.'],
     aTip:['Say if it is BYOB and suggest rideshare.'] },
+  { id:'venue', cat:'🏛️', t:'Book / confirm the venue', lead:21, must:1, f:'b', when:(c,a)=>inPl(a,'venue','bar','park'), tip:[
+    'Ask capacity, hours (including setup + teardown) and deposit.',
+    'Ask about alcohol, food and decor rules (tape, confetti).',
+    'Ask what cleanup is on you.'],
+    tipFn:(c,a,b)=> a.place==='bar' ? ['Ask for a reserved section or private room.','Ask about minimums, deposits and the headcount deadline.','Ask if outside cake is OK (and any cake-cutting fee).']
+      : a.place==='park' ? ['Reserve the pavilion or area. Popular days go fast.','Check alcohol, music and decoration rules.','Bathrooms + power nearby? Bring a battery speaker.'] : b },
   { id:'budget', cat:'💰', t:'Set a budget', lead:28, f:'b', tip:[
     'Pick ONE total number and stick to it.',
-    'Rough split: food & drinks 50%, cake 15%, decor 15%, fun/favors 20%.'] },
+    'Rough split: food & drinks 50%, cake 15%, decor 15%, fun/favors 20%.'],
+    tipFn:(c,a,b)=>{ const B = parseFloat(a.budget); if (!B) return b;
+      const g = Math.max(1, parseInt(c.guests, 10) || 1);
+      return [`Your total: ${money(B)} (about ${money(B / g)} per guest).`,
+        `Food & drinks ~${money(B * .5)}, cake ~${money(B * .15)}, decor ~${money(B * .15)}, fun/favors ~${money(B * .2)}.`,
+        'Track spending in your Notes app as you buy.']; } },
   { id:'theme', cat:'🎈', t:'Pick a theme & 2–3 colors', lead:14, f:'b', tip:[
     'Colors matter more than characters. Plates, balloons and cake all follow them.',
-    'One theme + one palette. Keep it simple.'] },
+    'One theme + one palette. Keep it simple.'],
+    tipFn:(c,a,b)=> isY2K(c) ? ['Y2K palette: metallic silver + hot pink + baby blue, with a pop of lime.','Chrome, holographic and glitter everything. Thrift + dollar stores cover most of it.'] : b },
   { id:'cake', cat:'🎂', t:'Order (or plan) the cake', lead:10, must:1, f:'b', tip:[
     'Bakeries want 3–7 days notice. Order today if buying.',
     'Servings: quarter sheet ≈ 12–20, half sheet ≈ 30–40.',
     'No time? Grocery-store cake, cupcakes or a box mix all work.'],
-    kTip:['Ask about allergies before you order.'] },
+    kTip:['Ask about allergies before you order.'],
+    tipFn:(c,a,b)=>({
+      ordered:['Confirm the pickup date, time and the message.','Put the pickup on your calendar.'],
+      store:['Order the store cake for pickup the day before (or morning of).','Ask them to write the message.'],
+      making:['Bake the day before, frost the morning of.','Buy candles + frosting now so you are not scrambling.'] }[a.cake] || b) },
   { id:'menu', cat:'🍕', t:'Plan the menu', lead:10, must:1, f:'b', tip:[
     'Keep it simple: 1 main + 2 sides + something sweet (cake counts).'],
     kTip:['Kid-proof: pizza, fruit, veggie tray, chips, juice/water.'],
-    aTip:['Grazing board + a hot app or two + a filling option so nobody drinks on an empty stomach.'] },
-  { id:'rentals', cat:'🪑', t:'Book rentals or borrow gear', lead:12, f:'b', tip:[
+    aTip:['Grazing board + a hot app or two + a filling option so nobody drinks on an empty stomach.'],
+    tipFn:(c,a,b)=>{ const m = {
+      meal:['Pick 1 main + 2 sides + a salad. Slow-cooker or sheet-pan food keeps you out of the kitchen.'],
+      apps:['Grazing board + 2–3 hot apps + a few dips. Nothing that needs a fork.'],
+      potluck:['Make a quick sign-up (main / side / dessert / drinks) so you do not end up with 9 bags of chips.','You cover the main and drinks.'],
+      cater:['Order early and confirm the pickup or delivery time.','Ask if trays, serving utensils and heating are included.'],
+      dessert:['Cake + a dessert table + a few salty snacks. Done.'],
+      pizza:['Order ahead or set a pickup time. Add fruit + a veggie tray.'],
+      snacks:['Chips, fruit, veggies, cake. Easy and nobody minds.'],
+      cookout:['Hot dogs/burgers + chips + fruit. Have someone else man the grill.'] }[a.food];
+      return m ? [...m, 'Check dietary needs and allergies on the RSVP.'] : b; } },
+  { id:'rentals', cat:'🪑', t:'Book rentals or borrow gear', lead:12, f:'b', when:(c,a)=>a.place!=='bar', tip:[
     'Tables, chairs, tent, coolers, bounce house. Rentals book up, so call today.',
     'Or borrow from family and neighbors (free!).',
-    'Chairs for about half your guests if mingling, all of them if sit-down.'] },
+    'Chairs for about half your guests if mingling, all of them if sit-down.'],
+    tipFn:(c,a,b)=> inPl(a,'venue','park') ? ['Ask if the venue includes tables + chairs before renting anything.',...b.slice(1)] : b },
   { id:'act-k', cat:'🎲', t:'Plan 2–3 activities', lead:10, f:'k', tip:[
     'One active game (freeze dance, relay, pin the tail).',
     'One hands-on thing (craft, sensory table, decorate a cupcake).',
     'Gather supplies this week.',
-    'Have a backup indoor game if the weather turns.'] },
-  { id:'act-a', cat:'🎶', t:'Plan the vibe (music + 1 optional game)', lead:7, f:'a', tip:[
+    'Have a backup indoor game if the weather turns.'],
+    tipFn:(c,a,b)=>{ const M = { games:'Games: 2–3 quick rounds (freeze dance, relay, musical chairs).', craft:'Craft: something they take home (decorate a visor, bracelets, cupcakes).',
+      pinata:'Piñata: buy candy/small toys to fill it, and a safe spot with space to swing.', bounce:'Bounce house: book it now, check yard size + power outlet.', water:'Water play: sprinklers, water balloons, towels + spare clothes.', dance:'Dance party: playlist + a few scarves or glow sticks.' };
+      const f = Array.isArray(a.fun) ? a.fun.map(k => M[k]).filter(Boolean) : []; return f.length ? [...f, 'Gather supplies this week.', 'Have a backup indoor game if the weather turns.'] : b; } },
+  { id:'act-a', cat:'🎶', t:'Plan the vibe (music + fun)', lead:7, f:'a', tip:[
     'Playlist for 3+ hours. Download it so Wi-Fi does not matter.',
-    'One optional game (cornhole, cards, trivia). No forced fun.'] },
-  { id:'bar', cat:'🍹', t:'Plan the drinks', lead:7, f:'a', tip:[
+    'One optional game (cornhole, cards, trivia). No forced fun.'],
+    tipFn:(c,a,b)=>{ const M = { dance:'Dancing: clear a floor, dim the lights, add a disco ball or lamp.', karaoke:'Karaoke: YouTube karaoke on a TV or speaker + a mic if you have one. Start a sign-up list.',
+      games:'Games: pick 1–2 easy ones (trivia, cards, cornhole). Keep them optional.', photo:'Photo booth: backdrop + props (see the photo task).', chill:'Chill: seating clusters + a playlist that works under conversation.' };
+      const f = Array.isArray(a.fun) ? a.fun.map(k => M[k]).filter(Boolean) : []; return f.length ? [...f, 'Download your playlist so Wi-Fi does not matter.'] : b; } },
+  { id:'bar', cat:'🍹', t:'Plan the drinks', lead:7, f:'a', when:(c,a)=>a.drinks!=='none', tip:[
     '1 signature drink + beer/wine/seltzer + 2 non-alcoholic options.',
     'Rule of thumb: about 1 drink per person per hour, plus 1.',
-    'Ice: 1–2 lbs per person. More than you think.'] },
+    'Ice: 1–2 lbs per person. More than you think.'],
+    tipFn:(c,a,b)=>({
+      bw:['Beer + wine + ONE batch cocktail (or seltzer) keeps it simple.','About 1 drink per person per hour, plus 1.','Ice: 1–2 lbs per person.'],
+      byob:['Guests bring their own. You supply ice, cups, mixers and water.','Say BYOB in the invite.','Have 2 non-alcoholic options on hand.'] }[a.drinks] || b) },
   { id:'gifts-k', cat:'🎁', t:'Decide: open gifts at the party or later?', lead:6, f:'k', tip:[
     'Under 6? Open at home. Way less overwhelming.',
     'If opening there, assign one person to jot down who gave what.'] },
@@ -231,18 +290,28 @@ const TEMPL = [
     'Plan roughly 1 adult per 4–5 kids.',
     'First-aid kit, a quiet spot, wipes and paper towels handy.',
     'Scan the yard/house for hazards (pool gate, pets, stairs).'] },
-  { id:'rides-a', cat:'🚗', t:'Plan rides + safety', lead:5, must:1, f:'a', tip:[
+  { id:'rides-a', cat:'🚗', t:'Plan rides + safety', lead:5, must:1, f:'a', when:(c,a)=>a.drinks!=='none', tip:[
     'Suggest rideshare or a designated driver in the invite.',
     'Serve real food plus lots of water and non-alcoholic options.',
     'Line up one person who stays clear-headed.',
     'Have a couch/spare-room plan for anyone who should not drive.'] },
-  { id:'neighbors-a', cat:'📣', t:'Give the neighbors a heads-up', lead:5, f:'a', tip:[
+  { id:'neighbors-a', cat:'📣', t:'Give the neighbors a heads-up', lead:5, f:'a', when:(c,a)=>!inPl(a,'venue','bar','park'), tip:[
     'Tell them the date and end time and share your number.',
     'Cheapest way to avoid a noise-complaint ending.'] },
-  { id:'weather', cat:'☁️', t:'Make a weather backup plan', lead:5, f:'b', tip:[
+  { id:'weather', cat:'☁️', t:'Make a weather backup plan', lead:5, f:'b', when:(c,a)=>!inPl(a,'home','venue','bar'), tip:[
     'Check the forecast now and again 2 days before.',
     'Backup: tent, garage, or an indoor layout. Decide your call time (morning of).',
     'Fully indoors? Skip this one.'] },
+  { id:'y2k-dress', cat:'👛', t:'Set the Y2K dress code', lead:14, f:'b', when:(c,a)=>isY2K(c) && a.dress==='yes', tip:[
+    'Put it in the invite: low-rise jeans, butterfly clips, velour, trucker hats, frosted tips, baby tees.',
+    'Keep a basket of extras for anyone who forgets: sunglasses, clips, tiaras, glitter.',
+    'Optional: a best-dressed prize.'] },
+  { id:'y2k-decor', cat:'🪩', t:'Y2K decor haul', lead:8, f:'b', when:(c,a)=>isY2K(c), tip:[
+    'Palette: silver/holographic + hot pink + baby blue.',
+    'Foil fringe curtain, disco ball, chrome + iridescent balloons.',
+    'Hang old CDs/DVDs on string as sparkly garland (free!).',
+    'Beaded curtain, inflatable chairs, lava lamp or lamps with pink bulbs.',
+    'Thrift stores + dollar store cover most of this.'] },
   { id:'supplies', cat:'🛍️', t:'Buy decor & party supplies', lead:6, f:'b', tip:[
     'Plates, cups, napkins, forks, tablecloth.',
     'Balloons, banner, candles + lighter, tape.',
@@ -250,6 +319,24 @@ const TEMPL = [
   { id:'favors-k', cat:'🎁', t:'Goody bags / favors', lead:5, f:'k', tip:[
     '3–4 small things + a treat is plenty.',
     'One per kid + 2 extras. Check treats for allergens.'] },
+  { id:'y2k-music', cat:'🎧', t:'Build the Y2K playlist', lead:5, f:'b', when:(c,a)=>isY2K(c), tip:[
+    'Search "early 2000s hits" for a head start, then add your own.',
+    'Mix: pop, R&B, hip-hop, pop-punk. Think Britney, NSYNC, Destiny\'s Child, OutKast, Usher, Avril.',
+    'Save a singalong block near the end of the night.',
+    'Download it so Wi-Fi does not matter.'] },
+  { id:'y2k-food', cat:'🥤', t:'Y2K snacks + drinks', lead:4, f:'b', when:(c,a)=>isY2K(c), tip:[
+    'Nostalgia snacks: Dunkaroos, Lunchables, pizza rolls, Bagel Bites, Fruit by the Foot, Pop Rocks.',
+    'Capri Sun and Hi-C for the throwback sippers.'],
+    tipFn:(c,a,b)=> c.type==='adults' && a.drinks!=='none' ? [...b, 'Adult sips: cosmos, appletinis, Smirnoff Ice, a blue-curaçao "sky" drink.'] : b },
+  { id:'y2k-games', cat:'🎮', t:'Y2K karaoke + games setup', lead:5, f:'b', when:(c,a)=>isY2K(c) && (has(a,'fun','karaoke') || has(a,'fun','games')), tip:[
+    'Karaoke: YouTube karaoke on a TV or speaker, and a sign-up list.',
+    'Console-era games: Just Dance, Mario Kart, Guitar Hero or Rock Band.',
+    'A 2000s trivia round (music, movies, TV) with small prizes.'] },
+  { id:'y2k-photo', cat:'📸', t:'Set up a Y2K photo corner', lead:3, f:'b', when:(c,a)=>isY2K(c) && (!Array.isArray(a.fun) || has(a,'fun','photo')), tip:[
+    'Silver fringe curtain + a disco ball or string lights behind it.',
+    'Props: flip phone, oversized sunglasses, tiaras, feather boas.',
+    'Disposable cameras on a table so guests capture the night.',
+    'Aim a lamp or ring light at the wall so photos are not dark.'] },
   { id:'rsvp', cat:'📲', t:'Chase RSVPs & lock the headcount', lead:4, must:1, f:'b', tip:[
     'Text everyone who has not replied.',
     'Update your final number. All your shopping depends on it.'] },
@@ -263,16 +350,17 @@ const TEMPL = [
     'Shop AFTER the headcount is final. The Party Day tab has quantities.',
     'Ice: buy the day before or morning of.',
     'Write the list by aisle to save time.'] },
-  { id:'clean', cat:'🧹', t:'Clean only what guests will see', lead:2, f:'b', tip:[
+  { id:'clean', cat:'🧹', t:'Clean only what guests will see', lead:2, f:'b', when:(c,a)=>!inPl(a,'venue','bar','park'), tip:[
     'Entry, bathroom, kitchen, party space. That is it.',
     'Stock the bathroom: TP, soap, hand towels, small trash can.',
     'Clear a spot for coats and gifts.'] },
-  { id:'prep', cat:'🥣', t:'Prep make-ahead food', lead:1, f:'b', tip:[
+  { id:'prep', cat:'🥣', t:'Prep make-ahead food', lead:1, f:'b', when:(c,a)=>a.food!=='cater' && a.place!=='bar', tip:[
     'Chop, marinate, assemble. Whatever can happen tonight.',
     'Clear fridge space for the party food.'] },
   { id:'setup', cat:'🎀', t:'Set up tables, chairs & decor', lead:1, f:'b', tip:[
     'Do everything non-perishable tonight.',
-    'Helium balloons last about 10 hrs, so inflate those day-of. Air-filled ones can go up tonight.'] },
+    'Helium balloons last about 10 hrs, so inflate those day-of. Air-filled ones can go up tonight.'],
+    tipFn:(c,a,b)=> inPl(a,'venue','bar','park') ? ['Ask when you can get into the space to decorate.','Bring tape the venue allows + a small toolkit.',...b.slice(1)] : b },
   { id:'charge', cat:'🔋', t:'Charge phone + clear storage', lead:1, f:'b', tip:[
     'Free up phone space for photos and video.',
     'Ask one person to be the photographer so you are in a few pics.'] },
@@ -287,6 +375,40 @@ const TEMPL = [
     'A quick thank-you text to guests within a day or two.',
     'Freeze leftover cake slices for later!'] }
 ];
+
+/* ───────── quick questions (asked one at a time in the app) ───────── */
+// cfgKey = saved on the party itself; otherwise saved in S.answers. done(v) = task ids to auto-check.
+const PLACE_OPTS = c => [['home', '🏠 My home'], ['backyard', '🌳 Backyard'],
+  [c.type === 'kids' ? 'park' : 'venue', c.type === 'kids' ? '🌳 Park' : '🏛️ Rented space']]
+  .concat(c.type === 'kids' ? [['venue', '🎪 Party venue']] : [['bar', '🍸 Bar / restaurant']]);
+const QS = [
+  { id:'age', cfgKey:'age', f:'b', kind:'number', q:c=>`How old is ${c.name} turning?`, ph:'37' },
+  { id:'theme', cfgKey:'theme', f:'b', kind:'single', other:1, q:()=>"What's the theme?", done:()=>['theme'],
+    opts:c=> c.type === 'kids'
+      ? [['Dinosaurs', '🦖 Dinosaurs'], ['Unicorns + rainbows', '🦄 Unicorns'], ['Superheroes', '🦸 Superheroes'], ['Princesses', '👑 Princesses'], ['Sports', '⚽ Sports'], ['No theme', '🙅 No theme']]
+      : [['Y2K', '💿 Y2K'], ['Tropical', '🌴 Tropical'], ['Glam + disco', '🪩 Glam / disco'], ['Casino night', '🎰 Casino night'], ['Taco + tequila', '🌮 Taco + tequila'], ['No theme', '🙅 No theme']] },
+  { id:'invites', f:'b', kind:'single', q:()=>'Have invites gone out yet?', done:v=>v === 'all' ? ['invites'] : [],
+    opts:()=>[['none', '⏳ Not yet'], ['some', '📨 Some sent'], ['all', '✅ All sent']] },
+  { id:'place', f:'b', kind:'single', other:1, q:()=>'Where is the party?', opts:PLACE_OPTS, done:()=>['plan'] },
+  { id:'cake', f:'b', kind:'single', q:()=>'What is the cake situation?', done:v=>v === 'ordered' ? ['cake'] : [],
+    opts:()=>[['ordered', '✅ Ordered'], ['store', '🛒 Buying at the store'], ['making', '👩‍🍳 Making it'], ['undecided', '🤷 Not sure yet']] },
+  { id:'budget', f:'b', kind:'number', pre:'$', q:()=>'About how much do you want to spend total?', ph:'300', done:()=>['budget'] },
+  { id:'food', f:'b', kind:'single', q:()=>'What kind of food?', done:()=>[],
+    opts:c=> c.type === 'kids'
+      ? [['pizza', '🍕 Pizza'], ['snacks', '🥨 Snacks + cake'], ['cookout', '🌭 Cookout'], ['cater', '🚚 Catered / takeout']]
+      : [['meal', '🍽️ Full meal'], ['apps', '🧀 Apps + grazing'], ['potluck', '🥘 Potluck'], ['cater', '🚚 Catered / takeout'], ['dessert', '🍰 Just cake + snacks']] },
+  { id:'drinks', f:'a', kind:'single', q:()=>'What is the drink plan?', done:()=>[],
+    opts:()=>[['open', '🍸 Full bar'], ['bw', '🍷 Beer, wine + 1 cocktail'], ['byob', '🧊 BYOB'], ['none', '🥤 No alcohol']] },
+  { id:'fun', f:'b', kind:'multi', q:()=>'What will people DO? (pick any)', done:()=>[],
+    opts:c=> c.type === 'kids'
+      ? [['games', '🎲 Games'], ['craft', '🎨 Craft'], ['pinata', '🪅 Piñata'], ['bounce', '🏰 Bounce house'], ['water', '💦 Water play'], ['dance', '💃 Dance party']]
+      : [['dance', '💃 Dancing'], ['karaoke', '🎤 Karaoke'], ['games', '🎲 Games'], ['photo', '📸 Photo booth'], ['chill', '🍕 Just hanging out']] },
+  { id:'dress', f:'b', kind:'single', q:c=>`Should guests dress up for ${c.theme}?`, show:c=>themed(c), done:()=>[],
+    opts:()=>[['yes', '👗 Yes, dress up!'], ['opt', '🙂 Optional'], ['no', '🙅 No']] },
+  { id:'stay', f:'k', kind:'single', q:()=>'Will parents stay or drop off?', done:()=>[],
+    opts:()=>[['stay', '👨‍👩‍👧 Stay'], ['drop', '👋 Drop-off'], ['mix', '🤝 Either']] }
+];
+
 
 const TL = {
   kids: { len: 120, items: [
@@ -321,15 +443,23 @@ const TL = {
 let S = null;                    // saved party
 let etag = null, pushT = null, syncState = 'local';
 const ui = { tab: 'todo', exp: new Set(), open: {}, showDone: false, sheet: false, editing: false, err: '',
-  form: { name: '', type: '', age: '', date: '', time: '', guests: '', touchedTime: false, touchedGuests: false } };
+  qSkip: new Set(), qOther: null, qEdit: null, review: false, multi: [], multiFor: null,
+  form: { name: '', type: '', age: '', theme: '', date: '', time: '', guests: '', touchedTime: false, touchedGuests: false } };
 
 function loadLocal(id) { try { return JSON.parse(localStorage.getItem(LSK(id))); } catch { return null; } }
 function saveLocal() { try { localStorage.setItem(LSK(S.id), JSON.stringify(S)); localStorage.setItem(LS_ACTIVE, S.id); } catch {} }
 function newId() { return 'p' + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4); }
-function tipFor(t, type) { return [...t.tip, ...((type === 'kids' ? t.kTip : t.aTip) || [])]; }
+function tipFor(t, cfg, a) {
+  const base = [...t.tip, ...((cfg.type === 'kids' ? t.kTip : t.aTip) || [])];
+  return t.tipFn ? t.tipFn(cfg, a || {}, base) : base;
+}
+const ansVals = () => Object.fromEntries(Object.entries((S && S.answers) || {}).map(([k, o]) => [k, o.v]));
+const sig = x => JSON.stringify([x.title, x.tip, x.must, x.due, !!x.done, !!x.del, !!x.off, x.cat, x.inv]);
 
-/* ───────── scheduling: turns "ideal lead times" into real due dates ───────── */
-function schedule(cfg, prev) {
+/* ───────── scheduling: turns "ideal lead times" into real due dates ─────────
+   opts.keep = keep existing due dates (used when answering questions), only place NEW tasks. */
+function schedule(cfg, prev, a, opts) {
+  a = a || {}; opts = opts || {};
   const t0 = today();
   const left = diffDays(cfg.date, t0);
   const prevMap = new Map((prev || []).map(t => [t.id, t]));
@@ -338,16 +468,21 @@ function schedule(cfg, prev) {
   const out = [], clamp = [];
   want.forEach((t, i) => {
     const p = prevMap.get(t.id);
+    const off = (t.when && !t.when(cfg, a)) ? 1 : 0;
     const nat = addDays(cfg.date, -t.lead);
-    const item = { id: t.id, o: i, cat: t.cat, title: t.t, tip: tipFor(t, cfg.type), must: t.must ? 1 : 0, inv: t.inv ? 1 : 0,
+    const item = { id: t.id, o: i, cat: t.cat, title: t.t, tip: tipFor(t, cfg, a), must: t.must ? 1 : 0, inv: t.inv ? 1 : 0,
       lead: t.lead, due: nat, done: false, ts: now };
-    if (p && p.del) { item.del = 1; item.done = !!p.done; item.due = p.due; item.ts = now; }
-    else if (p && p.done) { item.done = true; item.due = p.due; item.ts = p.ts || now; }
-    else if (t.lead >= 0 && nat <= t0) clamp.push(item);
+    if (off) item.off = 1;
+    const reuse = p && !(p.off && !off);   // a task that was switched off and is now back on gets fresh scheduling
+    if (p && p.del) { item.del = 1; item.done = !!p.done; item.due = p.due; }
+    else if (p && p.done) { item.done = true; item.due = p.due; }
+    else if (opts.keep && reuse) { item.due = p.due; }
+    else if (!off && t.lead >= 0 && nat <= t0) clamp.push(item);
+    if (reuse && (p.del || p.done || opts.keep)) { item.ts = p.ts || now; if (sig(item) !== sig(p)) item.ts = now; }
     out.push(item);
   });
   // Tasks that should already have happened get spread over the next few days (must-dos first)
-  clamp.sort((a, b) => (b.must - a.must) || (b.lead - a.lead) || (a.o - b.o));
+  clamp.sort((x, y) => (y.must - x.must) || (y.lead - x.lead) || (x.o - y.o));
   const spread = Math.max(1, Math.min(3, left));
   const per = Math.max(1, Math.ceil(clamp.length / spread));
   clamp.forEach((it, i) => { it.due = addDays(t0, Math.min(spread - 1, Math.floor(i / per))); });
@@ -378,6 +513,9 @@ function merge(a, b) {
   const day = {}, ad = a.day || {}, bd = b.day || {};
   new Set([...Object.keys(ad), ...Object.keys(bd)]).forEach(k => { const x = ad[k], y = bd[k]; day[k] = !x ? y : !y ? x : (y.ts > x.ts ? y : x); });
   base.day = day;
+  const ans = {}, aa = a.answers || {}, ba = b.answers || {};
+  new Set([...Object.keys(aa), ...Object.keys(ba)]).forEach(k => { const x = aa[k], y = ba[k]; ans[k] = !x ? y : !y ? x : (y.ts > x.ts ? y : x); });
+  base.answers = ans;
   return base;
 }
 async function pull() {
@@ -407,7 +545,7 @@ function commit(touchSettings) {
 /* ───────── derived data ───────── */
 function view() {
   const t0 = today(), pd = S.cfg.date;
-  const list = S.tasks.filter(t => !t.del);
+  const list = S.tasks.filter(t => !t.del && !t.off);
   const open = list.filter(t => !t.done);
   const over = open.filter(t => t.due < t0).sort((a, b) => a.due.localeCompare(b.due) || a.o - b.o);
   const rest = list.filter(t => t.due >= t0);
@@ -460,6 +598,9 @@ function setupHtml() {
       <div><label class="lbl">Party date</label><input type="date" data-f="date" min="${minDate}" value="${esc(f.date)}"></div>
       <div><label class="lbl">Start time</label><input type="time" data-f="time" value="${esc(f.time)}"></div>
     </div>
+    <label class="lbl">Theme (optional)</label>
+    <input data-f="theme" value="${esc(f.theme)}" placeholder="e.g. Y2K, tropical, none yet" autocomplete="off">
+
     <div class="row2">
       <div><label class="lbl">Guests (rough is fine)</label><input type="number" inputmode="numeric" min="1" data-f="guests" value="${esc(f.guests)}" placeholder="15"></div>
       <div><label class="lbl">Turning (optional)</label><input type="number" inputmode="numeric" min="1" data-f="age" value="${esc(f.age)}" placeholder="7"></div>
@@ -500,11 +641,13 @@ function mainHtml() {
   <div class="card hero">
     <div class="who">${title}</div>
     <div class="when">${fmtDate(c.date)} · ${fmtMin(startMin)} · ${c.type === 'kids' ? '🎈 Kids party' : '🥂 Adult party'} · ${c.guests} guests</div>
+    ${themed(c) ? `<div class="when">✨ Theme: ${esc(c.theme)}</div>` : ''}
     <div class="count">${countTxt}</div>
     <div class="bar"><i style="width:${pct}%"></i></div>
     <div class="barlbl"><span>${done} of ${total} done</span><span>${pct}%</span></div>
     ${status}${tight}
   </div>
+  ${qSection()}
   <div class="tabs">
     <button class="tab ${ui.tab === 'todo' ? 'on' : ''}" data-a="tab" data-v="todo">✅ To-Do</button>
     <button class="tab ${ui.tab === 'day' ? 'on' : ''}" data-a="tab" data-v="day">🎉 Party Day</button>
@@ -581,7 +724,7 @@ function dayHtml(v) {
     </div>`;
   }).join('');
 
-  const G = Math.max(1, parseInt(c.guests, 10) || 1);
+  const G = Math.max(1, parseInt(c.guests, 10) || 1), ans = ansVals();
   const cells = kind === 'kids' ? [
     [Math.ceil(G * 2 / 8), 'large pizzas', '2 slices per kid. Add 1 if parents eat too'],
     [G * 2, 'drinks', 'juice boxes / water'],
@@ -590,8 +733,8 @@ function dayHtml(v) {
     [G * 2, 'plates + napkins', 'seconds happen'],
     [Math.ceil(G * 1), 'lbs of ice', 'if using coolers']
   ] : [
-    [G * 10, 'bites of food', 'if it is not a full meal'],
-    [G * 4, 'drinks total', 'about 1/hr + 1. Keep 25%+ non-alcoholic'],
+    foodCell(G, ans.food),
+    drinkCell(G, ans.drinks),
     [Math.ceil(G * 1.5), 'lbs of ice', 'more if it is hot out'],
     [G, 'cake servings', 'or a dessert spread'],
     [G * 3, 'cups', 'people set them down and grab new ones'],
@@ -613,6 +756,7 @@ function sheetHtml() {
   <div class="sheet-bg" data-a="closeSheet">
     <div class="sheet">
       <h3>Party options</h3>
+      <button class="big-btn alt" data-a="review">📝 Change my answers</button>
       <button class="big-btn alt" data-a="edit">✏️ Edit party details</button>
       <button class="big-btn alt" data-a="share">🔗 Copy share link</button>
       <button class="big-btn danger" data-a="newParty">Start a brand new party</button>
@@ -633,13 +777,95 @@ function copyText(txt, okMsg) {
 }
 
 function inviteText() {
-  const c = S.cfg, start = toMin(c.time), len = TL[c.type].len;
+  const c = S.cfg, a = ansVals(), start = toMin(c.time), len = TL[c.type].len;
   const rsvpBy = fmtDate(addDays(c.date, -4));
   const when = `${fmtDate(c.date)}, ${fmtMin(start)} – ${fmtMin(start + len)}`;
+  const themeLine = themed(c) ? `\n✨ Theme: ${c.theme}${a.dress === 'yes' ? ' (come dressed for it!)' : a.dress === 'opt' ? ' (dress-up optional)' : ''}` : '';
+  const age = c.age ? ord(+c.age) + ' ' : '';
   if (c.type === 'kids') {
-    return `🎉 You're invited to ${c.name}'s ${c.age ? ord(+c.age) + ' ' : ''}birthday party! 🎈\n📅 ${when}\n📍 [address]\n\nPlease RSVP by ${rsvpBy} and let me know about any food allergies. Parents are welcome to stay or drop off!`;
+    const par = a.stay === 'stay' ? 'Parents are welcome to stay!' : a.stay === 'drop' ? 'Drop-off is totally fine!' : 'Parents are welcome to stay or drop off!';
+    return `🎉 You're invited to ${c.name}'s ${age}birthday party! 🎈\n📅 ${when}\n📍 [address]${themeLine}\n\nPlease RSVP by ${rsvpBy} and let me know about any food allergies. ${par}`;
   }
-  return `🥂 ${c.name}'s ${c.age ? ord(+c.age) + ' ' : ''}birthday bash!\n📅 ${when}\n📍 [address]\n\nFood + drinks provided (BYOB if you have a favorite). Please RSVP by ${rsvpBy}, and plan a rideshare or DD! 🚗`;
+  const fd = a.drinks === 'none' ? 'Food + drinks provided.' : a.drinks === 'byob' ? 'Food provided, BYOB!' : 'Food + drinks on me.';
+  const ride = a.drinks === 'none' ? '' : ' Plan a rideshare or DD! 🚗';
+  return `🥂 ${c.name}'s ${age}birthday bash!\n📅 ${when}\n📍 [address]${themeLine}\n\n${fd} Please RSVP by ${rsvpBy}.${ride}`;
+}
+
+function foodCell(G, f) {
+  if (f === 'meal') return [Math.ceil(G / 2), 'lbs of main dish', 'about ½ lb per person + 3–4 sides'];
+  if (f === 'cater') return [Math.ceil(G * 1.1), 'catered servings', 'order about 10% extra'];
+  if (f === 'potluck') return [Math.max(3, Math.ceil(G / 4)), 'potluck dishes', 'mix of main / side / dessert'];
+  if (f === 'dessert') return [G * 4, 'bites of sweets + snacks', 'add a few salty things'];
+  return [G * 10, 'bites of food', 'if it is not a full meal'];
+}
+function drinkCell(G, d) {
+  if (d === 'none') return [G * 3, 'drinks total', 'soda, mocktails, water'];
+  if (d === 'byob') return [G * 2, 'mixers + soft drinks', 'guests bring the booze'];
+  return [G * 4, 'drinks total', 'about 1/hr + 1. Keep 25%+ non-alcoholic'];
+}
+
+/* ───────── quick questions UI ───────── */
+const qById = id => QS.find(q => q.id === id);
+const qText = q => typeof q.q === 'function' ? q.q(S.cfg) : q.q;
+function qList() { const c = S.cfg, a = ansVals(); return QS.filter(q => (q.f === 'b' || q.f === (c.type === 'kids' ? 'k' : 'a')) && (!q.show || q.show(c, a))); }
+function curVal(q) { return q.cfgKey ? S.cfg[q.cfgKey] : (S.answers[q.id] ? S.answers[q.id].v : undefined); }
+function isAnswered(q) { const v = curVal(q); return Array.isArray(v) ? v.length > 0 : (v !== undefined && v !== null && v !== ''); }
+function ansLabel(q) {
+  const v = curVal(q); if (!isAnswered(q)) return null;
+  const opts = q.opts ? q.opts(S.cfg) : [];
+  const lab = x => { const o = opts.find(o => o[0] === x); return o ? o[1] : x; };
+  if (Array.isArray(v)) return v.map(lab).join(', ');
+  if (q.kind === 'number') return (q.pre || '') + v;
+  return lab(v);
+}
+
+function qCard(q, answered, total, editing) {
+  const c = S.cfg, cur = curVal(q);
+  let body;
+  if (q.kind === 'multi') {
+    if (ui.multiFor !== q.id) { ui.multi = Array.isArray(cur) ? [...cur] : []; ui.multiFor = q.id; }
+    body = `<div class="chips">${q.opts(c).map(o => `<button class="chip ${ui.multi.includes(o[0]) ? 'on' : ''}" data-a="mtoggle" data-v="${esc(o[0])}">${esc(o[1])}</button>`).join('')}</div>
+      <button class="qsave" data-a="ansMulti" data-q="${q.id}">Save</button>`;
+  } else if (q.kind === 'number' || ui.qOther === q.id) {
+    const isNum = q.kind === 'number';
+    body = `<div class="qin">${q.pre ? `<span>${q.pre}</span>` : ''}<input id="qin" ${isNum ? 'type="number" inputmode="decimal" min="0"' : 'type="text" maxlength="40"'} placeholder="${esc(isNum ? (q.ph || '') : 'Type it in')}" value="${esc(cur && !Array.isArray(cur) && !(q.opts && q.opts(c).some(o => o[0] === cur)) ? cur : '')}"></div>
+      <button class="qsave" data-a="ansText" data-q="${q.id}">Save</button>`;
+  } else {
+    body = `<div class="chips">${q.opts(c).map(o => `<button class="chip ${cur === o[0] ? 'on' : ''}" data-a="ans" data-q="${q.id}" data-v="${esc(o[0])}">${esc(o[1])}</button>`).join('')}${q.other ? `<button class="chip" data-a="qother" data-q="${q.id}">✏️ Something else</button>` : ''}</div>`;
+  }
+  return `<div class="card qcard">
+    <div class="qtop"><span>❓ Quick question</span><span>${answered} of ${total} answered</span></div>
+    <div class="qtext">${esc(qText(q))}</div>
+    ${body}
+    ${editing ? '<button class="link-btn" data-a="qcancel">Cancel</button>' : `<button class="link-btn" data-a="qskip" data-q="${q.id}">Skip for now</button>`}
+  </div>`;
+}
+
+function qSection() {
+  const list = qList(), un = list.filter(q => !isAnswered(q)), answered = list.length - un.length;
+  if (ui.review) {
+    if (ui.qEdit && qById(ui.qEdit)) return qCard(qById(ui.qEdit), answered, list.length, true);
+    return `<div class="card"><div class="h2">Your answers <small>tap one to change it</small></div>
+      ${list.map(q => { const l = ansLabel(q); return `<button class="qrow" data-a="qedit" data-q="${q.id}"><span>${esc(qText(q))}</span><b class="${l ? '' : 'none'}">${l ? esc(l) : 'not answered'}</b></button>`; }).join('')}
+      <button class="link-btn" data-a="closeReview">Done</button></div>`;
+  }
+  if (!un.length) return '';
+  const next = un.find(q => !ui.qSkip.has(q.id));
+  if (!next) return `<div class="card qsk"><span><b>${un.length} question${un.length === 1 ? '' : 's'} skipped.</b> Answering helps me tailor your plan.</span><button class="sbtn pri" data-a="qunskip">Answer</button></div>`;
+  return qCard(next, answered, list.length, false);
+}
+
+function setAnswer(q, v) {
+  const before = new Set(S.tasks.filter(t => !t.del && !t.off).map(t => t.id));
+  if (q.cfgKey) { S.cfg[q.cfgKey] = v; S.sTs = Date.now(); }
+  else S.answers[q.id] = { v, ts: Date.now() };
+  S.tasks = schedule(S.cfg, S.tasks, ansVals(), { keep: true });
+  const marked = [];
+  (q.done ? q.done(v) : []).forEach(id => { const t = findTask(id); if (t && !t.done && !t.del) { t.done = true; t.ts = Date.now(); marked.push(t); } });
+  const added = S.tasks.filter(t => !t.del && !t.off && !before.has(t.id)).length;
+  ui.qEdit = null; ui.qOther = null; ui.multiFor = null;
+  commit();
+  toast(added ? `Got it! Added ${added} task${added === 1 ? '' : 's'} ✨` : marked.length ? `Got it! Checked off "${marked[0].title}" ✓` : 'Got it ✓');
 }
 
 /* ───────── actions ───────── */
@@ -658,21 +884,21 @@ const actions = {
     if (!f.time) return fail('Pick a start time.');
     if (!g || g < 1) return fail('About how many guests?');
     ui.err = '';
-    const cfg = { name, type: f.type, age: f.age ? String(parseInt(f.age, 10) || '') : '', date: f.date, time: f.time, guests: g };
-    if (ui.editing && S) { S.cfg = cfg; S.tasks = schedule(cfg, S.tasks); S.day = S.day || {}; ui.editing = false; ui.exp = new Set(); commit(true); }
-    else { S = { v: 1, id: newId(), sTs: Date.now(), cfg, tasks: schedule(cfg, []), day: {} }; ui.tab = 'todo'; commit(true); pushUrl(); startSync(); }
+    const cfg = { name, type: f.type, age: f.age ? String(parseInt(f.age, 10) || '') : '', theme: (f.theme || '').trim(), date: f.date, time: f.time, guests: g };
+    if (ui.editing && S) { S.cfg = cfg; S.answers = S.answers || {}; S.tasks = schedule(cfg, S.tasks, ansVals()); S.day = S.day || {}; ui.editing = false; ui.exp = new Set(); commit(true); }
+    else { S = { v: 1, id: newId(), sTs: Date.now(), cfg, tasks: schedule(cfg, [], {}), day: {}, answers: {} }; ui.tab = 'todo'; commit(true); pushUrl(); startSync(); }
   },
   cancelEdit() { ui.editing = false; render(); },
   tab(el) { ui.tab = el.dataset.v; render(); },
   sheet() { ui.sheet = true; render(); },
   closeSheet() { ui.sheet = false; render(); },
-  edit() { const c = S.cfg; ui.form = { name: c.name, type: c.type, age: c.age || '', date: c.date, time: c.time, guests: String(c.guests), touchedTime: true, touchedGuests: true };
+  edit() { const c = S.cfg; ui.form = { name: c.name, type: c.type, age: c.age || '', theme: c.theme || '', date: c.date, time: c.time, guests: String(c.guests), touchedTime: true, touchedGuests: true };
     ui.sheet = false; ui.editing = true; ui.err = ''; render(); },
   share() { ui.sheet = false; render(); copyText(location.origin + location.pathname + '?p=' + S.id, 'Link copied 🔗'); },
   newParty() { if (!confirm('Start a brand new party? This one stays saved on this device but you will leave it.')) return;
     try { localStorage.removeItem(LS_ACTIVE); } catch {}
     S = null; ui.sheet = false; ui.editing = false; ui.err = '';
-    ui.form = { name: '', type: '', age: '', date: '', time: '', guests: '', touchedTime: false, touchedGuests: false };
+    ui.form = { name: '', type: '', age: '', theme: '', date: '', time: '', guests: '', touchedTime: false, touchedGuests: false };
     history.replaceState(null, '', location.pathname); render(); },
   toggle(el) { const t = findTask(el.dataset.id); if (!t) return; t.done = !t.done; t.ts = Date.now(); commit(); },
   exp(el) { const id = el.dataset.id; ui.exp.has(id) ? ui.exp.delete(id) : ui.exp.add(id); render(); },
@@ -686,6 +912,21 @@ const actions = {
     ui.open[due] = true; commit(); },
   showDone() { ui.showDone = !ui.showDone; render(); },
   copyInvite() { copyText(inviteText(), 'Invite text copied 📋'); },
+  ans(el) { setAnswer(qById(el.dataset.q), el.dataset.v); },
+  qother(el) { ui.qOther = el.dataset.q; render(); },
+  ansText(el) { const q = qById(el.dataset.q); const inp = document.getElementById('qin'); let v = ((inp && inp.value) || '').trim();
+    if (!v) return toast('Type an answer first');
+    if (q.kind === 'number') { const n = parseFloat(v.replace(/[^0-9.]/g, '')); if (!n) return toast('Enter a number');
+      if (q.id === 'age' && (n < 1 || n > 120)) return toast('Enter a valid age'); v = String(q.id === 'age' ? Math.round(n) : n); }
+    setAnswer(q, v); },
+  mtoggle(el) { const v = el.dataset.v, i = ui.multi.indexOf(v); if (i >= 0) ui.multi.splice(i, 1); else ui.multi.push(v); render(); },
+  ansMulti(el) { if (!ui.multi.length) return toast('Pick at least one'); setAnswer(qById(el.dataset.q), [...ui.multi]); },
+  qskip(el) { ui.qSkip.add(el.dataset.q); ui.qOther = null; render(); },
+  qunskip() { ui.qSkip.clear(); render(); },
+  qedit(el) { ui.qEdit = el.dataset.q; ui.qOther = null; ui.multiFor = null; render(); },
+  qcancel() { ui.qEdit = null; ui.qOther = null; render(); },
+  review() { ui.sheet = false; ui.review = true; ui.qEdit = null; render(); window.scrollTo(0, 0); },
+  closeReview() { ui.review = false; ui.qEdit = null; render(); },
   dayToggle(el) { const k = el.dataset.k; const cur = S.day[k] && S.day[k].v; S.day[k] = { v: !cur, ts: Date.now() }; commit(); }
 };
 function fail(msg) { ui.err = msg; render(); }
@@ -706,6 +947,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.id === 'newTask') actions.add();
+  if (e.key === 'Enter' && e.target.id === 'qin') { const b = document.querySelector('.qsave'); if (b) b.click(); }
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) pull(); });
 
@@ -727,6 +969,7 @@ async function boot() {
     if (!S) ui.err = 'Could not find that party. Start a new one below.';
   }
   if (S && !S.day) S.day = {};
+  if (S && !S.answers) S.answers = {};
   render();
   if (S) { pushUrl(); pull(); startSync(); }
 }
